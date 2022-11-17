@@ -1,0 +1,94 @@
+# Copyright (c) 2021 XXXX Device Co., Ltd.
+
+import("//build/test.gni")
+import("//test/xts/device_attest/build/devattestconfig.gni")
+
+module_output_path = "devattest/uttest"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+  cflags_cc = [
+    "-Wno-implicit-fallthrough",
+    "-fexceptions",
+  ]
+  include_dirs = [
+    "include",
+    "${devattest_path}/common",
+    "${devattest_path}/common/log",
+    "${devattest_innerkit_path}/native_cpp/include",
+    "${devattest_path}/services/devattest_ability/include",
+    "${devattest_path}/services/core/include",
+    "${devattest_path}/services/core/include/adapter",
+    "${devattest_path}/services/core/include/attest",
+    "${devattest_path}/services/core/include/dfx",
+    "${devattest_path}/services/core/include/security",
+    "${devattest_path}/services/core/include/network",
+    "${devattest_path}/services/core/include/utils",
+    "//utils/native/base/include",
+  ]
+  defines = []
+  if (enable_attest_debug_memory_leak) {
+    defines += [
+      "__ATTEST_DEBUG_MEMORY_LEAK__",
+    ]
+  }
+}
+
+deps_in = [
+  "//third_party/cJSON:cjson_static",
+  "//third_party/mbedtls:mbedtls_shared",
+  "//third_party/googletest:gtest_main",
+  "//third_party/googletest:gmock",
+]
+
+deps_ex = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+]
+
+ohos_unittest("DevAttestSdkTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "src/DevAttestSdkTest.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = deps_in
+  deps += [
+    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
+  ]
+  external_deps = deps_ex
+}
+
+ohos_unittest("DevAttestCoreTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "src/DevAttestCoreDeviceTest.cpp",
+    "src/DevAttestCoreServiceTest.cpp",
+    "src/DevAttestCoreMemTest.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = deps_in
+  deps += [
+    "${devattest_path}/services/core:devattest_core",
+  ]
+  external_deps = deps_ex
+}
+
+#1、基于文件维度创建测试套，命令格式"组件+模块+TEST"。
+#2、测试套名称、文件名称、类名成一致。
+group("unittest") {
+  testonly = true
+  deps = [
+    ":DevAttestSdkTest",
+    ":DevAttestCoreTest"
+  ]
+}

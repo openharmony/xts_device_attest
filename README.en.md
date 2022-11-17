@@ -1,22 +1,54 @@
-# xts_device_attest
+# device_attest
 
 #### Description
-{**When you're done, you can delete the content in this README and update the file with details for others getting started with your repository**}
+Open Harmony device attest development branches
+Provide the legal verification function of the device, and verify whether the device has passed the OpenHarmony compatibility certification (OHCA certification) through the combination of device and cloud
 
 #### Software Architecture
 Software architecture description
 
-#### Installation
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
+    device_attest
+    |    build（compile configuration）
+    |    |   devattestconfig.gni（compile public configurations such as directories）
+    |    |   BUILD.gn
+    |    common（common foundational competencies）
+    |    |    log
+    |    |    |    ***devattest_log.h
+    |    |   ***devattest_errno.h
+    |    interfaces（external interface）
+    |    |   innerkits
+    |    |   |   native_cpp
+    |    |   |   |   include
+    |    |   |   |   src
+    |    |   |   |   BUILD.gn
+    |    sample
+    |    |   client(client example)
+    |    services（service principal and business logic code）
+    |    |   devattest_ability（service framework）
+    |    |   |   include
+    |    |   |   src
+    |    |   |   BUILD.gn
+    |    |   etc（startup profile）
+    |    |   sa_profile（process configuration file）
+    |    |   core（business logic code）
+    |    |   |   adapter   
+    |    |   |   attest
+    |    |   |   dfx
+    |    |   |   network
+    |    |   |   security   
+    |    |   |   utils
+    |    |   |   include
+    |    |   |   attest_entry.c
+    |    |   |   attest_entry.h
+    |    |   |   BUILD.gn
+    |    test（test cases）
+    |    bundle.json
 
 #### Instructions
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  Modify build_xts = true
+2.  Input before compilation:export XTS_SUITENAME=acts
+3.  ./build.sh product_name=rk3568
 
 #### Contribution
 

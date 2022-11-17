@@ -104,9 +104,8 @@ int32_t InitSysData(void)
         return ATTEST_OK;
     }
 
-    int32_t ret;
     for (int32_t i = 0; i < SYS_DEV_MAX; i++) {
-        ret = SetSysData((SYS_DEV_TYPE_E)i);
+        int32_t ret = SetSysData((SYS_DEV_TYPE_E)i);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[InitSysData] SetSysData failed.");
             return ATTEST_ERR;

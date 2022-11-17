@@ -338,14 +338,13 @@ static int32_t InitSocketClient(int32_t *socketFd)
 static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
 {
     int32_t retCode;
-    SSL_CTX *socketCTX = NULL;
     char *caFile = "/etc/ssl/certs/cacert.pem";
 
     SSL_library_init();
     OpenSSL_add_ssl_algorithms();
     SSL_load_error_strings();
 
-    socketCTX = SSL_CTX_new(SSLv23_client_method());
+    SSL_CTX *socketCTX = SSL_CTX_new(SSLv23_client_method());
     if (socketCTX == NULL) {
         ATTEST_LOG_ERROR("[InitSSLSocket] SSL CTX create failed");
         return ATTEST_ERR;
@@ -386,13 +385,11 @@ static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
 
 static int32_t SendSSL(SSL *socketSSL, char *postData, int32_t postDataLen)
 {
-    int32_t retCode;
-    int32_t writeCnt;
     int32_t sendCnt = 0;
 
     while (sendCnt < postDataLen) {
-        writeCnt = SSL_write(socketSSL, postData + sendCnt, postDataLen - sendCnt);
-        retCode = SSL_get_error(socketSSL, writeCnt);
+        int32_t writeCnt = SSL_write(socketSSL, postData + sendCnt, postDataLen - sendCnt);
+        int32_t retCode = SSL_get_error(socketSSL, writeCnt);
         if (retCode == SSL_ERROR_NONE) {
             if (writeCnt > 0) {
                 sendCnt += writeCnt;

@@ -1,0 +1,13 @@
+{
+	"versionId": "SmartBox/huawei/HuaWeiDemoTest/SERIES(AA)/OpenHarmony-2.2.0(Canaryl)/ohos/default/8/1.0.0.6/release",
+	"buildRootHash": "110",
+	"displayVersion": "OpenHarmony 3.1.5.2",
+	"manufacture": "huawei",
+	"productModel": "ohos",
+	"brand": "HuaWeiDemotest",
+	"securityPatchTag": "2020-09-01",
+	"appid": "105625431",
+	"productId": "OH0009CD",
+	"acKey": "3F3F3F78213F247F523F3F1C4E273F3F3B3F3F150C3F3F77582E013F3F3F731D3F6D423F32423F3F3F7A3F3F3F7A3F3F",
+	"serial": "7001005458323933328a00fce1983800"
+}

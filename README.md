@@ -1,25 +1,55 @@
-# xts_device_attest
+# device_attest 设备证明
 
 #### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+Open Harmony设备证明开发分支
+提供设备的合法性验证功能，通过端云结合的方式校验设备是否通过OpenHarmony兼容性认证（OHCA认证）
 
-#### 软件架构
-软件架构说明
+#### 目录
 
+代码目录结构：
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
+    device_attest
+    |    build（编译配置）
+    |    |   devattestconfig.gni（编译目录等公共配置）
+    |    |   BUILD.gn
+    |    common（公共基础能力）
+    |    |    log
+    |    |    |    ***devattest_log.h
+    |    |   ***devattest_errno.h
+    |    interfaces（对外接口）
+    |    |   innerkits
+    |    |   |   native_cpp
+    |    |   |   |   include
+    |    |   |   |   src
+    |    |   |   |   BUILD.gn
+    |    sample(示例)
+    |    |   client(客户端示例)
+    |    services（服务主体和业务逻辑代码）
+    |    |   devattest_ability（服务框架）
+    |    |   |   include
+    |    |   |   src
+    |    |   |   BUILD.gn
+    |    |   etc（启动配置文件）
+    |    |   sa_profile（进程配置文件）
+    |    |   core（业务逻辑代码）
+    |    |   |   adapter   
+    |    |   |   attest（证明主流程）
+    |    |   |   dfx（质量）
+    |    |   |   network（网络连接）
+    |    |   |   security（安全加密）   
+    |    |   |   utils
+    |    |   |   include
+    |    |   |   attest_entry.c
+    |    |   |   attest_entry.h
+    |    |   |   BUILD.gn
+    |    test（测试用例）
+    |    bundle.json
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  将build_xts置为true
+2.  编译前输入export XTS_SUITENAME=acts
+3.  ./build.sh product_name=rk3568
 
 #### 参与贡献
 

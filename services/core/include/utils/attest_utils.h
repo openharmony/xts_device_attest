@@ -47,8 +47,6 @@ void PrintCurrentTime(void);
 
 int32_t ToLowerStr(char* str, int len);
 
-int32_t StrToHex(char *pbDest, char *pbSrc, int nLen);
-
 int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen);
 
 int32_t AnonymiseStr(char* str);

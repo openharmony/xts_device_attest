@@ -1,4 +1,4 @@
-# device_attest 设备证明
+# DEVICE_ATTEST 设备证明
 
 #### 介绍
 Open Harmony设备证明开发分支
@@ -15,7 +15,7 @@ Open Harmony设备证明开发分支
     |    common（公共基础能力）
     |    |    log
     |    |    |    ***devattest_log.h
-    |    |   ***devattest_errno.h
+    |    |    ***devattest_errno.h
     |    interfaces（对外接口）
     |    |   innerkits
     |    |   |   native_cpp
@@ -39,8 +39,8 @@ Open Harmony设备证明开发分支
     |    |   |   security（安全加密）   
     |    |   |   utils
     |    |   |   include
-    |    |   |   attest_entry.c
-    |    |   |   attest_entry.h
+    |    |   |   ***attest_entry.c
+    |    |   |   ***attest_entry.h
     |    |   |   BUILD.gn
     |    test（测试用例）
     |    bundle.json

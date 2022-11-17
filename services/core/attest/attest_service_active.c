@@ -20,10 +20,10 @@
 #include "attest_dfx.h"
 #include "attest_security.h"
 #include "attest_service_device.h"
+#include "attest_security_token.h"
 #include "attest_network.h"
 #include "attest_adapter_mock.h"
 #include "attest_service_active.h"
-#include "attest_security_token.h"
 
 int32_t GenActiveMsg(AuthResult* authResult, const ChallengeResult* challengeResult, DevicePacket** devPacket)
 {

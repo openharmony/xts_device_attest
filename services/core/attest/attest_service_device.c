@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#include "parameter.h"
 #include "attest_type.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_adapter.h"
 #include "attest_service_device.h"
-#include "parameter.h"
 
 char* g_devSysInfos[SYS_DEV_MAX] = {NULL};
 const char* g_devSysInfosStr[] = {

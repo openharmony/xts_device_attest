@@ -1,0 +1,60 @@
+{
+  "name": "@ohos/devattest_service",
+  "version": "3.1",
+  "description": "",
+  "license": "Apache License 2.0",
+  "domain": "os",
+  "publishAs": "",
+  "private": false,
+  "scripts": {},
+  "dirs": [],
+  "segment": {
+    "destPath": "test/xts/device_attest"
+  },
+  "component": {
+    "name": "device_attest",
+    "subsystem": "xts",
+    "syscap": [],
+    "features": [],
+    "adapted_system_type": [ "standard" ],
+    "rom": "3072KB",
+    "ram": "",
+    "deps": {
+      "components": [
+        "safwk",
+        "samgr",
+        "ipc",
+        "kal_timer",
+        "hiviewdfx_hilog_native",
+        "c_utils",
+        "napi",
+        "hdf_core"
+      ],
+      "third_party": [
+        "bounds_checking_function",
+        "cjson"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//test/xts/device_attest/build:attest_standard_packages"
+      ],
+      "inner_kits": [
+        {
+          "header": {
+            "header_base":"//test/xts/device_attest/interfaces/innerkits/native_cpp/include",
+            "header_files": [
+              "devattest_client.h",
+              "devattest_interface.h",
+              "devattest_service_proxy.h"
+            ]
+          },
+          "name": "//test/xts/device_attest/interfaces/innerkits/native_cpp:devattest_sdk"
+        }
+      ],
+      "test": [
+        "//test/xts/device_attest/test/unittest:unittest"
+      ]
+    }
+  }
+}

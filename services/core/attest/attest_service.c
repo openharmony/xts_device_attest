@@ -30,7 +30,6 @@
 #include "attest_service_challenge.h"
 #include "attest_network.h"
 #include "attest_service.h"
-#include "attest_service_device.h"
 
 pthread_mutex_t g_mtxAttest = PTHREAD_MUTEX_INITIALIZER;
 

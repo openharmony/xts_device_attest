@@ -14,9 +14,9 @@
  */
 
 #include "attest_type.h"
+#include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_dfx.h"
-#include "attest_utils.h"
 
 // 写到buffer，统一输出。
 void PrintChallengeResult(ChallengeResult* challengeResult)

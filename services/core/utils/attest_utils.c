@@ -179,36 +179,6 @@ int32_t ToLowerStr(char* str, int len)
     return ATTEST_OK;
 }
 
-/*
-// 将字符串转化为16进制数
-// parameter(s): [OUT] pbDest - 输出缓冲区
-// [IN] pbSrc - 字符串
-// [IN] nLen - 16进制数的字节数(字符串的长度/2)
-*/
-int32_t StrToHex(char *pbDest, char *pbSrc, int nLen)
-{
-    if (pbDest == NULL || pbSrc == NULL) {
-        ATTEST_LOG_ERROR("[StrToHex] Str to Hex failed");
-        return ATTEST_ERR;
-    }
-
-    for (int i = 0; i < nLen; i++) {
-        char h1 = pbSrc[2 * i]; // (2*i)即偶数列
-        char h2 = pbSrc[2 * i + 1]; // (2*i+1)即奇数列
-
-        unsigned char s1 = toupper(h1) - 0x30;
-        if (s1 > 9) { // 大于9 (即为字符A~F)
-            s1 -= 7; // ASCII码表中字符A与数字9中间隔为7，减去后就是正常的16进制中该字符对应的十进制数
-        }
-        unsigned char s2 = toupper(h2) - 0x30;
-        if (s2 > 9) { // 大于9 (即为字符A~F)
-            s2 -= 7; // ASCII码表中字符A与数字9中间隔为7
-        }
-        pbDest[i] = s1 * 16 + s2; // 16即让s1进一位，组成十六进制数((s1)(s2))对应的十进制数
-    }
-    return ATTEST_OK;
-}
-
 int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
 {
     if (src == NULL) {

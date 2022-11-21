@@ -29,10 +29,8 @@
             <filefilter name="defaultFilter" desc="Files not to check">
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
-                <filteritem type="filepath" name="projectroot/test/data/*" desc="Files for test">
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
-                <filteritem type="filepath" name="projectroot/test/data/*" desc="Files for test">
             </filefilter>
             <filefilter name="licenseFileNamePolicyFilter" desc="Filters for LICENSE file policies">
             </filefilter>
@@ -42,7 +40,6 @@
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
                 <filteritem type="filename" name="*.png" desc="Image for markdown doc"/> 
-                <filteritem type="filepath" name="projectroot/test/data/*" desc="Files for test">
             </filefilter>
         </filefilterlist>
         <licensematcherlist>

@@ -35,7 +35,6 @@ xts_device_attest module：
 │       └── etc                 # Startup configuration
 │       └── sa_profile          # Process configuration
 │   └── test           
-│       └── data                # Test case mock data
 │       └── unittest            # Test case
 ```
 

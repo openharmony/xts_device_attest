@@ -151,7 +151,7 @@ static int32_t SetSocketCliented(char* udid, char **outClientId)
         return ATTEST_ERR;
     }
 
-    // Harmonyos设备是大写Udid，云端计算clientId是用小写Udid，适配下
+    // OpenHarmony设备是大写Udid，云端计算clientId是用小写Udid，适配下
     int32_t retCode = ToLowerStr(udid, UDID_STRING_LEN);
     if (retCode != ATTEST_OK) {
         return ATTEST_ERR;

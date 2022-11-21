@@ -15,9 +15,9 @@
 
 ## 简介<a id="section100"></a>
 
-xts_device_attest组件：
+xts_device_attest模块：
 
--   device_attest，即设备证明组件，其基本功能是看护OpenHarmony生态设备认证结果，通过端侧数据上云，达成统计OH生态设备数量的目标。目的是统计OH设备数量。该组件用于标准系统（standard system）。
+-   device_attest，即设备证明模块，其基本功能是看护OpenHarmony生态设备认证结果，通过端侧数据上云，达成统计OH生态设备数量的目标。目的是统计OH设备数量。该组件用于标准系统（standard system）。
 
 ## 目录<a id="section200"></a>
 
@@ -45,7 +45,7 @@ xts_device_attest组件：
 
 ## 约束<a id="section400"></a>
 
-轻量级设备证明的集成依赖库如下表：
+设备证明的集成依赖库如下表：
 
 | 库名称    | 版本号           | 功能描述                                        | 备注                                     |
 | --------- | ---------------- | ----------------------------------------------- | ---------------------------------------- |
@@ -184,7 +184,7 @@ VersionId = deviceType/manufacture/brand/productSeries/OSFullName/productModel/s
 ### 编译指令<a id="section505"></a>
 
 ```c
-./build.sh product_name=rk3568 system_size=standard
+./build.sh --product-name=rk3568 system_size=standard
 ```
 
 ## 相关仓<a id="section600"></a>

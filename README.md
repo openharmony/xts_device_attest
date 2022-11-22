@@ -186,6 +186,7 @@ Call to view sample example.
 
 ### Compilation instruction<a id="section505"></a>
 
+Take rk3568 as an example
 ```c
 ./build.sh --product-name=rk3568 system_size=standard
 ```

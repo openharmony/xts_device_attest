@@ -181,7 +181,7 @@ VersionId = deviceType/manufacture/brand/productSeries/OSFullName/productModel/s
 调用可查看sample示例
 
 ### 编译指令<a id="section505"></a>
-
+以rk3568为例
 ```c
 ./build.sh --product-name=rk3568 system_size=standard
 ```

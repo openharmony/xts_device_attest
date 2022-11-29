@@ -52,7 +52,6 @@
         }
       ],
       "test": [
-        "//test/xts/device_attest/test/unittest:unittest"
       ]
     }
   }

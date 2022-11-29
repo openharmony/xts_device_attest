@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "idevicetoken_interface.h"
+#include "device_attest_oem_adapter.h"
 
 #include "attest_type.h"
 #include "attest_utils_log.h"
@@ -65,23 +65,19 @@ int32_t AttestWriteTicket(const TicketInfo* ticketInfo)
 // 读取Manufacturekey
 int32_t AttestGetManufacturekey(uint8_t manufacturekey[], uint32_t len)
 {
-    struct IDeviceTokenInterface *devicetoken = DeviceTokenInterfaceGet();
-    if (devicetoken == NULL) {
-        ATTEST_LOG_ERROR("[AttestGetManufacturekey] devicetoken is NULL.");
-        return ATTEST_ERR;
+    if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
+        return OsGetAcKeyStub((char*)manufacturekey, len);
     }
-    return devicetoken->GetManufactureKey(devicetoken, (char*)manufacturekey, len);
+    return OEMGetManufacturekey((char*)manufacturekey, len);
 }
 
 // 读取ProductId
 int32_t AttestGetProductId(uint8_t productId[], uint32_t len)
 {
-    struct IDeviceTokenInterface *devicetoken = DeviceTokenInterfaceGet();
-    if (devicetoken == NULL) {
-        ATTEST_LOG_ERROR("[AttestGetProductId] devicetoken is NULL.");
-        return ATTEST_ERR;
+    if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
+        return OsGetProdIdStub((char*)productId, len);
     }
-    return devicetoken->GetProdId(devicetoken, (char*)productId, len);
+    return OEMGetProductId((char*)productId, len);
 }
 
 // 读取Token
@@ -90,14 +86,13 @@ int32_t AttestReadToken(TokenInfo* tokenInfo)
     if (tokenInfo == NULL) {
         return ATTEST_ERR;
     }
-    struct IDeviceTokenInterface *devicetoken = DeviceTokenInterfaceGet();
-    if (devicetoken == NULL) {
-        ATTEST_LOG_ERROR("[AttestReadToken] devicetoken is NULL.");
-        return ATTEST_ERR;
-    }
-
     char token[TOKEN_ENCRYPT_LEN + 1] = {0};
-    int32_t ret = devicetoken->ReadToken(devicetoken, token, sizeof(token));
+    int32_t ret = 0;
+    if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
+        ret = OsReadTokenStub(token, TOKEN_ENCRYPT_LEN);
+    } else {
+        ret = OEMReadToken(token, TOKEN_ENCRYPT_LEN);
+    }
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[AttestReadToken] Read oem token failed, ret = %d", ret);
         return ret;
@@ -150,13 +145,12 @@ int32_t AttestWriteToken(TokenInfo* tokenInfo)
         return ATTEST_ERR;
     }
 
-    struct IDeviceTokenInterface *devicetoken = DeviceTokenInterfaceGet();
-    if (devicetoken == NULL) {
-        ATTEST_LOG_INFO("[AttestWriteToken] devicetoken is NULL.");
-        return ATTEST_ERR;
+    int32_t ret = 0;
+    if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
+        ret = OsWriteTokenStub(token, TOKEN_ENCRYPT_LEN);
+    } else {
+        ret = OEMWriteToken((const char *)token, TOKEN_ENCRYPT_LEN);
     }
-
-    int32_t ret = devicetoken->WriteToken(devicetoken, token);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[AttestWriteToken] Write token failed, ret = %d", ret);
         ret = ATTEST_ERR;
@@ -165,14 +159,12 @@ int32_t AttestWriteToken(TokenInfo* tokenInfo)
 }
 
 // 读取ProductKey
-int32_t AttestGetProductKey(uint8_t productId[], uint32_t len)
+int32_t AttestGetProductKey(uint8_t productKey[], uint32_t len)
 {
-    struct IDeviceTokenInterface *devicetoken = DeviceTokenInterfaceGet();
-    if (devicetoken == NULL) {
-        ATTEST_LOG_ERROR("[AttestGetProductKey] devicetoken is NULL.");
-        return ATTEST_ERR;
+    if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
+        return OsGetProdKeyStub((char*)productKey, len);
     }
-    return devicetoken->GetProdKey(devicetoken, (char*)productId, len);
+    return OEMGetProductKey((char*)productKey, len);
 }
 
 char* AttestGetVersionId(void)

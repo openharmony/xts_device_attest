@@ -15,9 +15,9 @@ import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
 ohos_executable("attesttestclient") {
-  sources = [ 
-    "devattest_main_client.cpp",
+  sources = [
     "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
+    "devattest_main_client.cpp",
   ]
 
   include_dirs = [
@@ -28,9 +28,7 @@ ohos_executable("attesttestclient") {
     "${devattest_path}/services/devattest_ability/include",
   ]
 
-  deps = [
-    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
-  ]
+  deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
 
   external_deps = [
     "c_utils:utils",

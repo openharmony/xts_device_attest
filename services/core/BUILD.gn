@@ -15,46 +15,40 @@ import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
 sources_common = [
-      "attest_entry.c",
-      "adapter/attest_adapter.c",
-      "adapter/attest_adapter_os.c",
-      "adapter/attest_adapter_oem.c",
-      "adapter/attest_adapter_mock.c",
-      "attest/attest_service.c",
-      "attest/attest_service_auth.c",
-      "attest/attest_service_active.c",
-      "attest/attest_service_challenge.c",
-      "attest/attest_service_reset.c",
-      "attest/attest_service_device.c",
-      "network/attest_network.c",
-      "security/attest_security.c",
-      "security/attest_security_token.c",
-      "security/attest_security_ticket.c",
-      "utils/attest_utils_file.c",
-      "utils/attest_utils_json.c",
-      "utils/attest_utils_log.c",
-      "utils/attest_utils_timer.c",
-      "utils/attest_utils_list.c",
-      "utils/attest_utils.c",
+  "attest_entry.c",
+  "adapter/attest_adapter.c",
+  "adapter/attest_adapter_os.c",
+  "adapter/attest_adapter_oem.c",
+  "adapter/attest_adapter_mock.c",
+  "attest/attest_service.c",
+  "attest/attest_service_auth.c",
+  "attest/attest_service_active.c",
+  "attest/attest_service_challenge.c",
+  "attest/attest_service_reset.c",
+  "attest/attest_service_device.c",
+  "network/attest_network.c",
+  "security/attest_security.c",
+  "security/attest_security_token.c",
+  "security/attest_security_ticket.c",
+  "utils/attest_utils_file.c",
+  "utils/attest_utils_json.c",
+  "utils/attest_utils_log.c",
+  "utils/attest_utils_timer.c",
+  "utils/attest_utils_list.c",
+  "utils/attest_utils.c",
 ]
 
 if (enable_attest_debug_memory_leak) {
-  sources_common += [
-    "utils/attest_utils_memleak.c",
-  ]
+  sources_common += [ "utils/attest_utils_memleak.c" ]
 }
 
 if (enable_attest_debug_dfx) {
-  sources_common += [
-    "dfx/attest_dfx.c",
-  ]
+  sources_common += [ "dfx/attest_dfx.c" ]
 }
 
 config("devattest_core_config") {
   visibility = [ ":*" ]
-  cflags = [
-    "-Wall",
-  ]
+  cflags = [ "-Wall" ]
   include_dirs = [
     "include",
     "${devattest_path}/services/core/include/adapter",
@@ -66,9 +60,7 @@ config("devattest_core_config") {
     "//base/startup/syspara_lite/adapter/native/syspara/include",
   ]
 
-  include_dirs += [
-    "//base/startup/init/interfaces/innerkits/include/syspara",
-  ]
+  include_dirs += [ "//base/startup/init/interfaces/innerkits/include/syspara" ]
 
   defines = [ "ATTEST_HILOG_LEVEL = 1" ]
   if (enable_attest_network_host_debug) {
@@ -77,56 +69,41 @@ config("devattest_core_config") {
       "HTTPS_NETWORK_HOST = \"wisedevice-saas-mirrorcn.hwcloudtest.cn\"",
     ]
   } else {
-    defines += [
-      "HTTPS_NETWORK_HOST = \"wisedevice-drcn.openharmony.cn\"",
-    ]
+    defines += [ "HTTPS_NETWORK_HOST = \"wisedevice-drcn.openharmony.cn\"" ]
   }
 
   if (enable_attest_test_mock_network) {
-    defines += [
-      "__ATTEST_MOCK_NETWORK_STUB__",
-    ]
+    defines += [ "__ATTEST_MOCK_NETWORK_STUB__" ]
   }
   if (enable_attest_test_mock_device) {
-    defines += [
-      "__ATTEST_MOCK_DEVICE_STUB__",
-    ]
+    defines += [ "__ATTEST_MOCK_DEVICE_STUB__" ]
   }
   if (enable_attest_debug_memory_leak) {
-    defines += [
-      "__ATTEST_DEBUG_MEMORY_LEAK__",
-    ]
+    defines += [ "__ATTEST_DEBUG_MEMORY_LEAK__" ]
   }
   if (enable_attest_network_debug_log) {
-    defines += [
-      "__ATTEST_NETWORK_DEBUG_LOG__",
-    ]
+    defines += [ "__ATTEST_NETWORK_DEBUG_LOG__" ]
   }
 
-  defines += [
-    "MBEDTLS_ALLOW_PRIVATE_ACCESS",
-  ]
+  defines += [ "MBEDTLS_ALLOW_PRIVATE_ACCESS" ]
 }
 
 ohos_shared_library("devattest_core") {
   sources = sources_common
 
-  configs = [
-    ":devattest_core_config",
-  ]
-  
+  configs = [ ":devattest_core_config" ]
+
   deps = [
+    "${devattest_path}/services/oem_adapter:device_attest_oem_adapter",
     "//third_party/cJSON:cjson_static",
     "//third_party/mbedtls:mbedtls_shared",
-    #"//third_party/openssl:libssl_static",
-    "//third_party/openssl:ssl_source",
     "//third_party/openssl:libcrypto_static",
-    "//drivers/peripheral/devicetoken/hdi_service:devicetoken_driver",
+    "//third_party/openssl:ssl_source",
   ]
-  
+
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
   ]
 

@@ -190,3 +190,79 @@ char* OsGetUdidStub(void)
     ATTEST_LOG_INFO_ANONY("[OsGetUdidStub] Sha256(udid) = %s\n", udidSha256);
     return udidSha256;
 }
+
+int OsGetAcKeyStub(char *acKey, unsigned int len)
+{
+    if ((acKey == NULL) || (len == 0)) {
+        return ATTEST_ERR;
+    }
+    const char manufacturekeyBuf[] = {
+        0x13, 0x42, 0x3F, 0x3F, 0x53, 0x3F, 0x72, 0x30, 0x3F, 0x3F, 0x1C, 0x3F, 0x2F, 0x3F, 0x2E, 0x42,
+        0x3F, 0x08, 0x3F, 0x57, 0x3F, 0x10, 0x3F, 0x3F, 0x29, 0x17, 0x52, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
+        0x57, 0x16, 0x3F, 0x7D, 0x4A, 0x0F, 0x3F, 0x3F, 0x3F, 0x30, 0x0C, 0x3F, 0x3F, 0x4C, 0x3F, 0x47
+    };
+    uint32_t manufacturekeyBufLen = sizeof(manufacturekeyBuf);
+    if (len < manufacturekeyBufLen) {
+        return ATTEST_ERR;
+    }
+
+    int ret = memcpy_s(acKey, len, manufacturekeyBuf, manufacturekeyBufLen);
+    return ret;
+}
+
+int OsGetProdIdStub(char* productId, uint32_t len)
+{
+    if ((productId == NULL) || (len == 0)) {
+        return ATTEST_ERR;
+    }
+    const char productIdBuf[] = "OH00000D";
+    uint32_t productIdLen = strlen(productIdBuf);
+    if (len < productIdLen) {
+        return ATTEST_ERR;
+    }
+
+    int ret = memcpy_s(productId, len, productIdBuf, productIdLen);
+    return ret;
+}
+
+int OsGetProdKeyStub(char* productKey, uint32_t len)
+{
+    if ((productKey == NULL) || (len == 0)) {
+        return ATTEST_ERR;
+    }
+    const char productKeyBuf[] = "test";
+    uint32_t productKeyLen = sizeof(productKeyBuf);
+    if (len < productKeyLen) {
+        return ATTEST_ERR;
+    }
+
+    int ret = memcpy_s(productKey, len, productKeyBuf, productKeyLen);
+    return ret;
+}
+
+int32_t OsReadTokenStub(char* buffer, uint32_t bufferLen)
+{
+    if (buffer == NULL || bufferLen == 0) {
+        return ATTEST_ERR;
+    }
+    int32_t ret = ReadFile(ATTEST_MOCK_STUB_PATH, ATTEST_MOCK_TOKEN_FILE_NAME, buffer, bufferLen);
+    if (ret != 0) {
+        return ATTEST_ERR;
+    }
+    return ATTEST_OK;
+}
+
+int32_t OsWriteTokenStub(char* buffer, uint32_t bufferLen)
+{
+    if (buffer == NULL || bufferLen == 0) {
+        return ATTEST_ERR;
+    }
+    if (CreateFile(ATTEST_MOCK_STUB_PATH, ATTEST_MOCK_TOKEN_FILE_NAME) != 0) {
+        return ATTEST_ERR;
+    }
+    int32_t ret = WriteFile(ATTEST_MOCK_STUB_PATH, ATTEST_MOCK_TOKEN_FILE_NAME, buffer, bufferLen);
+    if (ret != 0) {
+        return ATTEST_ERR;
+    }
+    return ATTEST_OK;
+}

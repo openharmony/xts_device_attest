@@ -39,9 +39,7 @@ config("module_private_config") {
   ]
   defines = []
   if (enable_attest_debug_memory_leak) {
-    defines += [
-      "__ATTEST_DEBUG_MEMORY_LEAK__",
-    ]
+    defines += [ "__ATTEST_DEBUG_MEMORY_LEAK__" ]
   }
 }
 
@@ -53,26 +51,22 @@ deps_in = [
 ]
 
 deps_ex = [
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
+  "c_utils:utils",
+  "hiviewdfx_hilog_native:libhilog",
+  "ipc:ipc_core",
+  "safwk:system_ability_fwk",
+  "samgr:samgr_proxy",
 ]
 
 ohos_unittest("DevAttestSdkTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "src/DevAttestSdkTest.cpp",
-  ]
+  sources = [ "src/DevAttestSdkTest.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = deps_in
-  deps += [
-    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
-  ]
+  deps += [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
   external_deps = deps_ex
 }
 
@@ -81,16 +75,14 @@ ohos_unittest("DevAttestCoreTest") {
 
   sources = [
     "src/DevAttestCoreDeviceTest.cpp",
-    "src/DevAttestCoreServiceTest.cpp",
     "src/DevAttestCoreMemTest.cpp",
+    "src/DevAttestCoreServiceTest.cpp",
   ]
 
   configs = [ ":module_private_config" ]
 
   deps = deps_in
-  deps += [
-    "${devattest_path}/services/core:devattest_core",
-  ]
+  deps += [ "${devattest_path}/services/core:devattest_core" ]
   external_deps = deps_ex
 }
 
@@ -99,7 +91,7 @@ ohos_unittest("DevAttestCoreTest") {
 group("unittest") {
   testonly = true
   deps = [
+    ":DevAttestCoreTest",
     ":DevAttestSdkTest",
-    ":DevAttestCoreTest"
   ]
 }

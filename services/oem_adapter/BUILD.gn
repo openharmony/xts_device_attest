@@ -14,17 +14,32 @@
 import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
-group("attest_standard_packages") {
-  deps = []
-  if (is_standard_system) {
-    deps += [
-      "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
-      "${devattest_path}/services/devattest_ability:devattest_service",
-      "${devattest_path}/services/etc/init:devattest_etc",
-      "${devattest_path}/services/sa_profile:devattest_sa_profile",
-    ]
-    if (enable_attest_test_sample) {
-      deps += [ "${devattest_path}/sample/client:attesttestclient" ]
-    }
-  }
+config("device_attest_oem_adapter_config") {
+  visibility = [ ":*" ]
+  cflags = [ "-Wall" ]
+  include_dirs = [
+    "include",
+    "${devattest_path}/services/core/include",
+    "${devattest_path}/services/core/include/utils",
+    "${devattest_path}/services/oem_adapter/include",
+  ]
+}
+
+ohos_shared_library("device_attest_oem_adapter") {
+  sources = [
+    "src/device_attest_oem_adapter.c",
+    "src/device_attest_oem_file.c",
+  ]
+
+  public_configs = [ ":device_attest_oem_adapter_config" ]
+
+  deps = [ "//third_party/cJSON:cjson_static" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  subsystem_name = "xts"
+  part_name = "device_attest"
 }

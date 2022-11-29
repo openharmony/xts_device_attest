@@ -15,16 +15,14 @@ import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
 group("devattest_etc") {
-  deps = [ 
-    ":devattest_service.cfg",
-  ]
+  deps = [ ":devattest_service.cfg" ]
 }
 
 ohos_prebuilt_etc("devattest_service.cfg") {
   if (use_musl) {
-      source = "devattest_service.cfg"
+    source = "devattest_service.cfg"
   } else {
-      source = "devattest_service.rc"
+    source = "devattest_service.rc"
   }
   relative_install_dir = "init"
   subsystem_name = "xts"

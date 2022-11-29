@@ -24,8 +24,8 @@ ohos_executable("attesttestclient") {
     "${devattest_path}/common",
     "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
-    "//utils/native/base/include",
     "${devattest_path}/services/devattest_ability/include",
+    "//utils/native/base/include",
   ]
 
   deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]

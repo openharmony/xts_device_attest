@@ -16,13 +16,10 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 
 config("devattest_service_config") {
   visibility = [ ":*" ]
-  cflags = [
-    "-Wall",
-  ]
+  cflags = [ "-Wall" ]
   include_dirs = [
     "include",
     "${devattest_path}/services/core",
-    #"${devattest_path}/services/core/include/cer_mgr",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
@@ -34,29 +31,25 @@ config("devattest_service_config") {
 
 ohos_shared_library("devattest_service") {
   sources = [
+    "src/attest_result_info.cpp",
+    "src/devattest_network_callback.cpp",
     "src/devattest_service.cpp",
     "src/devattest_service_stub.cpp",
-    "src/devattest_network_callback.cpp",
     "src/devattest_system_ability_listener.cpp",
-    "src/attest_result_info.cpp",
   ]
 
-  configs = [
-    ":devattest_service_config",
-  ]
+  configs = [ ":devattest_service_config" ]
 
-  deps = [
-    "${devattest_path}/services/core:devattest_core",
-  ]
+  deps = [ "${devattest_path}/services/core:devattest_core" ]
 
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
     "safwk:system_ability_fwk",
     "samgr:samgr_common",
     "samgr:samgr_proxy",
-    "netmanager_base:net_conn_manager_if",
   ]
 
   subsystem_name = "xts"

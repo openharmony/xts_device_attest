@@ -14,28 +14,30 @@
 import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
-ohos_executable("attesttestclient") {
-  sources = [
-    "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "devattest_main_client.cpp",
-  ]
-
+config("device_attest_oem_adapter_config") {
+  visibility = [ ":*" ]
+  cflags = [ "-Wall" ]
   include_dirs = [
-    "${devattest_path}/common",
-    "${devattest_path}/common/log",
-    "${devattest_innerkit_path}/native_cpp/include",
-    "${devattest_path}/services/devattest_ability/include",
-    "//utils/native/base/include",
+    "include",
+    "${devattest_path}/services/core/include",
+    "${devattest_path}/services/core/include/utils",
+    "${devattest_path}/services/oem_adapter/include",
+  ]
+}
+
+ohos_shared_library("device_attest_oem_adapter") {
+  sources = [
+    "src/device_attest_oem_adapter.c",
+    "src/device_attest_oem_file.c",
   ]
 
-  deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
+  public_configs = [ ":device_attest_oem_adapter_config" ]
+
+  deps = [ "//third_party/cJSON:cjson_static" ]
 
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "xts"

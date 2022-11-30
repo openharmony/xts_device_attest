@@ -64,7 +64,7 @@ int32_t AttestReadToken(TokenInfo* tokenInfo);
 
 int32_t AttestWriteToken(TokenInfo* tokenInfo);
 
-int32_t AttestGetProductKey(uint8_t productId[], uint32_t len);
+int32_t AttestGetProductKey(uint8_t productKey[], uint32_t len);
 
 int32_t AttestSetParameter(const char *key, const char *value);
 

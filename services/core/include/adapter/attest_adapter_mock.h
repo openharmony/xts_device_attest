@@ -39,6 +39,7 @@ extern "C" {
 #define ATTEST_MOCK_STUB_PATH "/data/data"
 #define ATTEST_MOCK_STUB_NETWORK_NAME "attest_mock_network_para"
 #define ATTEST_MOCK_STUB_DEVICE_NAME "attest_mock_device_para"
+#define ATTEST_MOCK_TOKEN_FILE_NAME "token"
 #define ATTEST_MOCK_STUB_MAX_LEN 512
 
 // 定义打桩数据Json的节点名称
@@ -69,6 +70,15 @@ char* OsGetSecurityPatchTagStub(void);
 
 char* OsGetUdidStub(void);
 
+int OsGetAcKeyStub(char *acKey, unsigned int len);
+
+int OsGetProdIdStub(char* productId, uint32_t len);
+
+int OsGetProdKeyStub(char* productKey, uint32_t len);
+
+int32_t OsReadTokenStub(char* buffer, uint32_t bufferLen);
+
+int32_t OsWriteTokenStub(char* buffer, uint32_t bufferLen);
 
 #ifdef __cplusplus
 #if __cplusplus

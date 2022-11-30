@@ -18,13 +18,13 @@ group("attest_standard_packages") {
   deps = []
   if (is_standard_system) {
     deps += [
+      "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
+      "${devattest_path}/services/devattest_ability:devattest_service",
       "${devattest_path}/services/etc/init:devattest_etc",
       "${devattest_path}/services/sa_profile:devattest_sa_profile",
-      "${devattest_path}/services/devattest_ability:devattest_service",
-      "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
     ]
     if (enable_attest_test_sample) {
-      deps += ["${devattest_path}/sample/client:attesttestclient"]
+      deps += [ "${devattest_path}/sample/client:attesttestclient" ]
     }
   }
 }

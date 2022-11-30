@@ -27,8 +27,7 @@
         "kal_timer",
         "hiviewdfx_hilog_native",
         "c_utils",
-        "napi",
-        "hdf_core"
+        "napi"
       ],
       "third_party": [
         "bounds_checking_function",
@@ -53,7 +52,6 @@
         }
       ],
       "test": [
-        "//test/xts/device_attest/test/unittest:unittest"
       ]
     }
   }

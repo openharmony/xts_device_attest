@@ -16,7 +16,7 @@
 <info>
     <process>devattest_service</process>
     <systemability>
-        <name>7100</name>
+        <name>5501</name>
         <libpath>libdevattest_service.z.so</libpath>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>

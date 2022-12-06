@@ -29,9 +29,8 @@ device_attest，设备证明部件，是一个系统服务（SystemAbility）, �
 │       └── core                # 业务逻辑代码
 │       └── devattest_ability   # 服务框架
 │       └── etc                 # 启动配置文件存放目录
+│       └── oem_adapter         # 设备厂商适配接口存放目录
 │       └── sa_profile          # 进程配置文件存放目录
-│   └── test                    # 测试用例编译配置存放目录
-│       └── unittest            # 测试用例代码存放目录
 ```
 
 ## 架构图<a id="section300"></a>
@@ -69,7 +68,7 @@ device_attest，设备证明部件，是一个系统服务（SystemAbility）, �
 ```sh
 ./build.sh --product-name=rk3568 system_size=standard
 ```
-编译成功后会在out/rk3568/packages/phone/system/lib路径下生成libdevattest_core.z.so、libdevattest_sdk.z.so、libdevattest_service.z.so三个动态库
+编译成功后会在out/rk3568/packages/phone/system/lib路径下生成libdevattest_core.z.so、libdevattest_sdk.z.so、libdevattest_service.z.so、libdevice_attest_oem_adapter.z.so四个动态库
 
 ## 相关仓<a id="section700"></a>
 

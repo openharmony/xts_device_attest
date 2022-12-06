@@ -301,11 +301,14 @@ static int32_t QueryAttestStatusImpl(int32_t* authResult, int32_t* softwareResul
     // 获取token
     char* decryptedTicket = (char *)ATTEST_MEM_MALLOC(MAX_TICKET_LEN);
     if (decryptedTicket == NULL) {
+        DestroyAuthStatus(&authStatus);
         ATTEST_LOG_ERROR("[QueryAttestStatusImpl] buff malloc memory failed");
         return ATTEST_ERR;
     }
     int32_t retCode = ReadTicketFromDevice(decryptedTicket, MAX_TICKET_LEN);
     if (retCode != ATTEST_OK) {
+        DestroyAuthStatus(&authStatus);
+        ATTEST_MEM_FREE(decryptedTicket);
         ATTEST_LOG_ERROR("[QueryAttestStatusImpl] read ticket from device failed");
         return ATTEST_ERR;
     }

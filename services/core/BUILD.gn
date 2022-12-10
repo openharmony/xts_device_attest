@@ -95,10 +95,10 @@ ohos_shared_library("devattest_core") {
 
   deps = [
     "${devattest_path}/services/oem_adapter:device_attest_oem_adapter",
-    "//third_party/cJSON:cjson_static",
+    "//third_party/cJSON:cjson",
     "//third_party/mbedtls:mbedtls_shared",
-    "//third_party/openssl:libcrypto_static",
-    "//third_party/openssl:ssl_source",
+    "//third_party/openssl:libcrypto_shared",
+    "//third_party/openssl:libssl_shared",
   ]
 
   external_deps = [

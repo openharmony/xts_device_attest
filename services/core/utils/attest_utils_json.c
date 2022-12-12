@@ -74,16 +74,16 @@ int32_t GetObjectItemValueStr(const char* rootStr, const char* key, char** dest)
 }
 
 // 返回值需要使用isnan判断是否合法
-uint64_t GetObjectItemValueNumber(const char* rootStr, char* key)
+double GetObjectItemValueNumber(const char* rootStr, char* key)
 {
     if (rootStr == NULL || key == NULL) {
-        return (uint64_t)NAN;
+        return (double)NAN;
     }
     cJSON* root = cJSON_Parse(rootStr);
     if (root == NULL) {
-        return (uint64_t)NAN;
+        return (double)NAN;
     }
-    uint64_t valueDouble = cJSON_GetNumberValue(cJSON_GetObjectItem(root, key));
+    double valueDouble = cJSON_GetNumberValue(cJSON_GetObjectItem(root, key));
     cJSON_Delete(root);
     return valueDouble;
 }

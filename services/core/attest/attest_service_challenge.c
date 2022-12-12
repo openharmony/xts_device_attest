@@ -85,19 +85,19 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         ATTEST_LOG_ERROR("[ParseChallengeResult] Invalid parameter");
         return ATTEST_ERR;
     }
-    uint64_t errorCode = GetObjectItemValueNumber(jsonStr, "errcode");
+    double errorCode = GetObjectItemValueNumber(jsonStr, "errcode");
     if (isnan(errorCode)) {
         ATTEST_LOG_WARN("[ParseChallengeResult] errorCode is nan.");
         ATTEST_LOG_ERROR("[ParseChallengeResult] Parse msg failed.");
         return ATTEST_ERR;
     }
     if (errorCode != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[ParseChallengeResult] -errorCode = %d.", -errorCode);
-        return -(errorCode);
+        ATTEST_LOG_ERROR("[ParseChallengeResult] -errorCode = %d.", -(int32_t)(errorCode));
+        return -(int32_t)(errorCode);
     }
 
     challenge->currentTime = GetObjectItemValueNumber(jsonStr, "currentTime");
-    if (isnan(challenge->currentTime)) {
+    if (isnan((double)challenge->currentTime)) {
         ATTEST_LOG_WARN("[ParseChallengeResult] currentTime is nan.");
         ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem currentTime failed.");
         return ATTEST_ERR;

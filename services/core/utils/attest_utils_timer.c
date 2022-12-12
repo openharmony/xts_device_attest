@@ -54,7 +54,8 @@ static int32_t TimerCreate(TimerCallbackFunc userCallBack, TimerInfo* timerInfo)
 
 static int32_t TimerStart(TimerInfo* timerInfo, AttestTimerType type, uint32_t milliseconds)
 {
-    struct itimerspec ts = {0};
+    struct itimerspec ts;
+    (void)memset_s(&ts, sizeof(ts), 0, sizeof(ts));
     Ms2TimeSpec(&ts.it_value, milliseconds);
     if (type == ATTEST_TIMER_TYPE_PERIOD) {
         Ms2TimeSpec(&ts.it_interval, milliseconds);

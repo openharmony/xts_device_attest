@@ -11,7 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+on post-fs-data
+    mkdir /data/device_attest
+    chown device_attest device_attest /data/device_attest
+    start devattest_service
+
 service devattest_service /system/bin/sa_main /system/profile/devattest_service.xml
     class z_core
-    user root
-    group system shell
+    user device_attest
+    group device_attest system shell

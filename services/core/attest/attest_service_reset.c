@@ -86,14 +86,14 @@ int32_t ParseResetResult(const char* jsonStr)
         ATTEST_LOG_ERROR("[ParseResetResult] Invalid parameter");
         return ATTEST_ERR;
     }
-    uint64_t errorCode = GetObjectItemValueNumber(jsonStr, "errcode");
+    double errorCode = GetObjectItemValueNumber(jsonStr, "errcode");
     if (isnan(errorCode)) {
         ATTEST_LOG_ERROR("[ParseResetResult] errorCode is nan.");
         return ATTEST_ERR;
     }
     if (errorCode != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[ParseResetResult] -errorCode = %d.", -errorCode);
-        return -(errorCode);
+        ATTEST_LOG_ERROR("[ParseResetResult] -errorCode = %d.", -(int32_t)errorCode);
+        return -(int32_t)(errorCode);
     }
     return ATTEST_OK;
 }

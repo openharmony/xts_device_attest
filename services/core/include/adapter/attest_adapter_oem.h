@@ -22,8 +22,7 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-
-#define AUTH_RESULT_PATH "/data/data" // 具体读写路径待和浩哥讨论
+#define AUTH_RESULT_PATH "/data/device_attest" // 具体读写路径待和浩哥讨论
 #define AUTH_STATUS_FILE_NAME "auth_status"
 #define TICKET_FILE_NAME "ticket"
 #define RESET_FLAG_FILE_NAME "reset_flag"

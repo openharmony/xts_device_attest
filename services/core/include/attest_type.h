@@ -49,7 +49,7 @@ extern "C" {
 
 #define MAX_ATTEST_BUFF_LEN 256
 
-#define STARTSUP_PARA_ATTEST_KEY "attest.auth.result"
+#define STARTSUP_PARA_ATTEST_KEY "persist.xts.devattest.authresult"
 #define STARTSUP_PARA_ATTEST_OK "attest_ok"
 #define STARTSUP_PARA_ATTEST_ERROR "attest_error"
 

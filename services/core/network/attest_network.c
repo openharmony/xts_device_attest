@@ -236,7 +236,7 @@ static int32_t BuildSocketInfo(DevicePacket *devValue, HttpPacket *msgHttpPack,
     }
     msgHttpPack->reqXclientID = reqXclientID;
     msgHttpPack->reqXtraceID = reqXtraceID;
-    ATTEST_LOG_DEBUG("[BuildSocketInfo] End.");
+    ATTEST_LOG_ERROR("[BuildSocketInfo] End, reqXtraceID = %s.", reqXtraceID);
     return ATTEST_OK;
 }
 

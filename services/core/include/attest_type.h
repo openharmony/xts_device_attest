@@ -89,10 +89,19 @@ typedef struct {
 typedef struct {
     char* versionId;
     char* authType;
+    char* softwareResultDetail;
     int32_t softwareResult;
     int32_t hardwareResult;
     uint64_t expireTime;  // 项目新增字段，参考接口文档
 } AuthStatus;
+
+// 认证返回结果中的softwareResultDetail结构
+typedef struct {
+    int32_t versionIdResult;
+    int32_t patchLevelResult;
+    int32_t rootHashResult;
+    int32_t pcidResult;
+} SoftwareResultDetail;
 
 // 获取挑战值返回结果
 typedef struct {
@@ -144,9 +153,10 @@ typedef struct DevicePacket {
     char *udid;
     char *ticket;
     char *randomUuid;  // uuid的长度
+    char *kitinfo; /* 可以重新定义一个新结构，然后做成链表 */
+    char *pcid;
     DeviceTokenInfo tokenInfo;
     DeviceProductInfo productInfo;
-    char *kitinfo; /* 可以重新定义一个新结构，然后做成链表 */
 } DevicePacket;
 
 typedef enum {

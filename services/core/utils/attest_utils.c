@@ -25,6 +25,7 @@
 
 #define DEV_BUF_LENGTH   3
 #define HASH_LENGTH      32
+#define DECIMAL_BASE     10
 
 #if defined(MBEDTLS_VERSION_NUMBER) && (MBEDTLS_VERSION_NUMBER >= 0x03000000)
 #define mbedtls_sha256_starts_ret mbedtls_sha256_starts
@@ -247,8 +248,8 @@ int32_t CharToAscii(char* str, int len, uint8_t* outputStr, int outputLen)
     uint8_t outStr[OUT_STR_LEN_MAX] = {0};
     for (int i = 0, j = 0; i < len; i++) {
         if ((str[i] > 'F' && str[i] < 'Z') || (str[i] > 'f' && str[i] < 'z')) {
-            outStr[j++] = (str[i] - '0') / 10 + '0';
-            outStr[j++] = (str[i] - '0') % 10 + '0';
+            outStr[j++] = (str[i] - '0') / DECIMAL_BASE + '0';
+            outStr[j++] = (str[i] - '0') % DECIMAL_BASE + '0';
         } else {
             outStr[j++] = str[i];
         }

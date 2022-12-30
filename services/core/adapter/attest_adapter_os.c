@@ -53,6 +53,11 @@ char* OsGetSecurityPatchTag(void)
     return AttestStrdup(GetSecurityPatchTag());
 }
 
+char* OsGetSerial(void)
+{
+    return AttestStrdup(GetSerial());
+}
+
 char* OsGetUdid(void)
 {
     char udid[UDID_STRING_LEN + 1] = {0};

@@ -118,7 +118,8 @@ static int32_t GetTokenIdDecrypted(TokenInfo* tokenInfo, uint8_t* tokenId, uint8
         return ret;
     }
 
-    ret = Decrypt((const uint8_t*)tokenInfo->tokenId, strlen((const char*)tokenInfo->tokenId), aesKey, tokenId, tokenIdLen);
+    ret = Decrypt((const uint8_t*)tokenInfo->tokenId, strlen((const char*)tokenInfo->tokenId),
+                  aesKey, tokenId, tokenIdLen);
     (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenIdDecrypted] Decrypt token id failed, ret = %d", ret);
@@ -318,7 +319,6 @@ int32_t GetTokenId(uint8_t* tokenId, uint8_t tokenIdLen)
     TokenInfo tokenInfo;
     (void)memset_s(&tokenInfo, sizeof(TokenInfo), 0, sizeof(TokenInfo));
     int32_t ret = AttestReadToken(&tokenInfo);
-
     if (ret == TOKEN_UNPRESET) {
         ATTEST_LOG_ERROR("[GetTokenId] read tokenInfo failed, ret = %d", ret);
         ret = GetTokenIdSpecial(tokenId, tokenIdLen);

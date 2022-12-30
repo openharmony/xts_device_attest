@@ -17,12 +17,31 @@
 #include "securec.h"
 #include "attest_error.h"
 #include "attest_adapter.h"
-#include "attest_utils_log.h"
 #include "attest_dfx.h"
+#include "attest_utils.h"
+#include "attest_utils_log.h"
 #include "attest_security.h"
 #include "attest_security_token.h"
 
 char g_tokenVersion[VERSION_ENCRYPT_LEN + 1] = TOKEN_VER0_0;
+
+static int32_t GetTokenValueSpecial(uint8_t* tokenValue, uint8_t tokenValueLen)
+{
+    char *sn = AttestGetSerial();
+    size_t snLen = strlen(sn);
+    (void)memcpy_s(tokenValue, tokenValueLen, sn, snLen);
+    ATTEST_MEM_FREE(sn);
+    return ATTEST_OK;
+}
+
+static int32_t GetTokenIdSpecial(uint8_t* tokenId, uint8_t tokenIdLen)
+{
+    char *sn = AttestGetSerial();
+    size_t snLen = strlen(sn);
+    int32_t ret = CharToAscii(sn, snLen, tokenId, tokenIdLen);
+    ATTEST_MEM_FREE(sn);
+    return ret;
+}
 
 static int32_t TransTokenVersion(const char* tokenVersion, uint8_t tokenVersionLen)
 {
@@ -99,7 +118,8 @@ static int32_t GetTokenIdDecrypted(TokenInfo* tokenInfo, uint8_t* tokenId, uint8
         return ret;
     }
 
-    ret = Decrypt((const uint8_t*)tokenInfo->tokenId, sizeof(tokenInfo->tokenId), aesKey, tokenId, tokenIdLen);
+    ret = Decrypt((const uint8_t*)tokenInfo->tokenId, strlen((const char*)tokenInfo->tokenId),
+                  aesKey, tokenId, tokenIdLen);
     (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenIdDecrypted] Decrypt token id failed, ret = %d", ret);
@@ -217,9 +237,10 @@ static int32_t GetTokenInfo(const char* tokenValue, uint8_t tokenValueLen,
 }
 
 
-static int32_t EncryptHmac(const char *challenge, const uint8_t *tokenValue, uint8_t *hmac, uint8_t hmacLen)
+static int32_t EncryptHmac(const char *challenge, const uint8_t *tokenValue, size_t tokenValueLen,
+                           uint8_t *hmac, uint8_t hmacLen)
 {
-    if (challenge == NULL || tokenValue == NULL || hmac == NULL || hmacLen == 0) {
+    if (challenge == NULL || tokenValue == NULL || tokenValueLen == 0 || hmac == NULL || hmacLen == 0) {
         ATTEST_LOG_ERROR("[EncryptHmac] Invalid parameter");
         return ATTEST_ERR;
     }
@@ -229,7 +250,7 @@ static int32_t EncryptHmac(const char *challenge, const uint8_t *tokenValue, uin
     mbedtls_md_init(&ctx);
     if ((mbedtls_md_setup(&ctx, info, 1) != 0) ||
         (mbedtls_md_hmac_starts(&ctx, (const uint8_t*)challenge, strlen(challenge)) < 0) ||
-        (mbedtls_md_hmac_update(&ctx, tokenValue, TOKEN_VALUE_LEN) < 0) ||
+        (mbedtls_md_hmac_update(&ctx, tokenValue, tokenValueLen) < 0) ||
         (mbedtls_md_hmac_finish(&ctx, hmac) < 0)) {
         mbedtls_md_free(&ctx);
         ATTEST_LOG_ERROR("[EncryptHmac] Generate Encrypt code fail");
@@ -244,6 +265,12 @@ static int32_t GetTokenValueDecrypted(uint8_t* tokenValue, uint8_t tokenValueLen
     TokenInfo tokenInfo;
     (void)memset_s(&tokenInfo, sizeof(TokenInfo), 0, sizeof(TokenInfo));
     int32_t ret = AttestReadToken(&tokenInfo);
+    if (ret == TOKEN_UNPRESET) {
+        ATTEST_LOG_ERROR("[GetTokenValueDecrypted] read tokenInfo failed, ret = %d", ret);
+        ret = GetTokenValueSpecial(tokenValue, tokenValueLen);
+        return ret;
+    }
+
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueDecrypted] read tokenInfo failed, ret = %d", ret);
         return ATTEST_ERR;
@@ -265,15 +292,15 @@ int32_t GetTokenValueHmac(const char* challenge, uint8_t* tokenValueHmac, uint8_
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
 
-    uint8_t tokenValue[TOKEN_VALUE_LEN + 1] = {0};
-    int32_t ret = GetTokenValueDecrypted(tokenValue, TOKEN_VALUE_LEN);
+    uint8_t tokenValue[TOKEN_VALUE_LEN_MAX + 1] = {0};
+    int32_t ret = GetTokenValueDecrypted(tokenValue, TOKEN_VALUE_LEN_MAX);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueHmac] Get symbol failed, ret = %d", ret);
         return ret;
     }
 
     uint8_t hmac[HMAC_SHA256_CIPHER_LEN] = {0};
-    ret = EncryptHmac(challenge, (const uint8_t*)tokenValue, hmac, sizeof(hmac));
+    ret = EncryptHmac(challenge, (const uint8_t*)tokenValue, strlen((const char *)tokenValue), hmac, sizeof(hmac));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueHmac] Encrypt token value hmac failed, ret = %d", ret);
         return ret;
@@ -292,6 +319,11 @@ int32_t GetTokenId(uint8_t* tokenId, uint8_t tokenIdLen)
     TokenInfo tokenInfo;
     (void)memset_s(&tokenInfo, sizeof(TokenInfo), 0, sizeof(TokenInfo));
     int32_t ret = AttestReadToken(&tokenInfo);
+    if (ret == TOKEN_UNPRESET) {
+        ATTEST_LOG_ERROR("[GetTokenId] read tokenInfo failed, ret = %d", ret);
+        ret = GetTokenIdSpecial(tokenId, tokenIdLen);
+        return ret;
+    }
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenId] read tokenInfo failed");
         return ATTEST_ERR;
@@ -307,7 +339,7 @@ int32_t GetTokenId(uint8_t* tokenId, uint8_t tokenIdLen)
 static int32_t WriteToken(const char* tokenValue, uint8_t tokenValueLen,
                           const char* tokenId, uint8_t tokenIdLen)
 {
-    if (tokenValue == NULL || tokenValueLen != TOKEN_VALUE_LEN || tokenId == NULL || tokenIdLen != TOKEN_ID_LEN) {
+    if (tokenValue == NULL || tokenValueLen != TOKEN_VALUE_LEN || tokenId == NULL || tokenIdLen == 0) {
         ATTEST_LOG_ERROR("[WriteToken] Invalid Parameter");
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }

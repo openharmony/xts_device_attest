@@ -56,6 +56,11 @@ extern "C" {
 // token相关
 #define TOKEN_ID_LEN 36
 #define TOKEN_VALUE_LEN 32
+#define TOKEN_ID_LEN_MAX 128
+#define TOKEN_VALUE_LEN_MAX 128
+#define OUT_STR_LEN_MAX 128
+
+#define TOKEN_UNPRESET (-2)
 
 #define SALT_ENCRYPT_LEN 16
 #define TOKEN_ID_ENCRYPT_LEN 64
@@ -93,6 +98,7 @@ typedef struct {
     int32_t hardwareResult;
     uint64_t expireTime;  // 项目新增字段，参考接口文档
 } AuthStatus;
+
 
 // 获取挑战值返回结果
 typedef struct {

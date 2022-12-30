@@ -662,9 +662,9 @@ int32_t GenAuthMsg(ChallengeResult* challengeResult, DevicePacket** devPacket)
     }
     
     uint8_t tokenValueHmac[TOKEN_VALUE_HMAC_LEN + 1] = {0};
-    uint8_t tokenId[TOKEN_ID_LEN + 1] = {0};
+    uint8_t tokenId[TOKEN_ID_LEN_MAX + 1] = {0};
     if (GetTokenValueHmac(challengeResult->challenge, tokenValueHmac, TOKEN_VALUE_HMAC_LEN) != 0 ||
-        GetTokenId(tokenId, TOKEN_ID_LEN) != 0) {
+        GetTokenId(tokenId, TOKEN_ID_LEN_MAX) != 0) {
         ATTEST_LOG_ERROR("[GenAuthMsg] Get TokenId or TokenValueHmac failed");
         return ATTEST_ERR;
     }

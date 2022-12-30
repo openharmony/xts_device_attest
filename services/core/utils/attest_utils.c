@@ -238,3 +238,29 @@ void AttestMemFree(void **point)
     *point = NULL;
 }
 
+int32_t CharToAscii(char* str, int len, uint8_t* outputStr, int outputLen)
+{
+    if (str == NULL || outputStr == NULL) {
+        ATTEST_LOG_ERROR("[CharToAscii] Str is NUll");
+        return ATTEST_ERR;
+    }
+    uint8_t outStr[OUT_STR_LEN_MAX] = {0};
+    for (int i = 0, j = 0; i < len; i++) {
+        if ((str[i] > 'F' && str[i] < 'Z') || (str[i] > 'f' && str[i] < 'z')) {
+            outStr[j++] = (str[i] - '0') / 10 + '0';
+            outStr[j++] = (str[i] - '0') % 10 + '0';
+        } else {
+            outStr[j++] = str[i];
+        }
+    }
+    int32_t outStrLen = strlen((const char*)outStr);
+    if (outStrLen >= outputLen) {
+        ATTEST_LOG_ERROR("[CharToAscii] out of the len");
+        return ATTEST_ERR;
+    }
+    if (memcpy_s(outputStr, outputLen, outStr, outStrLen) != 0) {
+        return ATTEST_ERR;
+    }
+    return ATTEST_OK;
+}
+

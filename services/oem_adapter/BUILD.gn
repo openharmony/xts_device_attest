@@ -33,7 +33,7 @@ ohos_shared_library("device_attest_oem_adapter") {
 
   public_configs = [ ":device_attest_oem_adapter_config" ]
 
-  deps = [ "//third_party/cJSON:cjson_static" ]
+  deps = [ "//third_party/cJSON:cjson" ]
 
   external_deps = [
     "c_utils:utils",

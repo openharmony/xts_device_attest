@@ -38,7 +38,7 @@ declare_args() {
   enable_attest_debug_memory_leak = false
 
   # 打印debug日志开关。true:打印debug日志; false:不打印debug日志。
-  enable_attest_network_debug_log = true
+  enable_attest_network_debug_log = false
 
   # 控制测试demo开关
   enable_attest_test_sample = false

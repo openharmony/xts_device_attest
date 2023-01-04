@@ -352,7 +352,7 @@ int32_t Decrypt(const uint8_t* inputData, size_t inputDataLen, const uint8_t* ae
 
     size_t decryptDataLen = 0;
     uint8_t decryptData[ENCRYPT_LEN] = {0};
-    AesCryptBufferDatas datas = {encryptData, strlen((const char*)encryptData), decryptData, &decryptDataLen};
+    AesCryptBufferDatas datas = {encryptData, base64Len, decryptData, &decryptDataLen};
     if (DecryptAesCbc(&datas, aesKey, aesKey + PSK_LEN, AES_KEY_LEN - PSK_LEN) != 0) {
         ATTEST_LOG_ERROR("[Decrypt] Aes CBC encrypt symbol info failed, ret = %d", ret);
         return ERR_ATTEST_SECURITY_DECRYPT;

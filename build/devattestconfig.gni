@@ -27,19 +27,19 @@ declare_args() {
 declare_args() {
   # 构建版本
   attest_build_target = attest_release
-  
+
   # 模拟网络认证数据开关。true:模拟网络数据; false:访问真实网络数据。
   enable_attest_test_mock_network = false
-  
+
   # 模拟设备数据开关。true:模拟设备数据; false:访问真实设备数据。
   enable_attest_test_mock_device = false
-  
+
   # 记录内存使用情况的开关，用来检查内存是否存在泄漏。
   enable_attest_debug_memory_leak = false
 
   # 打印debug日志开关。true:打印debug日志; false:不打印debug日志。
-  enable_attest_network_debug_log = false
-  
+  enable_attest_network_debug_log = true
+
   # 控制测试demo开关
   enable_attest_test_sample = false
 
@@ -51,7 +51,7 @@ declare_args() {
 declare_args() {
   # 调试debug开关
   enable_attest_common_debug = false
-  
+
   # 调试网络HOST debug开关
   enable_attest_network_host_debug = true
 }

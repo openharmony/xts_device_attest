@@ -44,10 +44,10 @@ int32_t GenActiveMsg(AuthResult* authResult, const ChallengeResult* challengeRes
     }
 
     // 获取tokenId和tokenValue(hdmac加密)
-    uint8_t tokenId[TOKEN_ID_LEN_MAX + 1] = {0};
+    uint8_t tokenId[TOKEN_ID_LEN + 1] = {0};
     uint8_t tokenValueHmac[TOKEN_VALUE_HMAC_LEN + 1] = {0};
     if (GetTokenValueHmac((const char*)(challengeResult->challenge), tokenValueHmac, TOKEN_VALUE_HMAC_LEN) != 0 ||
-        GetTokenId(tokenId, TOKEN_ID_LEN_MAX) != 0) {
+        GetTokenId(tokenId, TOKEN_ID_LEN) != 0) {
         ATTEST_LOG_ERROR("[GenActiveMsg] Get tokenId or tokenValue failed.");
         return ATTEST_ERR;
     }

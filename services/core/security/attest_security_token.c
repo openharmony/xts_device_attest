@@ -117,9 +117,11 @@ static int32_t GetTokenIdDecrypted(TokenInfo* tokenInfo, uint8_t* tokenId, uint8
         ATTEST_LOG_ERROR("[GetTokenIdDecrypted] Generate aes key failed, ret = %d", ret);
         return ret;
     }
-
-    ret = Decrypt((const uint8_t*)tokenInfo->tokenId, strlen((const char*)tokenInfo->tokenId),
-                  aesKey, tokenId, tokenIdLen);
+    size_t realTokenIdLen = strlen((const char*)tokenInfo->tokenId);
+    if (realTokenIdLen > TOKEN_ID_ENCRYPT_LEN) {
+        realTokenIdLen = TOKEN_ID_ENCRYPT_LEN;
+    }
+    ret = Decrypt((const uint8_t*)tokenInfo->tokenId, realTokenIdLen, aesKey, tokenId, tokenIdLen);
     (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenIdDecrypted] Decrypt token id failed, ret = %d", ret);
@@ -292,8 +294,8 @@ int32_t GetTokenValueHmac(const char* challenge, uint8_t* tokenValueHmac, uint8_
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
 
-    uint8_t tokenValue[TOKEN_VALUE_LEN_MAX + 1] = {0};
-    int32_t ret = GetTokenValueDecrypted(tokenValue, TOKEN_VALUE_LEN_MAX);
+    uint8_t tokenValue[TOKEN_VALUE_LEN + 1] = {0};
+    int32_t ret = GetTokenValueDecrypted(tokenValue, TOKEN_VALUE_LEN);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueHmac] Get symbol failed, ret = %d", ret);
         return ret;

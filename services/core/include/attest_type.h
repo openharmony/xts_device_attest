@@ -56,6 +56,11 @@ extern "C" {
 // token相关
 #define TOKEN_ID_LEN 36
 #define TOKEN_VALUE_LEN 32
+#define TOKEN_ID_LEN_MAX 128
+#define TOKEN_VALUE_LEN_MAX 128
+#define OUT_STR_LEN_MAX 128
+
+#define TOKEN_UNPRESET (-2)
 
 #define SALT_ENCRYPT_LEN 16
 #define TOKEN_ID_ENCRYPT_LEN 64

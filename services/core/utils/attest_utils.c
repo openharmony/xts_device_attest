@@ -25,6 +25,7 @@
 
 #define DEV_BUF_LENGTH   3
 #define HASH_LENGTH      32
+#define DECIMAL_BASE     10
 
 #if defined(MBEDTLS_VERSION_NUMBER) && (MBEDTLS_VERSION_NUMBER >= 0x03000000)
 #define mbedtls_sha256_starts_ret mbedtls_sha256_starts
@@ -236,5 +237,31 @@ void AttestMemFree(void **point)
     }
     free(*point);
     *point = NULL;
+}
+
+int32_t CharToAscii(char* str, int len, uint8_t* outputStr, int outputLen)
+{
+    if (str == NULL || outputStr == NULL) {
+        ATTEST_LOG_ERROR("[CharToAscii] Str is NUll");
+        return ATTEST_ERR;
+    }
+    uint8_t outStr[OUT_STR_LEN_MAX] = {0};
+    for (int i = 0, j = 0; i < len; i++) {
+        if ((str[i] > 'A' && str[i] < 'Z') || (str[i] > 'f' && str[i] < 'z')) {
+            outStr[j++] = (str[i] - '0') / DECIMAL_BASE + '0';
+            outStr[j++] = (str[i] - '0') % DECIMAL_BASE + '0';
+        } else {
+            outStr[j++] = str[i];
+        }
+    }
+    int32_t outStrLen = strlen((const char*)outStr);
+    if (outStrLen >= outputLen) {
+        ATTEST_LOG_ERROR("[CharToAscii] out of the len");
+        return ATTEST_ERR;
+    }
+    if (memcpy_s(outputStr, outputLen, outStr, outStrLen) != 0) {
+        return ATTEST_ERR;
+    }
+    return ATTEST_OK;
 }
 

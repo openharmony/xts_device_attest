@@ -38,6 +38,8 @@ char* OsGetSecurityPatchTag(void);
 
 char* OsGetUdid(void);
 
+char* OsGetSerial(void);
+
 int32_t OsSetParameter(const char *key, const char *value);
 
 int32_t OsGetParameter(const char *key, const char *def, char *value, uint32_t len);

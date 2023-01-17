@@ -45,7 +45,7 @@ int32_t DestroyMemNodeList(void);
 
 int32_t AddMemInfo(void* addr, const char* file, uint32_t line, const char* func);
 
-int32_t RemoveMemInfo(const void* addr);
+int32_t RemoveMemInfo(void* addr);
 
 void PrintMemNodeList(void);
 

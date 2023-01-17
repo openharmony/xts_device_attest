@@ -175,7 +175,7 @@ int32_t AddMemInfo(void* addr, const char* file, uint32_t line, const char* func
     return ATTEST_OK;
 }
 
-int32_t RemoveMemInfo(const void* addr)
+int32_t RemoveMemInfo(void* addr)
 {
     if (addr == NULL) {
         ATTEST_LOG_ERROR("[RemoveMemInfo] addr is null.");

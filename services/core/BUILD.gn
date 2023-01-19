@@ -86,6 +86,7 @@ config("devattest_core_config") {
   }
 
   defines += [ "MBEDTLS_ALLOW_PRIVATE_ACCESS" ]
+  defines += [ "OPENSSL_SUPPRESS_DEPRECATED" ]
 }
 
 ohos_shared_library("devattest_core") {

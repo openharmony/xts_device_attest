@@ -239,7 +239,7 @@ void AttestMemFree(void **point)
     *point = NULL;
 }
 
-int32_t CharToAscii(char* str, int len, uint8_t* outputStr, int outputLen)
+int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
 {
     if (str == NULL || outputStr == NULL) {
         ATTEST_LOG_ERROR("[CharToAscii] Str is NUll");

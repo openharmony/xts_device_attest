@@ -102,6 +102,7 @@ ohos_shared_library("devattest_core") {
     "//third_party/mbedtls:mbedtls_shared",
     "//third_party/openssl:libcrypto_shared",
     "//third_party/openssl:libssl_shared",
+    "//developtools/syscap_codec:syscap_interface_shared"
   ]
 
   external_deps = [

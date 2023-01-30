@@ -48,12 +48,12 @@ void DevAttestSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId,
     for (size_t i = 0; i < 5; i++) {
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_FOR_KVSTORE));
         ret = netManager->RegisterNetConnCallback(callback);
-        if (ret == NetConnResultCode::NET_CONN_SUCCESS) {
+        if (ret == NETMANAGER_SUCCESS) {
             break;
         }
     }
 
-    if (ret == NetConnResultCode::NET_CONN_SUCCESS) {
+    if (ret == NETMANAGER_SUCCESS) {
         HILOGE("RegisterNetConnCallback success.");
     } else {
         HILOGE("RegisterNetConnCallback failed.");

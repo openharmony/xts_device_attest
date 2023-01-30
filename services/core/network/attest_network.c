@@ -289,7 +289,7 @@ static int32_t InitSocketClient(int32_t *socketFd)
 
     retCode = getaddrinfo(msgHttpPack.reqHost, msgHttpPack.reqPort, &hints, &resAddr);
     if (retCode != 0) {
-        ATTEST_LOG_ERROR("[InitSocketClient] InitSocket getaddr %s fail, error:%d", msgHttpPack.reqHost, h_errno);
+        ATTEST_LOG_ERROR("[InitSocketClient] InitSocket getaddr fail, error:%d", h_errno);
         return ATTEST_ERR;
     }
 

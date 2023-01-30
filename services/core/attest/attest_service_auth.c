@@ -258,7 +258,7 @@ static int32_t ParseAuthType(const cJSON* root, AuthStatus* authStatus)
         return ATTEST_ERR;
     }
     char* temp = cJSON_GetStringValue(cJSON_GetObjectItem(root, "authType"));
-    if (temp == NULL || strlen(temp) == 0) {
+    if (temp == NULL) {
         ATTEST_LOG_ERROR("[ParseAuthType] Get String Value for authType fail");
         return ATTEST_ERR;
     }
@@ -288,7 +288,7 @@ static int32_t ParseVersionId(const cJSON* root, AuthStatus* authStatus)
         return ATTEST_ERR;
     }
     char* temp = cJSON_GetStringValue(cJSON_GetObjectItem(root, "versionId"));
-    if (temp == NULL || strlen(temp) == 0) {
+    if (temp == NULL) {
         ATTEST_LOG_ERROR("[ParseVersionId] Get String Value for versionId fail");
         return ATTEST_ERR;
     }
@@ -642,7 +642,7 @@ static int32_t ParseAuthStats(const cJSON* json, AuthResult* authResult)
         return ATTEST_ERR;
     }
     char* item = cJSON_GetStringValue(cJSON_GetObjectItem(json, "authStats"));
-    if ((item == NULL) || (strlen(item) == 0)) {
+    if (item == NULL) {
         ATTEST_LOG_ERROR("[ParseAuthStats] GetStringValue authStats failed");
         return ATTEST_ERR;
     }

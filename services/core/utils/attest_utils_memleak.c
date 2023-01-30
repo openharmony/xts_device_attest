@@ -133,7 +133,7 @@ static char* StrdupMemInfo(const char* input)
         return NULL;
     }
     size_t len = strlen(input) + 1;
-    if (len == 0) {
+    if (len == 1) {
         return NULL;
     }
     char* out = malloc(len);

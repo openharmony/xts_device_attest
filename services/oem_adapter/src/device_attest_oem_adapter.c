@@ -78,7 +78,7 @@ static void SetTokenFlag(unsigned char flag[], uint32_t value)
 
 int32_t OEMReadToken(char *token, uint32_t len)
 {
-    if (token == NULL || len < 0) {
+    if (token == NULL || len == 0) {
         return DEVICE_ATTEST_OEM_ERR;
     }
     char tokenWithFlagA[TOKEN_WITH_FLAG_SIZE] = {0};
@@ -108,7 +108,7 @@ int32_t OEMReadToken(char *token, uint32_t len)
 
 int32_t OEMWriteToken(const char *token, uint32_t len)
 {
-    if (token == NULL || len < 0) {
+    if (token == NULL || len == 0) {
         return DEVICE_ATTEST_OEM_ERR;
     }
     char tokenWithFlagA[TOKEN_WITH_FLAG_SIZE] = {0};

@@ -51,7 +51,7 @@ int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen);
 
 int32_t AnonymiseStr(char* str);
 
-int32_t CharToAscii(char* str, int len, uint8_t* outputStr, int outLen);
+int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outLen);
 
 #ifdef __cplusplus
 #if __cplusplus

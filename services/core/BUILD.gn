@@ -57,12 +57,6 @@ config("devattest_core_config") {
     "${devattest_path}/services/core/include/security",
     "${devattest_path}/services/core/include/network",
     "${devattest_path}/services/core/include/utils",
-    "//base/startup/syspara_lite/adapter/native/syspara/include",
-  ]
-
-  include_dirs += [ 
-    "//base/startup/init/interfaces/innerkits/include/syspara",
-    "//developtools/syscap_codec/interfaces/inner_api"
   ]
 
   defines = [ "ATTEST_HILOG_LEVEL = 1" ]
@@ -102,13 +96,13 @@ ohos_shared_library("devattest_core") {
     "//third_party/mbedtls:mbedtls_shared",
     "//third_party/openssl:libcrypto_shared",
     "//third_party/openssl:libssl_shared",
-    "//developtools/syscap_codec:syscap_interface_shared"
   ]
 
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
+    "syscap_codec:syscap_interface_shared"
   ]
 
   subsystem_name = "xts"

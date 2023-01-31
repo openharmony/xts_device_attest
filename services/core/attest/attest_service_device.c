@@ -187,7 +187,7 @@ char* GetRandomUuid(void)
 
 static int32_t MergePcid(char *osPcid, int32_t osPcidLen, char *privatePcid, int32_t privatePcidLen, char **output)
 {
-    if (*output == NULL || osPcid == NULL || osPcidLen == 0) {
+    if (output == NULL || osPcid == NULL || osPcidLen == 0) {
         ATTEST_LOG_ERROR("[MergePcid] Invalid parameter.");
         return ATTEST_ERR;
     }

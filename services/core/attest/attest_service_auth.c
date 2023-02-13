@@ -826,21 +826,8 @@ int32_t SendAuthMsg(DevicePacket* devicePacket, char** respMsg)
     return ret;
 }
 
-int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
+static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult)
 {
-    ATTEST_LOG_DEBUG("[ParseAuthResultResp] Begin.");
-    if (authResult == NULL || msg == NULL) {
-        ATTEST_LOG_ERROR("[ParseAuthResultResp] Invalid parameter.");
-        return ATTEST_ERR;
-    }
-    
-    AuthStatus* authStatus = CreateAuthStatus();
-    cJSON* json = cJSON_Parse(msg);
-    if (json == NULL) {
-        ATTEST_LOG_ERROR("[ParseAuthResultResp] Format error, response is not json format strings");
-        DestroyAuthStatus(&authStatus);
-        return ATTEST_ERR;
-    }
     int32_t ret = -1;
     do {
         // 解析错误码为4999或140001时，重试一次
@@ -876,6 +863,25 @@ int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
         }
         ret = 0;
     } while (0);
+    return ret;
+}
+
+int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
+{
+    ATTEST_LOG_DEBUG("[ParseAuthResultResp] Begin.");
+    if (authResult == NULL || msg == NULL) {
+        ATTEST_LOG_ERROR("[ParseAuthResultResp] Invalid parameter.");
+        return ATTEST_ERR;
+    }
+
+    AuthStatus* authStatus = CreateAuthStatus();
+    cJSON* json = cJSON_Parse(msg);
+    if (json == NULL) {
+        ATTEST_LOG_ERROR("[ParseAuthResultResp] Format error, response is not json format strings");
+        DestroyAuthStatus(&authStatus);
+        return ATTEST_ERR;
+    }
+    int32_t ret = ParseAuthResultRespImpl(json, authResult);
     cJSON_Delete(json);
     if (ATTEST_DEBUG_DFX) {
         ATTEST_DFX_AUTH_RESULT(authResult);

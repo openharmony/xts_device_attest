@@ -430,11 +430,10 @@ int32_t CheckAuthResult(AuthStatus* authStatus, uint64_t currentTime)
         return ATTEST_ERR;
     }
 
-    int32_t result = authStatus->hardwareResult;
     uint64_t expireTime = authStatus->expireTime;
 
-    if (result != ATTEST_OK || expireTime <= currentTime) {
-        ATTEST_LOG_ERROR("[CheckAuthResult] result or expireTime is Wrong, result = %d.", result);
+    if (expireTime <= currentTime) {
+        ATTEST_LOG_ERROR("[CheckAuthResult] expireTime is Wrong.");
         return ATTEST_ERR;
     }
 

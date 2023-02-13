@@ -69,7 +69,8 @@ bool IsAuthStatusChg(void)
 
 int32_t FlushAuthResult(const char* ticket, const char* authStatus)
 {
-    if (ticket == NULL || WriteTicketToDevice(ticket, strlen(ticket)) != 0) {
+    // ticket is not always need to write, and we don't care about writing it succeed or not.
+    if (ticket != NULL && WriteTicketToDevice(ticket, strlen(ticket)) != 0) {
         ATTEST_LOG_WARN("[FlushAuthResult] write ticket failed");
     }
 
@@ -867,6 +868,7 @@ int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
         }
         if (ParseTokenValue(json, authResult) != 0) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse token value from symbol authentication response failed");
+            ret = 0;
             break;
         }
         if (ParseTokenId(json, authResult) != 0) {

@@ -69,7 +69,8 @@ bool IsAuthStatusChg(void)
 
 int32_t FlushAuthResult(const char* ticket, const char* authStatus)
 {
-    if (ticket == NULL || WriteTicketToDevice(ticket, strlen(ticket)) != 0) {
+    // ticket is not always need to write, and we don't care about writing it succeed or not.
+    if (ticket != NULL && WriteTicketToDevice(ticket, strlen(ticket)) != 0) {
         ATTEST_LOG_WARN("[FlushAuthResult] write ticket failed");
     }
 
@@ -321,11 +322,10 @@ int32_t CheckAuthResult(AuthStatus* authStatus, uint64_t currentTime)
         return ATTEST_ERR;
     }
 
-    int32_t result = authStatus->hardwareResult;
     uint64_t expireTime = authStatus->expireTime;
 
-    if (result != ATTEST_OK || expireTime <= currentTime) {
-        ATTEST_LOG_ERROR("[CheckAuthResult] result or expireTime is Wrong, result = %d.", result);
+    if (expireTime <= currentTime) {
+        ATTEST_LOG_ERROR("[CheckAuthResult] expireTime is Wrong.");
         return ATTEST_ERR;
     }
 
@@ -715,21 +715,8 @@ int32_t SendAuthMsg(DevicePacket* devicePacket, char** respMsg)
     return ret;
 }
 
-int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
+static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, AuthStatus* authStatus)
 {
-    ATTEST_LOG_DEBUG("[ParseAuthResultResp] Begin.");
-    if (authResult == NULL || msg == NULL) {
-        ATTEST_LOG_ERROR("[ParseAuthResultResp] Invalid parameter.");
-        return ATTEST_ERR;
-    }
-    
-    AuthStatus* authStatus = CreateAuthStatus();
-    cJSON* json = cJSON_Parse(msg);
-    if (json == NULL) {
-        ATTEST_LOG_ERROR("[ParseAuthResultResp] Format error, response is not json format strings");
-        DestroyAuthStatus(&authStatus);
-        return ATTEST_ERR;
-    }
     int32_t ret = -1;
     do {
         // 解析错误码为4999或140001时，重试一次
@@ -748,6 +735,7 @@ int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
         }
         if ((authStatus != NULL) && (authStatus->hardwareResult != 0)) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Hardware result is [%d]", authStatus->hardwareResult);
+            ret = 0;
             break;
         }
         if (ParseTicket(json, authResult) != 0) {
@@ -764,6 +752,25 @@ int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
         }
         ret = 0;
     } while (0);
+    return ret;
+}
+
+int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
+{
+    ATTEST_LOG_DEBUG("[ParseAuthResultResp] Begin.");
+    if (authResult == NULL || msg == NULL) {
+        ATTEST_LOG_ERROR("[ParseAuthResultResp] Invalid parameter.");
+        return ATTEST_ERR;
+    }
+
+    AuthStatus* authStatus = CreateAuthStatus();
+    cJSON* json = cJSON_Parse(msg);
+    if (json == NULL) {
+        ATTEST_LOG_ERROR("[ParseAuthResultResp] Format error, response is not json format strings");
+        DestroyAuthStatus(&authStatus);
+        return ATTEST_ERR;
+    }
+    int32_t ret = ParseAuthResultRespImpl(json, authResult, authStatus);
     cJSON_Delete(json);
     if (ATTEST_DEBUG_DFX) {
         ATTEST_DFX_AUTH_RESULT(authResult);

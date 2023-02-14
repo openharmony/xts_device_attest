@@ -735,6 +735,7 @@ static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, Auth
         }
         if ((authStatus != NULL) && (authStatus->hardwareResult != 0)) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Hardware result is [%d]", authStatus->hardwareResult);
+            ret = 0;
             break;
         }
         if (ParseTicket(json, authResult) != 0) {
@@ -743,7 +744,6 @@ static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, Auth
         }
         if (ParseTokenValue(json, authResult) != 0) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse token value from symbol authentication response failed");
-            ret = 0;
             break;
         }
         if (ParseTokenId(json, authResult) != 0) {

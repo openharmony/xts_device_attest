@@ -826,7 +826,7 @@ int32_t SendAuthMsg(DevicePacket* devicePacket, char** respMsg)
     return ret;
 }
 
-static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult)
+static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, AuthStatus* authStatus)
 {
     int32_t ret = -1;
     do {
@@ -881,7 +881,7 @@ int32_t ParseAuthResultResp(const char* msg, AuthResult* authResult)
         DestroyAuthStatus(&authStatus);
         return ATTEST_ERR;
     }
-    int32_t ret = ParseAuthResultRespImpl(json, authResult);
+    int32_t ret = ParseAuthResultRespImpl(json, authResult, authStatus);
     cJSON_Delete(json);
     if (ATTEST_DEBUG_DFX) {
         ATTEST_DFX_AUTH_RESULT(authResult);

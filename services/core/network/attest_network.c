@@ -617,10 +617,10 @@ char* BuildHttpsAuthBody(DevicePacket *postValue)
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] postData Add Item To Object fail");
             break;
         }
-        if (cJSON_AddStringToObject(software, "versionId", postValue->productInfo.versionId) == NULL || 
-            cJSON_AddStringToObject(software, "manufacture", postValue->productInfo.manu) == NULL || 
-            cJSON_AddStringToObject(software, "model", postValue->productInfo.model) == NULL || 
-            cJSON_AddStringToObject(software, "brand", postValue->productInfo.brand) == NULL || 
+        if (cJSON_AddStringToObject(software, "versionId", postValue->productInfo.versionId) == NULL ||
+            cJSON_AddStringToObject(software, "manufacture", postValue->productInfo.manu) == NULL ||
+            cJSON_AddStringToObject(software, "model", postValue->productInfo.model) == NULL ||
+            cJSON_AddStringToObject(software, "brand", postValue->productInfo.brand) == NULL ||
             cJSON_AddStringToObject(software, "rootHash", postValue->productInfo.rootHash) == NULL ||
             cJSON_AddStringToObject(software, "version", postValue->productInfo.displayVersion) == NULL ||
             cJSON_AddStringToObject(software, "patchLevel", postValue->productInfo.patchTag) == NULL ||

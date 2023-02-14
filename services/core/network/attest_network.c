@@ -88,6 +88,7 @@ DevicePacket* CreateDevicePacket(void)
     devicePacket->productInfo.rootHash = NULL;
     devicePacket->productInfo.patchTag = NULL;
     devicePacket->kitinfo = NULL;
+    devicePacket->pcid = NULL;
     return devicePacket;
 }
 
@@ -113,6 +114,8 @@ void DestroyDevicePacket(DevicePacket** devPacket)
     ATTEST_MEM_FREE(devicePacket->productInfo.displayVersion);
     ATTEST_MEM_FREE(devicePacket->productInfo.rootHash);
     ATTEST_MEM_FREE(devicePacket->productInfo.patchTag);
+    ATTEST_MEM_FREE(devicePacket->kitinfo);
+    ATTEST_MEM_FREE(devicePacket->pcid);
     ATTEST_MEM_FREE(*devPacket);
 }
 
@@ -236,7 +239,7 @@ static int32_t BuildSocketInfo(DevicePacket *devValue, HttpPacket *msgHttpPack,
     }
     msgHttpPack->reqXclientID = reqXclientID;
     msgHttpPack->reqXtraceID = reqXtraceID;
-    ATTEST_LOG_ERROR("[BuildSocketInfo] End.");
+    ATTEST_LOG_DEBUG("[BuildSocketInfo] End.");
     return ATTEST_OK;
 }
 
@@ -255,7 +258,7 @@ static int32_t InitReqHost(HttpPacket *msgHttpPack)
 
 static int32_t InitSocketClient(int32_t *socketFd)
 {
-    int32_t retCode;
+    int32_t retCode = ATTEST_ERR;
     int32_t sockfd = 0;
     int32_t bufLen = HTTPS_NETWORK_BUFFER_LEN;
     struct timeval timeout = {60, 0};
@@ -304,7 +307,7 @@ static int32_t InitSocketClient(int32_t *socketFd)
             retCode = ATTEST_OK;
             break;
         }
-   
+
         close(sockfd);
         retCode = ATTEST_ERR;
     }
@@ -375,7 +378,7 @@ static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
     }
 
     retCode = SSL_connect(*socketSSL);
-    if (retCode != SSL_OK)     {
+    if (retCode != SSL_OK) {
         ATTEST_LOG_ERROR("[InitSSLSocket] InitSSL SSL_connect fail, retCode=%d \n", retCode);
         return ATTEST_ERR;
     }
@@ -575,58 +578,59 @@ char* BuildHttpsAuthBody(DevicePacket *postValue)
         ATTEST_LOG_ERROR("[BuildHttpsAuthBody] postData CreateObject fail");
         return NULL;
     }
-    int32_t ret = 0;
+    int32_t ret = ATTEST_OK;
     do {
         if (cJSON_AddStringToObject(postData, "udid", postValue->udid) == NULL) {
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] udid Add String To Object fail");
             break;
         }
 
         cJSON *tokenInfo = cJSON_CreateObject();
         if (tokenInfo == NULL) {
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] tokenInfo Create Object fail");
             break;
         }
         if (!cJSON_AddItemToObject(postData, "tokenInfo", tokenInfo)) {
             cJSON_Delete(tokenInfo);
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] tokenInfo Add Item To Object fail");
             break;
         }
         if (cJSON_AddStringToObject(tokenInfo, "uuid", postValue->tokenInfo.uuid) == NULL ||
             cJSON_AddStringToObject(tokenInfo, "token", postValue->tokenInfo.token) == NULL) {
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] tokenInfo Add uuid or token fail");
             break;
         }
 
         cJSON *software = cJSON_CreateObject();
         if (software == NULL) {
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] software Create Object fail");
             break;
         }
         if (!cJSON_AddItemToObject(postData, "software", software)) {
             cJSON_Delete(software);
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] postData Add Item To Object fail");
             break;
         }
-        if (cJSON_AddStringToObject(software, "versionId", postValue->productInfo.versionId) == NULL || 
-            cJSON_AddStringToObject(software, "manufacture", postValue->productInfo.manu) == NULL || 
-            cJSON_AddStringToObject(software, "model", postValue->productInfo.model) == NULL || 
-            cJSON_AddStringToObject(software, "brand", postValue->productInfo.brand) == NULL || 
+        if (cJSON_AddStringToObject(software, "versionId", postValue->productInfo.versionId) == NULL ||
+            cJSON_AddStringToObject(software, "manufacture", postValue->productInfo.manu) == NULL ||
+            cJSON_AddStringToObject(software, "model", postValue->productInfo.model) == NULL ||
+            cJSON_AddStringToObject(software, "brand", postValue->productInfo.brand) == NULL ||
             cJSON_AddStringToObject(software, "rootHash", postValue->productInfo.rootHash) == NULL ||
             cJSON_AddStringToObject(software, "version", postValue->productInfo.displayVersion) == NULL ||
-            cJSON_AddStringToObject(software, "patchLevel", postValue->productInfo.patchTag) == NULL) {
-            ret = -1;
+            cJSON_AddStringToObject(software, "patchLevel", postValue->productInfo.patchTag) == NULL ||
+            cJSON_AddStringToObject(software, "pcid", postValue->pcid) == NULL) {
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] software Add productInfo values fail");
             break;
         }
     } while (0);
-    if (ret == -1) {
+    if (ret == ATTEST_ERR) {
         cJSON_Delete(postData);
         ATTEST_LOG_ERROR("[BuildHttpsAuthBody] postData extract values fail");
         return NULL;
@@ -652,35 +656,35 @@ char* BuildHttpsActiveBody(DevicePacket *postValue)
         ATTEST_LOG_ERROR("[BuildHttpsActiveBody] postData CreateObject fail");
         return NULL;
     }
-    int32_t ret = 0;
+    int32_t ret = ATTEST_OK;
     do {
         if (cJSON_AddStringToObject(postData, "ticket", postValue->ticket) == NULL ||
             cJSON_AddStringToObject(postData, "udid", postValue->udid) == NULL) {
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsActiveBody] postData Add ticket or udid fail");
             break;
         }
 
         cJSON *postObj = cJSON_CreateObject();
         if (postObj == NULL) {
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsActiveBody] postObj CreateObject fail");
             break;
         }
         if (!cJSON_AddItemToObject(postData, "tokenInfo", postObj)) {
             cJSON_Delete(postObj);
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsActiveBody] postObj AddItemToObject fail");
             break;
         }
         if (cJSON_AddStringToObject(postObj, "uuid", postValue->tokenInfo.uuid) == NULL || 
             cJSON_AddStringToObject(postObj, "token", postValue->tokenInfo.token) == NULL) {
-            ret = -1;
+            ret = ATTEST_ERR;
             ATTEST_LOG_ERROR("[BuildHttpsActiveBody] postObj add uuid or token fail");
             break;
         }
     } while (0);
-    if (ret == -1) {
+    if (ret == ATTEST_ERR) {
         cJSON_Delete(postData);
         ATTEST_LOG_ERROR("[BuildHttpsActiveBody] postData extract values by postValue fail");
         return NULL;
@@ -799,7 +803,7 @@ static int32_t SendHttpsMsg(char *postData, char **respData)
         ATTEST_LOG_ERROR("[SendHttpsMsg] Invalid parameter.");
         return ATTEST_ERR;
     }
-    int32_t ret;
+    int32_t ret = ATTEST_ERR;
     int32_t socketFd = -1;
     SSL *postSSL = NULL;
     do {

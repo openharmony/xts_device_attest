@@ -46,6 +46,7 @@ sptr<AttestResultInfo> AttestResultInfo::Unmarshalling(Parcel &parcel)
 
     ptr->softwareResultDetail_.resize(setCount);
     parcel.ReadInt32Vector(&ptr->softwareResultDetail_);
+
     if (!parcel.ReadInt32(ptr->ticketLength_) || !parcel.ReadString(ptr->ticket_)) {
         return nullptr;
     }

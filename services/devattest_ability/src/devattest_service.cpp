@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "cstdint"
+#include "securec.h"
 
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
@@ -83,69 +84,65 @@ void DevAttestService::OnStop()
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToSa_ = false;
 }
-int32_t DevAttestService::ReadInt32(int32_t *destAddr, int32_t destAddrSize, int32_t offset, int32_t *number)
+
+int32_t DevAttestService::CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo)
 {
-    if ((destAddr == NULL) || (offset >= destAddrSize)) {
+    if (resultArray == NULL) {
         return DEVATTEST_FAIL;
     }
-    int32_t *tempAddr = destAddr + offset;
-    *number = *tempAddr;
+    int32_t *head = resultArray;
+    attestResultInfo.authResult_ = *head;
+    head++;
+    attestResultInfo.softwareResult_ = *head;
+    for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
+        head++;
+        attestResultInfo.softwareResultDetail_[i] = *head;
+    }
     return DEVATTEST_SUCCESS;
 }
-int DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
+
+int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
 {
-    char* ticketStr = NULL;
-    int32_t *intArray = NULL;
-    int32_t arraySize = 0;
-    int32_t ticketLenght = 0;
-    int authRes = QueryAttest(&intArray, &arraySize, &ticketStr, &ticketLenght);
-    if (authRes != DEVATTEST_SUCCESS) {
-        return authRes;
-    }
-    if (arraySize != ATTEST_RESULT_MAX) {
+    HILOGI("GetAttestStatus start");
+    int32_t resultArraySize = MAX_ATTEST_RESULT_SIZE * sizeof(int32_t);
+    int32_t *resultArray = (int32_t *)malloc(resultArraySize);
+    if (resultArray == NULL) {
+        HILOGE("malloc resultArray failed");
         return DEVATTEST_FAIL;
     }
+    (void)memset_s(resultArray, resultArraySize, 0, resultArraySize);
+    int32_t ticketLenght = 0;
+    char* ticketStr = NULL;
     int32_t ret = DEVATTEST_SUCCESS;
     do {
-        int32_t *authResult = &attestResultInfo.authResult_;
-        if (ReadInt32(intArray, arraySize, ATTEST_RESULT_AUTH, authResult) != DEVATTEST_SUCCESS) {
+        ret = QueryAttest(&resultArray, MAX_ATTEST_RESULT_SIZE, &ticketStr, &ticketLenght);
+        if (ret != DEVATTEST_SUCCESS) {
+            HILOGE("QueryAttest failed");
+            break;
+        }
+        if (ticketStr == NULL || ticketLenght == 0) {
+            HILOGE("get ticket failed");
             ret = DEVATTEST_FAIL;
             break;
         }
-        int32_t *softResult = &attestResultInfo.softwareResult_;
-        if (ReadInt32(intArray, arraySize, ATTEST_RESULT_SOFTWARE, softResult) != DEVATTEST_SUCCESS) {
-            ret = DEVATTEST_FAIL;
-            break;
-        }
-        int32_t *versionIdResult = &attestResultInfo.softwareResultDetail_[VERSIONID_RESULT];
-        if (ReadInt32(intArray, arraySize, ATTEST_RESULT_VERSIONID, versionIdResult) != DEVATTEST_SUCCESS) {
-            ret = DEVATTEST_FAIL;
-            break;
-        }
-        int32_t *patchResult = &attestResultInfo.softwareResultDetail_[PATCHLEVEL_RESULT];
-        if (ReadInt32(intArray, arraySize, ATTEST_RESULT_PATCHLEVEL, patchResult) != DEVATTEST_SUCCESS) {
-            ret = DEVATTEST_FAIL;
-            break;
-        }
-        int32_t *roothashResult = &attestResultInfo.softwareResultDetail_[ROOTHASH_RESULT];
-        if (ReadInt32(intArray, arraySize, ATTEST_RESULT_ROOTHASH, roothashResult) != DEVATTEST_SUCCESS) {
-            ret = DEVATTEST_FAIL;
-            break;
-        }
-        int32_t *pcidResult = &attestResultInfo.softwareResultDetail_[PCID_RESULT];
-        if (ReadInt32(intArray, arraySize, ATTEST_RESULT_PCID, pcidResult) != DEVATTEST_SUCCESS) {
-            ret = DEVATTEST_FAIL;
+        attestResultInfo.ticketLength_ = ticketLenght;
+        attestResultInfo.ticket_ = ticketStr;
+        ret = CopyAttestResult(resultArray,  attestResultInfo);
+        if (ret != DEVATTEST_SUCCESS) {
+            HILOGE("copy attest result failed");
             break;
         }
     } while (0);
-    if (ret != DEVATTEST_SUCCESS) {
-        return DEVATTEST_FAIL;
+    if (ticketStr != NULL) {
+        free(ticketStr);
+        ticketStr = NULL;
     }
-    attestResultInfo.ticketLength_ = ticketLenght;
-    attestResultInfo.ticket_ = ticketStr;
+    free(resultArray);
+    resultArray = NULL;
     HILOGI("GetAttestStatus end success");
-    return DEVATTEST_SUCCESS;
+    return ret;
 }
+
 // 根据入参判断接口权限，当前没有入参，后续确认不需要后再删除
 bool DevAttestService::CheckPermission(const std::string &packageName)
 {

@@ -25,7 +25,7 @@ extern "C" {
 
 int32_t ProcAttest(void);
 
-int32_t QueryAttestStatus(int32_t** resultArray, int32_t* arraySize, char** ticket, int32_t* ticketLength);
+int32_t QueryAttestStatus(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength);
 
 #ifdef __cplusplus
 #if __cplusplus

@@ -73,7 +73,7 @@ static int32_t SendChallMsg(DevicePacket* devicePacket, char** respMsg, ATTEST_A
     uint32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_CHALLENGE, &recvMsg);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[SendChallMsg] Send AttestMsg failed");
-        return ATTEST_ERR;
+        return ret;
     }
     *respMsg = recvMsg;
     return ret;

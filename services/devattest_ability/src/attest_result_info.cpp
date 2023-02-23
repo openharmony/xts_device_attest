@@ -18,13 +18,13 @@ namespace OHOS {
 namespace DevAttest {
 bool AttestResultInfo::Marshalling(Parcel &parcel) const
 {
-    if (!parcel.WriteInt32(authResult_)) {
+    if (!parcel.WriteInt32(authResult_) || !parcel.WriteInt32(softwareResult_)) {
         return false;
     }
-    if (!parcel.WriteInt32(softwareResult_)) {
+    if (!parcel.WriteInt32(softwareResultDetail_.size()) || !parcel.WriteInt32Vector(softwareResultDetail_)) {
         return false;
     }
-    if (!parcel.WriteString(ticket_)) {
+    if (!parcel.WriteInt32(ticketLength_) || !parcel.WriteString(ticket_)) {
         return false;
     }
     return true;
@@ -36,8 +36,17 @@ sptr<AttestResultInfo> AttestResultInfo::Unmarshalling(Parcel &parcel)
     if (ptr == nullptr) {
         return nullptr;
     }
-    if (!parcel.ReadInt32(ptr->authResult_) || !parcel.ReadInt32(ptr->softwareResult_) ||
-        !parcel.ReadString(ptr->ticket_)) {
+    if (!parcel.ReadInt32(ptr->authResult_) || !parcel.ReadInt32(ptr->softwareResult_)) {
+        return nullptr;
+    }
+    int32_t setCount;
+    if (!parcel.ReadInt32(setCount) || setCount != SOFTWARE_RESULT_DETAIL_SIZE) {
+        return nullptr;
+    }
+
+    ptr->softwareResultDetail_.resize(setCount);
+    parcel.ReadInt32Vector(&ptr->softwareResultDetail_);
+    if (!parcel.ReadInt32(ptr->ticketLength_) || !parcel.ReadString(ptr->ticket_)) {
         return nullptr;
     }
     return ptr;

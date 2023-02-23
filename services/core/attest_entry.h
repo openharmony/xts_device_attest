@@ -26,7 +26,7 @@ extern "C" {
 
 int32_t AttestTask(void);
 
-int32_t QueryAttest(int32_t* authResult, int32_t* softwareResult, char** ticket);
+int32_t QueryAttest(int32_t** resultArray, int32_t* arraySize, char** ticket, int32_t* ticketLength);
 
 #ifdef __cplusplus
 #if __cplusplus

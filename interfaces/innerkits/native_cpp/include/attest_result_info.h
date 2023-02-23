@@ -19,12 +19,26 @@
 #include <string>
 #include <list>
 
+#define SOFTWARE_RESULT_DETAIL_SIZE 5
+
+typedef enum {
+    ATTEST_RESULT_AUTH = 0,
+    ATTEST_RESULT_SOFTWARE,
+    ATTEST_RESULT_VERSIONID,
+    ATTEST_RESULT_PATCHLEVEL,
+    ATTEST_RESULT_ROOTHASH,
+    ATTEST_RESULT_PCID,
+    ATTEST_RESULT_MAX,
+} ATTEST_RESULT_INFO_TYPE; // Modify ATTEST_RESULT_TYPE at the same time
+
 namespace OHOS {
 namespace DevAttest {
 class AttestResultInfo : public Parcelable {
 public:
     int32_t authResult_ = -1;
     int32_t softwareResult_ = -1;
+    std::vector<int32_t> softwareResultDetail_ = {-1, -1, -1, -1, -1};
+    int32_t ticketLength_ = 0;
     std::string ticket_;
 
     virtual bool Marshalling(Parcel &parcel) const override;

@@ -43,6 +43,7 @@
           "header": {
             "header_base":"//test/xts/device_attest/interfaces/innerkits/native_cpp/include",
             "header_files": [
+              "attest_result_info.h",
               "devattest_client.h",
               "devattest_interface.h",
               "devattest_service_proxy.h"

@@ -239,6 +239,26 @@ void AttestMemFree(void **point)
     *point = NULL;
 }
 
+int AttestWriteInt32(int32_t *destAddr, int32_t destAddrSize, int32_t offset, int32_t number)
+{
+    if ((destAddr == NULL) || (offset >= destAddrSize)) {
+        return ATTEST_ERR;
+    }
+    int32_t *tempAddr = destAddr + offset;
+    *tempAddr = number;
+    return ATTEST_OK;
+}
+
+int AttestReadInt32(int32_t *destAddr, int32_t destAddrSize, int32_t offset, int32_t *number)
+{
+    if ((destAddr == NULL) || (offset >= destAddrSize)) {
+        return ATTEST_ERR;
+    }
+    int32_t *tempAddr = destAddr + offset;
+    *number = *tempAddr;
+    return ATTEST_OK;
+}
+
 int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
 {
     if (str == NULL || outputStr == NULL) {

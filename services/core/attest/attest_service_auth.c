@@ -134,6 +134,109 @@ static int32_t ParseSoftwareResult(const cJSON* root, AuthStatus* authStatus)
     return ATTEST_OK;
 }
 
+static int32_t ParseVersionIdResult(const cJSON* json, SoftwareResultDetail* softwareResultDetail)
+{
+    if ((json == NULL) || (softwareResultDetail == NULL)) {
+        ATTEST_LOG_ERROR("[ParseVersionIdResult] Invalid parameter");
+        return ATTEST_ERR;
+    }
+    cJSON* item = cJSON_GetObjectItem(json, "versionIdResult");
+    if ((item == NULL) || !cJSON_IsNumber(item)) {
+        ATTEST_LOG_ERROR("[ParseVersionIdResult] GetObjectItem versionIdResult failed");
+        return ATTEST_ERR;
+    }
+    softwareResultDetail->versionIdResult = item->valueint;
+    return ATTEST_OK;
+}
+
+static int32_t ParsePatchLevelResult(const cJSON* json, SoftwareResultDetail* softwareResultDetail)
+{
+    if ((json == NULL) || (softwareResultDetail == NULL)) {
+        ATTEST_LOG_ERROR("[ParsePatchLevelResult] Invalid parameter");
+        return ATTEST_ERR;
+    }
+    cJSON* item = cJSON_GetObjectItem(json, "patchLevelResult");
+    if ((item == NULL) || !cJSON_IsNumber(item)) {
+        ATTEST_LOG_ERROR("[ParsePatchLevelResult] GetObjectItem patchLevelResult failed");
+        return ATTEST_ERR;
+    }
+    softwareResultDetail->patchLevelResult = item->valueint;
+    return ATTEST_OK;
+}
+
+static int32_t ParseRootHashResult(const cJSON* json, SoftwareResultDetail* softwareResultDetail)
+{
+    if ((json == NULL) || (softwareResultDetail == NULL)) {
+        ATTEST_LOG_ERROR("[ParseRootHashResult] Invalid parameter");
+        return ATTEST_ERR;
+    }
+    cJSON* item = cJSON_GetObjectItem(json, "rootHashResult");
+    if ((item == NULL) || !cJSON_IsNumber(item)) {
+        ATTEST_LOG_ERROR("[ParseRootHashResult] GetObjectItem rootHashResult failed");
+        return ATTEST_ERR;
+    }
+    softwareResultDetail->rootHashResult = item->valueint;
+    return ATTEST_OK;
+}
+
+static int32_t ParsePcidResult(const cJSON* json, SoftwareResultDetail* softwareResultDetail)
+{
+    if ((json == NULL) || (softwareResultDetail == NULL)) {
+        ATTEST_LOG_ERROR("[ParsePcidResult] Invalid parameter");
+        return ATTEST_ERR;
+    }
+    cJSON* item = cJSON_GetObjectItem(json, "pcidResult");
+    if ((item == NULL) || !cJSON_IsNumber(item)) {
+        ATTEST_LOG_ERROR("[ParsePcidResult] GetObjectItem pcidResult failed");
+        return ATTEST_OK; // Special handling, compatible with pcid
+    }
+    softwareResultDetail->pcidResult = item->valueint;
+    return ATTEST_OK;
+}
+
+static int32_t ParseSoftwareResultDetail(const cJSON* root, AuthStatus* authStatus)
+{
+    if (root == NULL || authStatus == NULL) {
+        ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] Invalid parameter");
+        return ATTEST_ERR;
+    }
+
+    cJSON* json = cJSON_GetObjectItem(root, "softwareResultDetail");
+    if (json == NULL || !cJSON_IsObject(json)) {
+        ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] cJSON GetObjectItem softwareResultDetail fail");
+        return ATTEST_ERR;
+    }
+
+    size_t len = sizeof(SoftwareResultDetail);
+    authStatus->softwareResultDetail = (char *)ATTEST_MEM_MALLOC(len);
+    if (authStatus->softwareResultDetail == NULL) {
+        ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] Failed to malloc.");
+        return ATTEST_ERR;
+    }
+    (void)memset_s(authStatus->softwareResultDetail, len, 0, len);
+    int32_t ret = ATTEST_ERR;
+    do {
+        if (ParseVersionIdResult(json, (SoftwareResultDetail *)authStatus->softwareResultDetail) != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] Failed to parse versionIdResult.");
+            break;
+        }
+        if (ParsePatchLevelResult(json, (SoftwareResultDetail *)authStatus->softwareResultDetail) != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] Failed to parse patchLevelResult.");
+            break;
+        }
+        if (ParseRootHashResult(json, (SoftwareResultDetail *)authStatus->softwareResultDetail) != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] Failed to parse rootHashResult.");
+            break;
+        }
+        if (ParsePcidResult(json, (SoftwareResultDetail *)authStatus->softwareResultDetail) != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] Failed to parse pcidResult.");
+            break;
+        }
+        ret = ATTEST_OK;
+    } while (0);
+    return ret;
+}
+
 static int32_t ParseExpireTime(const cJSON* root, AuthStatus* authStatus)
 {
     if (root == NULL || authStatus == NULL) {
@@ -218,6 +321,7 @@ static bool IsAuthStatusValid(const cJSON* root)
     if (cJSON_HasObjectItem(root, "authResult") &&
         cJSON_HasObjectItem(root, "authType") &&
         cJSON_HasObjectItem(root, "softwareResult") &&
+        cJSON_HasObjectItem(root, "softwareResultDetail") &&
         cJSON_HasObjectItem(root, "versionId") &&
         cJSON_HasObjectItem(root, "expireTime")) {
         return true;
@@ -251,6 +355,10 @@ static int32_t UnpackAuthStatusResp(const char* decodedAuthStatus, AuthStatus* a
             break;
         }
         if ((ret = ParseSoftwareResult(root, authStatus)) != 0) {
+            ATTEST_LOG_ERROR("[UnpackAuthStatusResp] Parse software status failed");
+            break;
+        }
+        if ((ret = ParseSoftwareResultDetail(root, authStatus)) != 0) {
             ATTEST_LOG_ERROR("[UnpackAuthStatusResp] Parse software status failed");
             break;
         }
@@ -439,9 +547,10 @@ AuthStatus* CreateAuthStatus(void)
         return NULL;
     }
     authStatus->versionId = NULL;
+    authStatus->authType = NULL;
+    authStatus->softwareResultDetail = NULL;
     authStatus->softwareResult = DEVICE_ATTEST_INIT;
     authStatus->hardwareResult = DEVICE_ATTEST_INIT;
-    authStatus->authType = NULL;
     authStatus->expireTime = 0;
     return authStatus;
 }
@@ -455,6 +564,7 @@ void DestroyAuthStatus(AuthStatus** authStat)
     AuthStatus* authStatus = *authStat;
     ATTEST_MEM_FREE(authStatus->versionId);
     ATTEST_MEM_FREE(authStatus->authType);
+    ATTEST_MEM_FREE(authStatus->softwareResultDetail);
     ATTEST_MEM_FREE(authStatus);
     *authStat = NULL;
 }
@@ -680,6 +790,7 @@ int32_t GenAuthMsg(ChallengeResult* challengeResult, DevicePacket** devPacket)
     devicePacket->udid = StrdupDevInfo(UDID);
     devicePacket->tokenInfo.uuid = AttestStrdup((char*)tokenId);
     devicePacket->tokenInfo.token = AttestStrdup((char*)tokenValueHmac);
+    devicePacket->pcid = StrdupDevInfo(PCID);
     int32_t ret = PackProductInfo(&devicePacket->productInfo);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GenAuthMsg] Pack ProductInfo failed.");
@@ -720,33 +831,33 @@ static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, Auth
     int32_t ret = -1;
     do {
         // 解析错误码为4999或140001时，重试一次
-        if ((ret = ParseErrcode(json, authResult)) != 0) {
+        if ((ret = ParseErrcode(json, authResult)) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Invalid error code or get it failed, ret = %d", ret);
             break;
         }
-        if ((ret = ParseAuthStats(json, authResult)) != 0) {
+        if ((ret = ParseAuthStats(json, authResult)) != ATTEST_OK) {
             ATTEST_LOG_ERROR(
                 "[ParseAuthResultResp] Parse auth status from symbol authentication response failed, ret = %d", ret);
             break;
         }
-        if ((ret = DecodeAuthStatus(authResult->authStatus, authStatus)) != 0) {
+        if ((ret = DecodeAuthStatus(authResult->authStatus, authStatus)) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Decode authentication status data damaged, ret = %d", ret);
             break;
         }
-        if ((authStatus != NULL) && (authStatus->hardwareResult != 0)) {
+        if ((authStatus != NULL) && (authStatus->hardwareResult != ATTEST_OK)) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Hardware result is [%d]", authStatus->hardwareResult);
             ret = 0;
             break;
         }
-        if (ParseTicket(json, authResult) != 0) {
+        if (ParseTicket(json, authResult) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse ticket from symbol authentication response failed");
             break;
         }
-        if (ParseTokenValue(json, authResult) != 0) {
+        if (ParseTokenValue(json, authResult) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse token value from symbol authentication response failed");
             break;
         }
-        if (ParseTokenId(json, authResult) != 0) {
+        if (ParseTokenId(json, authResult) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse token id from symbol authentication response failed");
             break;
         }

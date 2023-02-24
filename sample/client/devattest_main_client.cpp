@@ -16,7 +16,6 @@
 #include "devattest_client.h"
 
 #include <string>
-#include <iostream>
 
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -24,6 +23,7 @@
 #include "singleton.h"
 
 #include "devattest_log.h"
+#include "devattest_errno.h"
 #include "attest_result_info.h"
 
 using namespace OHOS;
@@ -36,16 +36,26 @@ int main(int argc, char *arg[])
     attestResultInfo.authResult_ = 3;
     attestResultInfo.softwareResult_ = 3;
     attestResultInfo.ticket_ = "test";
-    HILOGI("attestResultInfo authResult_ %{public}d", attestResultInfo.authResult_);
-    HILOGI("attestResultInfo softwareResult_ %{public}d", attestResultInfo.softwareResult_);
-    HILOGI("attestResultInfo ticket_ %{public}s", attestResultInfo.ticket_.c_str());
+    attestResultInfo.ticketLength_ = strlen("test");
+    HILOGI("attestResultInfo authResult %{public}d", attestResultInfo.authResult_);
+    HILOGI("attestResultInfo softwareResult %{public}d", attestResultInfo.softwareResult_);
+    HILOGI("attestResultInfo ticket %{public}s", attestResultInfo.ticket_.c_str());
 
     int res = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
-
-    HILOGI("attestResultInfo authResult_ %{public}d", attestResultInfo.authResult_);
-    HILOGI("attestResultInfo softwareResult_ %{public}d", attestResultInfo.softwareResult_);
-    HILOGI("attestResultInfo ticket_ %{public}s", attestResultInfo.ticket_.c_str());
-
     HILOGI("Test client GetAuthRes = %{public}d", res);
-    return 0;
+    if (res != DEVATTEST_SUCCESS) {
+        HILOGI("AttestTest client main fail!");
+        return DEVATTEST_FAIL;
+    }
+    HILOGI("attestResultInfo authResult %{public}d", attestResultInfo.authResult_);
+    HILOGI("attestResultInfo softwareResult %{public}d", attestResultInfo.softwareResult_);
+    HILOGI("attestResultInfo ticket %{public}s", attestResultInfo.ticket_.c_str());
+    HILOGI("attestResultInfo ticketLength %{public}d", attestResultInfo.ticketLength_);
+    HILOGI("attestResultInfo softwareResultDetail");
+    for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
+        HILOGI("[%{public}d] %{public}d", i, attestResultInfo.softwareResultDetail_[i]);
+    }
+
+    HILOGI("Test client main end");
+    return DEVATTEST_SUCCESS;
 }

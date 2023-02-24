@@ -72,7 +72,7 @@ Content-Length: %d\r\n\r\n")
     (httpPacket).reqMethod, (httpPacket).reqHost, (httpPacket).reqPort, \
     (httpPacket).reqXclientID, (httpPacket).reqXtraceID, \
     (httpPacket).reqXappID, (httpPacket).reqXtenantID, (httpPacket).reqContentLength
-    
+
 DevicePacket* CreateDevicePacket(void);
 
 void DestroyDevicePacket(DevicePacket** devicePacket);

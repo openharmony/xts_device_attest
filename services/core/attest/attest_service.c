@@ -274,30 +274,23 @@ int32_t ProcAttest(void)
     return ret;
 }
 
-static int32_t CopyResultArray(AuthStatus* input, int32_t** output)
+static int32_t CopyResultArray(AuthStatus* authStatus, int32_t** resultArray)
 {
-    if (input == NULL || output == NULL) {
+    if (authStatus == NULL || resultArray == NULL) {
         return ATTEST_ERR;
     }
-    int32_t *head = *output;
-    *head = input->hardwareResult;
-    head++;
-    *head = input->softwareResult;
-    head++;
-
-    SoftwareResultDetail *softwareResultDetail = (SoftwareResultDetail *)input->softwareResultDetail;
+    int32_t *head = *resultArray;
+    head[ATTEST_RESULT_AUTH] = authStatus->hardwareResult;
+    head[ATTEST_RESULT_SOFTWARE] = authStatus->hardwareResult;
+    SoftwareResultDetail *softwareResultDetail = (SoftwareResultDetail *)authStatus->softwareResultDetail;
     if (softwareResultDetail == NULL) {
         return ATTEST_ERR;
     }
-    *head = softwareResultDetail->versionIdResult;
-    head++;
-    *head = softwareResultDetail->patchLevelResult;
-    head++;
-    *head = softwareResultDetail->rootHashResult;
-    head++;
-    *head = softwareResultDetail->pcidResult;
-    head++;
-    *head = DEVICE_ATTEST_FAIL;
+    head[ATTEST_RESULT_VERSIONID] = softwareResultDetail->versionIdResult;
+    head[ATTEST_RESULT_PATCHLEVEL] = softwareResultDetail->patchLevelResult;
+    head[ATTEST_RESULT_ROOTHASH] = softwareResultDetail->rootHashResult;
+    head[ATTEST_RESULT_PCID] = softwareResultDetail->pcidResult;
+    head[ATTEST_RESULT_RESERVE] = DEVICE_ATTEST_FAIL;
     return ATTEST_OK;
 }
 
@@ -339,8 +332,9 @@ static int32_t QueryAttestStatusImpl(int32_t** resultArray, int32_t arraySize, c
         ATTEST_LOG_ERROR("[QueryAttestStatusImpl] read ticket from device failed");
         return ATTEST_ERR;
     }
-    int32_t ret = CopyResultArray(authStatus, resultArray);
-    if (ret != ATTEST_OK) {
+
+    retCode = CopyResultArray(authStatus, resultArray);
+    if (retCode != ATTEST_OK) {
         DestroyAuthStatus(&authStatus);
         ATTEST_MEM_FREE(decryptedTicket);
         return ATTEST_ERR;

@@ -35,11 +35,6 @@
 #include "attest_result_info.h"
 #include "attest_entry.h"
 
-#define VERSIONID_RESULT 0
-#define PATCHLEVEL_RESULT 1
-#define ROOTHASH_RESULT 2
-#define PCID_RESULT 3
-
 using namespace std;
 namespace OHOS {
 namespace DevAttest {
@@ -95,8 +90,7 @@ int32_t DevAttestService::CopyAttestResult(int32_t *resultArray, AttestResultInf
     head++;
     attestResultInfo.softwareResult_ = *head;
     for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
-        head++;
-        attestResultInfo.softwareResultDetail_[i] = *head;
+        attestResultInfo.softwareResultDetail_[i] = *(++head);
     }
     return DEVATTEST_SUCCESS;
 }

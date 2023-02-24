@@ -831,33 +831,33 @@ static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, Auth
     int32_t ret = -1;
     do {
         // 解析错误码为4999或140001时，重试一次
-        if ((ret = ParseErrcode(json, authResult)) != 0) {
+        if ((ret = ParseErrcode(json, authResult)) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Invalid error code or get it failed, ret = %d", ret);
             break;
         }
-        if ((ret = ParseAuthStats(json, authResult)) != 0) {
+        if ((ret = ParseAuthStats(json, authResult)) != ATTEST_OK) {
             ATTEST_LOG_ERROR(
                 "[ParseAuthResultResp] Parse auth status from symbol authentication response failed, ret = %d", ret);
             break;
         }
-        if ((ret = DecodeAuthStatus(authResult->authStatus, authStatus)) != 0) {
+        if ((ret = DecodeAuthStatus(authResult->authStatus, authStatus)) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Decode authentication status data damaged, ret = %d", ret);
             break;
         }
-        if ((authStatus != NULL) && (authStatus->hardwareResult != 0)) {
+        if ((authStatus != NULL) && (authStatus->hardwareResult != ATTEST_OK)) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Hardware result is [%d]", authStatus->hardwareResult);
             ret = 0;
             break;
         }
-        if (ParseTicket(json, authResult) != 0) {
+        if (ParseTicket(json, authResult) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse ticket from symbol authentication response failed");
             break;
         }
-        if (ParseTokenValue(json, authResult) != 0) {
+        if (ParseTokenValue(json, authResult) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse token value from symbol authentication response failed");
             break;
         }
-        if (ParseTokenId(json, authResult) != 0) {
+        if (ParseTokenId(json, authResult) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseAuthResultResp] Parse token id from symbol authentication response failed");
             break;
         }

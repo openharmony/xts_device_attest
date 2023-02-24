@@ -281,7 +281,7 @@ static int32_t CopyResultArray(AuthStatus* authStatus, int32_t** resultArray)
     }
     int32_t *head = *resultArray;
     head[ATTEST_RESULT_AUTH] = authStatus->hardwareResult;
-    head[ATTEST_RESULT_SOFTWARE] = authStatus->hardwareResult;
+    head[ATTEST_RESULT_SOFTWARE] = authStatus->softwareResult;
     SoftwareResultDetail *softwareResultDetail = (SoftwareResultDetail *)authStatus->softwareResultDetail;
     if (softwareResultDetail == NULL) {
         return ATTEST_ERR;

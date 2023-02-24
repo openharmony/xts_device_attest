@@ -181,7 +181,7 @@ typedef enum {
     ATTEST_RESULT_PCID,
     ATTEST_RESULT_RESERVE,
     ATTEST_RESULT_MAX,
-} ATTEST_RESULT_TYPE; // Modify ATTEST_RESULT_INFO_TYPE at the same time
+} ATTEST_RESULT_TYPE; // Modify SOFTWARE_RESULT_DETAIL_TYPE at the same time
 
 #ifdef __cplusplus
 #if __cplusplus

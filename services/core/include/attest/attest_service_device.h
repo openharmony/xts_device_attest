@@ -36,6 +36,7 @@ typedef enum {
     RANDOM_UUID,
     APP_ID,
     TENANT_ID,
+    PCID,
     SYS_DEV_MAX, // 注意: 添加枚举值需要同步修改 g_devSysInfos 和 g_devSysInfosStr
 } SYS_DEV_TYPE_E;
 
@@ -59,6 +60,8 @@ char* GetRandomUuid(void);
 char* GetAppId(void);
 
 char* GetTenantId(void);
+
+char* GetPcid(void);
 
 #ifdef __cplusplus
 #if __cplusplus

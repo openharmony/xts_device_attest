@@ -12,28 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef DEVATTEST_NAPI__H
+#define DEVATTEST_NAPI__H
 
-#ifndef DEVATTEST_ERRNO_H
-#define DEVATTEST_ERRNO_H
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 
-#include <errors.h>
+#define PARAM1 1
 
 namespace OHOS {
-    namespace DevAttest {
-        enum {
-            DEVATTEST_FAIL = -1,
+namespace DevAttest {
+class DevAttestNapi {
+public:
+    static napi_value Init(napi_env env, napi_value exports);
+private:
+    DevAttestNapi() = default;
+    ~DevAttestNapi() = default;
+    static napi_value GetAttestResultInfo(napi_env env, napi_callback_info info);
+    static napi_value GetAttestResultInfoSync(napi_env env, napi_callback_info info);
+};
+} // namespace DevAttest
+} // namespace OHOS
 
-            DEVATTEST_SUCCESS = 0,
-
-            DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP = 202,
-            DEVATTEST_ERR_JS_PARAMETER_ERROR = 401,
-            DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION = 20000001,
-            // SA框架使用错误码
-            DEVATTEST_SERVICE_FAILED = 0x10000 + 1,
-            DEVATTEST_WRITE_FAIL = 0x10000 + 2,
-            DEVATTEST_PARAM_NULL,
-            DEVATTEST_SA_NO_INIT,
-        };
-    } // end of DevAttest
-} // end of OHOS
-#endif
+#endif // DEVATTEST_NAPI__H

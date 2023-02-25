@@ -14,43 +14,43 @@
 import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
-config("devattest_sdk_config") {
-  visibility = [ ":*" ]
-  cflags = [ "-Wall" ]
+config("devattest_kit_config") {
   include_dirs = [
     "include",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
-    "${devattest_path}/common/permission/include",
+    "${devattest_path}/interfaces/innerkits/native_cpp/include",
     "${devattest_path}/services/devattest_ability/include",
-    "//utils/native/base/include",
-    "//utils/system/safwk/native/include",
+  ]
+
+  include_dirs += [
+    "//third_party/libuv/include",
+    "//third_party/node/src",
+    "//foundation/ace/napi/interfaces/kits",
   ]
 }
 
-ohos_shared_library("devattest_sdk") {
-  sources = [
-    "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "src/devattest_client.cpp",
-    "src/devattest_service_proxy.cpp",
+ohos_shared_library("deviceattest") {
+  include_dirs = []
+  configs = [ ":devattest_kit_config" ]
+  public_configs = [ ":devattest_kit_config" ]
+  sources = [ "src/devattest_napi.cpp" ]
+  deps = [
+    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
+    "//foundation/arkui/napi:ace_napi",
   ]
-
-  configs = [ ":devattest_sdk_config" ]
-
-  deps = [ "${devattest_path}/common/permission:devattest_permission" ]
-
   external_deps = [
-    "ability_runtime:ability_manager",
-    "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
+  relative_install_dir = "module"
   subsystem_name = "xts"
   part_name = "device_attest"
 }

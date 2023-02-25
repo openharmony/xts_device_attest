@@ -158,7 +158,7 @@ bool Permission::IsPermissionGranted(const std::string& perm)
             break;
     }
     if (result == PermissionState::PERMISSION_DENIED) {
-        HILOGE("[IsPermissionGranted] permission denied, perm=%{public}s type=%{public}d, pid=%{public}d, uid=%{public}d",
+        HILOGE("[IsPermissionGranted] permis denied, perm=%{public}s type=%{public}d, pid=%{public}d, uid=%{public}d",
             perm.c_str(), static_cast<int32_t>(type), pid, uid);
         return false;
     }

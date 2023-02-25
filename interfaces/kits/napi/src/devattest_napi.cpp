@@ -67,7 +67,7 @@ static napi_value GenerateDevAttestHandle(napi_env env, int32_t auth, int32_t so
     return resultObject;
 }
 
-string ConvertToJsErrMsg(int32_t jsErrCode)
+static string ConvertToJsErrMsg(int32_t jsErrCode)
 {
     auto iter = g_errorStringMap.find(jsErrCode);
     if (iter != g_errorStringMap.end()) {
@@ -116,7 +116,7 @@ static napi_value GenerateReturnValue(napi_env env, DevAttestAsyncContext* callb
 
 /* 耗时操作 */
 static void Execute(napi_env env, void* data)
-{ 
+{
     if (data == nullptr) {
         HILOGI("[Execute] Invalid parameter");
         return;
@@ -131,7 +131,8 @@ static void Execute(napi_env env, void* data)
 }
 
 /* 传参，不耗时 */
-static void Complete(napi_env env, napi_status status, void* data) {
+static void Complete(napi_env env, napi_status status, void* data)
+{
     DevAttestAsyncContext* callback = static_cast<DevAttestAsyncContext*>(data);
 
     // 根据Execute函数的结果进行返回值的赋值, result[0]存放error; result[1]存放返回值
@@ -225,7 +226,7 @@ napi_value DevAttestNapi::GetAttestResultInfoSync(napi_env env, napi_callback_in
     napi_value destObject;
     napi_create_object(env, &destObject);
     destObject = GenerateDevAttestHandle(env, attestResultInfo.authResult_, attestResultInfo.softwareResult_,
-            attestResultInfo.ticket_, attestResultInfo.softwareResultDetail_);
+        attestResultInfo.ticket_, attestResultInfo.softwareResultDetail_);
     return destObject;
 }
 
@@ -243,11 +244,8 @@ EXTERN_C_START
 static napi_value DevattestInit(napi_env env, napi_value exports)
 {
     HILOGI("Initialize the DevAttestNapi module");
-
     napi_value ret = DevAttestNapi::Init(env, exports);
-
     HILOGI("The initialization of the DevAttestNapi module is complete");
-
     return ret;
 }
 EXTERN_C_END

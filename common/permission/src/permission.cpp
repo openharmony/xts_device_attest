@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "devattest_permission.h"
+#include "permission.h"
 
 #include "accesstoken_kit.h"
 #include "sys_mgr_client.h"
@@ -29,7 +29,6 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DevAttest {
-
 static bool IsTokenAplMatch(ATokenAplEnum apl)
 {
     AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
@@ -143,7 +142,7 @@ bool Permission::IsPermissionGranted(const std::string& perm)
     pid_t pid = IPCSkeleton::GetCallingPid();
     pid_t uid = IPCSkeleton::GetCallingUid();
     ATokenTypeEnum type = AccessTokenKit::GetTokenTypeFlag(tokenId);
-    HILOGD("[IsPermissionGranted] checking permission, perm=%{public}s type=%{public}d, pid=%{public}d, uid=%{public}d",
+    HILOGD("[IsPermissionGranted] check permission, perm=%{public}s type=%{public}d, pid=%{public}d,uid=%{public}d",
         perm.c_str(), static_cast<int32_t>(type), pid, uid);
     int32_t result = PermissionState::PERMISSION_DENIED;
     switch (type) {

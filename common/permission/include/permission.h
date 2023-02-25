@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVATTEST_PERMISSION_H
-#define DEVATTEST_PERMISSION_H
+#ifndef PERMISSION_H
+#define PERMISSION_H
 
 #include <string>
 #include "bundle_mgr_interface.h"
@@ -45,4 +45,4 @@ private:
 };
 } // namespace DevAttest
 } // namespace OHOS
-#endif // DEVATTEST_PERMISSION_H
+#endif // PERMISSION_H

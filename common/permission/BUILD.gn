@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
 ohos_shared_library("devattest_permission") {
-  sources = [ "src/devattest_permission.cpp" ]
+  sources = [ "src/permission.cpp" ]
 
   include_dirs = [
     "include",

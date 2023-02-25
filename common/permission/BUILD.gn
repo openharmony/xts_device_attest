@@ -21,7 +21,6 @@ ohos_shared_library("devattest_permission") {
     "include",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
-    "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include/bundlemgr",
   ]
 
   external_deps = [

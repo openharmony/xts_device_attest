@@ -21,10 +21,11 @@
 
 #include "devattest_log.h"
 #include "devattest_errno.h"
+#include "devattest_permission.h"
 #include "attest_result_info.h"
 
 using namespace std;
-
+using namespace OHOS;
 
 namespace OHOS {
 namespace DevAttest {
@@ -64,6 +65,9 @@ int DevAttestClient::InitClientService()
 int DevAttestClient::GetAttestStatus(AttestResultInfo &attestResultInfo)
 {
     HILOGI("DevAttestClient GetAttestStatus Begin");
+    if (!DelayedSingleton<Permission>::GetInstance()->IsSystem()) {
+        return DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP;
+    }
     if (attestClientInterface_ == nullptr) {
         HILOGE("DevAttestClient GetAttestStatus attestClientInterface_ is null");
         return DEVATTEST_FAIL;

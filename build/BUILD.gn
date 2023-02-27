@@ -19,6 +19,7 @@ group("attest_standard_packages") {
   if (is_standard_system) {
     deps += [
       "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
+      "${devattest_path}/interfaces/kits/napi:deviceattest",
       "${devattest_path}/services/devattest_ability:devattest_service",
       "${devattest_path}/services/etc/init:devattest_etc",
       "${devattest_path}/services/sa_profile:devattest_sa_profile",

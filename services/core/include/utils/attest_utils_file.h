@@ -16,6 +16,8 @@
 #ifndef __ATTEST_UTILS_FILE_H__
 #define __ATTEST_UTILS_FILE_H__
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {

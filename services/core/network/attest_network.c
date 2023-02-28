@@ -36,8 +36,10 @@
 #include "securec.h"
 
 #include "attest_utils_log.h"
+#include "attest_utils_list.h"
 #include "attest_utils.h"
 #include "attest_type.h"
+#include "attest_adapter.h"
 #include "attest_network.h"
 
 #ifdef __cplusplus
@@ -45,6 +47,8 @@
     extern "C" {
 #endif
 #endif
+
+List g_attestNetworkList;
 
 char *g_httpHeaderName[ATTEST_HTTPS_MAX] = {
     "HTTP/1.1",
@@ -133,7 +137,7 @@ static int32_t Sha256Udid(char *udid, char *outStr)
     SHA256_Final(hash, &sha256);
     
     uint32_t curLen = 0;
-    for (int32_t i = 0; i < strlen((char *)hash); i++) {
+    for (uint32_t i = 0; i < strlen((char *)hash); i++) {
         if (curLen > (HTTPS_NETWORK_SHA256_LEN - 1)) {
             ATTEST_LOG_ERROR("[Sha256Udid] CurLen(%d) is more than maxLen(%d).", curLen, HTTPS_NETWORK_SHA256_LEN);
             return ATTEST_OK;
@@ -211,13 +215,15 @@ static int32_t BuildSocketInfo(DevicePacket *devValue, HttpPacket *msgHttpPack,
     int32_t actionType, int32_t reqContentLength)
 {
     ATTEST_LOG_DEBUG("[BuildSocketInfo] Begin.");
-    if (msgHttpPack == NULL || devValue == NULL) {
+    if (msgHttpPack == NULL || devValue == NULL || g_attestNetworkList.head == NULL) {
         ATTEST_LOG_ERROR("[BuildSocketInfo] Invalid parameter");
         return ATTEST_ERR;
     }
 
-    msgHttpPack->reqPort = HTTPS_NETWORK_PORT;
-    msgHttpPack->reqHost = HTTPS_NETWORK_HOST;
+    ServerInfo* serverInfo = (ServerInfo*)g_attestNetworkList.head->data;
+
+    msgHttpPack->reqPort = serverInfo->hostName;
+    msgHttpPack->reqHost = serverInfo->port;
     msgHttpPack->reqMethod = g_uriPath[actionType];
     msgHttpPack->reqXappID = devValue->appId;
     msgHttpPack->reqXtenantID = devValue->tenantId;
@@ -243,37 +249,16 @@ static int32_t BuildSocketInfo(DevicePacket *devValue, HttpPacket *msgHttpPack,
     return ATTEST_OK;
 }
 
-static int32_t InitReqHost(HttpPacket *msgHttpPack)
-{
-    if (msgHttpPack == NULL) {
-        ATTEST_LOG_ERROR("[InitReqHost] Invalid parameter");
-        return ATTEST_ERR;
-    }
-
-    msgHttpPack->reqPort = HTTPS_NETWORK_PORT;
-    msgHttpPack->reqHost = HTTPS_NETWORK_HOST;
-
-    return ATTEST_OK;
-}
-
 static int32_t InitSocketClient(int32_t *socketFd)
 {
     int32_t retCode = ATTEST_ERR;
     int32_t sockfd = 0;
     int32_t bufLen = HTTPS_NETWORK_BUFFER_LEN;
     struct timeval timeout = {60, 0};
-    HttpPacket msgHttpPack = { 0 };
 
-    if (socketFd == NULL) {
+    if (socketFd == NULL || g_attestNetworkList.head == NULL) {
         ATTEST_LOG_ERROR("[InitSocketClient] InitSocket Parameter is NULL");
         return ATTEST_ERR;
-    }
-
-    /* 获取网络基础数据 */
-    retCode = InitReqHost(&msgHttpPack);
-    if (retCode != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[InitSocketClient] Init Request Host failed");
-        return retCode;
     }
 
     struct addrinfo hints;
@@ -290,7 +275,9 @@ static int32_t InitSocketClient(int32_t *socketFd)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_IP;
 
-    retCode = getaddrinfo(msgHttpPack.reqHost, msgHttpPack.reqPort, &hints, &resAddr);
+    ServerInfo* serverInfo = (ServerInfo*)g_attestNetworkList.head->data;
+
+    retCode = getaddrinfo(serverInfo->hostName, serverInfo->port, &hints, &resAddr);
     if (retCode != 0) {
         ATTEST_LOG_ERROR("[InitSocketClient] InitSocket getaddr fail, error:%d", h_errno);
         return ATTEST_ERR;
@@ -955,6 +942,146 @@ int32_t SendAttestMsg(DevicePacket *devPacket, ATTEST_ACTION_TYPE actionType, ch
     ATTEST_LOG_DEBUG("[SendAttestMsg] End.");
     return retCode;
 }
+
+static int32_t SplitNetworkInfoSymbol(char *inputData, List *list)
+{
+    if (inputData == NULL || list == NULL) {
+        ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] paramter wrong.");
+        return ATTEST_ERR;
+    }
+
+    if (CountSymbolNum(inputData, ':') != 1) {
+        ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] inputData form wrong.");
+        return ATTEST_ERR;
+    }
+
+    char *next = NULL;
+    char *pNext = strtok_s(inputData, ":", &next);
+    if (pNext == NULL || next == NULL) {
+        ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] Detach failed.");
+        return ATTEST_ERR;
+    }
+
+    ServerInfo* networkServerInfo = (ServerInfo*)ATTEST_MEM_MALLOC(sizeof(ServerInfo));
+    if (networkServerInfo == NULL) {
+        ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] network infomation malloc failed.");
+        return ATTEST_ERR;
+    }
+
+    int32_t ret = ATTEST_OK;
+    do {
+        if (sprintf_s(networkServerInfo->hostName, MAX_HOST_NAME_LEN, "%s", pNext) <= 0) {
+            ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] failed to copy host");
+            ret = ATTEST_ERR;
+            break;
+        }
+        if (sprintf_s(networkServerInfo->port, MAX_PORT_LEN, "%s", next) <= 0) {
+            ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] failed to copy port");
+            ret = ATTEST_ERR;
+            break;
+        }
+    } while (0);
+    if (ret != ATTEST_OK) {
+        ATTEST_MEM_FREE(networkServerInfo);
+        return ret;
+    }
+    ret = AddListNode(list, (char *)networkServerInfo);
+    return ret;
+}
+
+static int32_t ParseNetworkInfosConfig(char *inputData, int32_t inputLen, List *list)
+{
+    if (inputData == NULL || inputLen == 0 || list == NULL) {
+        ATTEST_LOG_ERROR("[ParseNetworkInfoConfig] parameter wrong.");
+        return ATTEST_ERR;
+    }
+
+    cJSON* root = cJSON_Parse(inputData);
+    if (root == NULL) {
+        ATTEST_LOG_ERROR("[ParseNetworkInfoConfig] failed to parse json.");
+        return ATTEST_ERR;
+    }
+
+    int32_t ret = ATTEST_OK;
+    do {
+        char *valueString = cJSON_GetStringValue(cJSON_GetObjectItem(root, NETWORK_CONFIG_SERVER_INFO_NAME));
+        if (valueString == NULL) {
+            ATTEST_LOG_ERROR("[ParseNetworkInfosConfig] failed to get string");
+            ret = ATTEST_ERR;
+            break;
+        }
+
+        ret = SplitNetworkInfoSymbol(valueString, list);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ParseNetworkInfosConfig] failed to get SplitNetworkInfo");
+            break;
+        }
+    } while (0);
+
+    cJSON_Delete(root);
+    return ret;
+}
+
+static int32_t NetworkInfoConfig(List* list)
+{
+    if (list == NULL) {
+        ATTEST_LOG_ERROR("[NetworkInfoConfig] paramter wrong");
+        return ATTEST_ERR;
+    }
+
+    // No need to initialize
+    if (GetListSize(list) != 0) {
+        ATTEST_LOG_WARN("[NetworkInfoConfig] already configed network list");
+        return ATTEST_OK;
+    }
+
+    int32_t ret = CreateList(list);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[NetworkInfoConfig] create network list failed");
+        return ATTEST_ERR;
+    }
+
+    // For reading network_config.json
+    char *buffer = (char *)ATTEST_MEM_MALLOC(NETWORK_CONFIG_SIZE);
+    if (buffer == NULL) {
+        ATTEST_LOG_ERROR("[NetworkInfoConfig] buffer malloc failed.");
+        ReleaseList(list);
+        return ATTEST_ERR;
+    }
+    do {
+        ret = AttestReadNetworkConfig(buffer, NETWORK_CONFIG_SIZE);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[NetworkInfoConfig] read networkconfig failed.");
+            break;
+        }
+
+        ret = ParseNetworkInfosConfig(buffer, NETWORK_CONFIG_SIZE, list);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[NetworkInfoConfig] parse networkconfig failed.");
+            break;
+        }
+    } while (0);
+    if (ret != ATTEST_OK) {
+        ReleaseList(list);
+    }
+    ATTEST_MEM_FREE(buffer);
+    return ret;
+}
+
+int32_t InitNetworkServerInfo(void)
+{
+    if (g_attestNetworkList.head != NULL) {
+        ATTEST_LOG_ERROR("[D2CConnect] already init g_attestNetworkList");
+        return ATTEST_ERR;
+    }
+    int32_t ret = NetworkInfoConfig(&g_attestNetworkList);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_INFO("[InitNetworkServerInfo] init g_attestNetworkList failed");
+        return ret;
+    }
+    return ATTEST_OK;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
     }

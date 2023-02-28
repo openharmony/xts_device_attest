@@ -1071,8 +1071,8 @@ static int32_t NetworkInfoConfig(List* list)
 int32_t InitNetworkServerInfo(void)
 {
     if (g_attestNetworkList.head != NULL) {
-        ATTEST_LOG_ERROR("[D2CConnect] already init g_attestNetworkList");
-        return ATTEST_ERR;
+        ATTEST_LOG_WARN("[InitNetworkServerInfo] already init g_attestNetworkList");
+        return ATTEST_OK;
     }
     int32_t ret = NetworkInfoConfig(&g_attestNetworkList);
     if (ret != ATTEST_OK) {

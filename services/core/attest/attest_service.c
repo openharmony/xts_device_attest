@@ -260,6 +260,11 @@ int32_t ProcAttest(void)
         ret = InitMemNodeList();
         ATTEST_LOG_INFO("[ProcAttest] Init mem node list, ret = %d.", ret);
     }
+    // init network server info
+    ret = InitNetworkServerInfo();
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[ProcAttest] InitNetworkServerInfo failed, ret = %d.", ret);
+    }
     ret = ProcAttestImpl();
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);

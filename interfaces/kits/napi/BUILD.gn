@@ -21,10 +21,6 @@ config("devattest_kit_config") {
     "${devattest_path}/common/log",
     "${devattest_path}/interfaces/innerkits/native_cpp/include",
     "${devattest_path}/services/devattest_ability/include",
-  ]
-
-  include_dirs += [
-    "//third_party/libuv/include",
     "//third_party/node/src",
   ]
 }
@@ -34,7 +30,10 @@ ohos_shared_library("deviceattest") {
   configs = [ ":devattest_kit_config" ]
   public_configs = [ ":devattest_kit_config" ]
   sources = [ "src/devattest_napi.cpp" ]
-  deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
+  deps = [
+    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
+    "//third_party/libuv:uv",
+  ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",

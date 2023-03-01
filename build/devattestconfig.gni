@@ -51,9 +51,6 @@ declare_args() {
 declare_args() {
   # 调试debug开关
   enable_attest_common_debug = false
-
-  # 调试网络HOST debug开关
-  enable_attest_network_host_debug = true
 }
 
 # 设置通用全局宏

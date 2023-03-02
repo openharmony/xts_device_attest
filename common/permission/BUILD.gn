@@ -24,19 +24,11 @@ ohos_shared_library("devattest_permission") {
   ]
 
   external_deps = [
-    "ability_runtime:ability_manager",
-    "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
-    "access_token:libprivacy_sdk",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "hicollie_native:libhicollie",
-    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 

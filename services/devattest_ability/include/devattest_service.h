@@ -52,6 +52,7 @@ private:
     bool registerToSa_ = false;
     bool CheckPermission(const std::string &packageName);
     const int32_t NETMANAGER_SAMGR_ID = 1151;
+    int32_t CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo);
 };
 } // end of DevAttest
 } // end of OHOS

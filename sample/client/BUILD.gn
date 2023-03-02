@@ -15,10 +15,7 @@ import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
 ohos_executable("attesttestclient") {
-  sources = [
-    "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "devattest_main_client.cpp",
-  ]
+  sources = [ "devattest_main_client.cpp" ]
 
   include_dirs = [
     "${devattest_path}/common",

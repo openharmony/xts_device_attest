@@ -19,11 +19,13 @@
 #include <string>
 #include "iremote_broker.h"
 #include "attest_result_info.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DevAttest {
 class DevAttestInterface : public OHOS::IRemoteBroker {
 public:
+    static const int SA_ID_DEVICE_ATTEST_SERVICE = DEVICE_ATTEST_PROFILE_SA_ID;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.DevAttest.DevAttestInterface");
 
     virtual int32_t GetAttestStatus(AttestResultInfo &attestResultInfo) = 0;

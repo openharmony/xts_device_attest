@@ -15,9 +15,20 @@
 #ifndef ATTEST_RESULT_INFO_H
 #define ATTEST_RESULT_INFO_H
 
-#include "parcel.h"
 #include <string>
 #include <list>
+#include "parcel.h"
+
+#define SOFTWARE_RESULT_DETAIL_SIZE 5
+#define MAX_ATTEST_RESULT_SIZE (SOFTWARE_RESULT_DETAIL_SIZE + 2)
+
+typedef enum {
+    SOFTWARE_RESULT_VERSIONID,
+    SOFTWARE_RESULT_PATCHLEVEL,
+    SOFTWARE_RESULT_ROOTHASH,
+    SOFTWARE_RESULT_PCID,
+    SOFTWARE_RESULT_RESERVE,
+} SOFTWARE_RESULT_DETAIL_TYPE;
 
 namespace OHOS {
 namespace DevAttest {
@@ -25,6 +36,8 @@ class AttestResultInfo : public Parcelable {
 public:
     int32_t authResult_ = -1;
     int32_t softwareResult_ = -1;
+    std::vector<int32_t> softwareResultDetail_ = {-1, -1, -1, -1, -1};
+    int32_t ticketLength_ = 0;
     std::string ticket_;
 
     virtual bool Marshalling(Parcel &parcel) const override;

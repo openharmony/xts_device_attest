@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "cstdint"
+#include "securec.h"
 
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
@@ -78,16 +79,64 @@ void DevAttestService::OnStop()
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToSa_ = false;
 }
-int DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
+
+int32_t DevAttestService::CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo)
 {
-    char* ticketStr = NULL;
-    int authRes = QueryAttest(&attestResultInfo.authResult_, &attestResultInfo.softwareResult_, &ticketStr); 
-    if (authRes == DEVATTEST_SUCCESS) {
-        attestResultInfo.ticket_ = ticketStr;
+    if (resultArray == NULL) {
+        return DEVATTEST_FAIL;
     }
-    HILOGI("GetAttestStatus end success %{public}d", authRes);
-    return authRes;
+    int32_t *head = resultArray;
+    attestResultInfo.authResult_ = *head;
+    head++;
+    attestResultInfo.softwareResult_ = *head;
+    for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
+        attestResultInfo.softwareResultDetail_[i] = *(++head);
+    }
+    return DEVATTEST_SUCCESS;
 }
+
+int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
+{
+    HILOGI("GetAttestStatus start");
+    int32_t resultArraySize = MAX_ATTEST_RESULT_SIZE * sizeof(int32_t);
+    int32_t *resultArray = (int32_t *)malloc(resultArraySize);
+    if (resultArray == NULL) {
+        HILOGE("malloc resultArray failed");
+        return DEVATTEST_FAIL;
+    }
+    (void)memset_s(resultArray, resultArraySize, 0, resultArraySize);
+    int32_t ticketLenght = 0;
+    char* ticketStr = NULL;
+    int32_t ret = DEVATTEST_SUCCESS;
+    do {
+        ret = QueryAttest(&resultArray, MAX_ATTEST_RESULT_SIZE, &ticketStr, &ticketLenght);
+        if (ret != DEVATTEST_SUCCESS) {
+            HILOGE("QueryAttest failed");
+            break;
+        }
+        if (ticketStr == NULL || ticketLenght == 0) {
+            HILOGE("get ticket failed");
+            ret = DEVATTEST_FAIL;
+            break;
+        }
+        attestResultInfo.ticketLength_ = ticketLenght;
+        attestResultInfo.ticket_ = ticketStr;
+        ret = CopyAttestResult(resultArray,  attestResultInfo);
+        if (ret != DEVATTEST_SUCCESS) {
+            HILOGE("copy attest result failed");
+            break;
+        }
+    } while (0);
+    if (ticketStr != NULL) {
+        free(ticketStr);
+        ticketStr = NULL;
+    }
+    free(resultArray);
+    resultArray = NULL;
+    HILOGI("GetAttestStatus end success");
+    return ret;
+}
+
 // 根据入参判断接口权限，当前没有入参，后续确认不需要后再删除
 bool DevAttestService::CheckPermission(const std::string &packageName)
 {

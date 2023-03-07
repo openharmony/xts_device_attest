@@ -31,7 +31,7 @@ namespace OHOS {
 namespace DevAttest {
 DevAttestClient::DevAttestClient()
 {
-    InitClientService();
+    (void)InitClientService();
 }
 
 DevAttestClient::~DevAttestClient()
@@ -72,9 +72,13 @@ int DevAttestClient::GetAttestStatus(AttestResultInfo &attestResultInfo)
         HILOGE("DevAttestClient GetAttestStatus attestClientInterface_ is null");
         return DEVATTEST_FAIL;
     }
-    int res = attestClientInterface_->GetAttestStatus(attestResultInfo);
-    HILOGI("DevAttestClient GetAttestStatus end res = %{public}d", res);
-    return res;
+    int ret = attestClientInterface_->GetAttestStatus(attestResultInfo);
+    if (ret != DEVATTEST_SUCCESS) {
+        HILOGE("DevAttestClient GetAttestStatus failed ret = %{public}d", ret);
+        return DEVATTEST_FAIL;
+    }
+    HILOGI("DevAttestClient GetAttestStatus end");
+    return DEVATTEST_SUCCESS;
 }
 }
 }

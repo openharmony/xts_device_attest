@@ -114,11 +114,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
             HILOGE("QueryAttest failed");
             break;
         }
-        if (ticketStr == NULL || ticketLenght == 0) {
-            HILOGE("get ticket failed");
-            ret = DEVATTEST_FAIL;
-            break;
-        }
+
         attestResultInfo.ticketLength_ = ticketLenght;
         attestResultInfo.ticket_ = ticketStr;
         ret = CopyAttestResult(resultArray,  attestResultInfo);
@@ -127,7 +123,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
             break;
         }
     } while (0);
-    if (ticketStr != NULL) {
+    if (ticketStr != NULL && ticketLenght != 0) {
         free(ticketStr);
         ticketStr = NULL;
     }

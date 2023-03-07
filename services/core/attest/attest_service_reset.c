@@ -70,7 +70,7 @@ int32_t SendResetMsg(DevicePacket* devicePacket, char** respMsg)
         return ATTEST_ERR;
     }
     char* recvMsg = NULL;
-    uint32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_RESET, &recvMsg);
+    int32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_RESET, &recvMsg);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[SendResetMsg] Send AttestMsg failed");
         return ATTEST_ERR;

@@ -83,7 +83,7 @@ int32_t SendActiveMsg(DevicePacket* devicePacket, char** respMsg)
         return ATTEST_ERR;
     }
     char* recvMsg = NULL;
-    uint32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_ACTIVATE, &recvMsg);
+    int32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_ACTIVATE, &recvMsg);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[SendActiveMsg] Send AttestMsg failed.");
         return ATTEST_ERR;

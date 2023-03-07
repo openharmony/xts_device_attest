@@ -14,40 +14,21 @@
 import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
-config("devattest_sdk_config") {
-  visibility = [ ":*" ]
-  cflags = [ "-Wall" ]
+ohos_shared_library("devattest_permission") {
+  sources = [ "src/permission.cpp" ]
+
   include_dirs = [
     "include",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
-    "${devattest_path}/common/permission/include",
-    "${devattest_path}/services/devattest_ability/include",
-    "//utils/native/base/include",
-    "//utils/system/safwk/native/include",
   ]
-}
-
-ohos_shared_library("devattest_sdk") {
-  sources = [
-    "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "src/devattest_client.cpp",
-    "src/devattest_service_proxy.cpp",
-  ]
-
-  configs = [ ":devattest_sdk_config" ]
-
-  deps = [ "${devattest_path}/common/permission:devattest_permission" ]
 
   external_deps = [
-    "ability_runtime:ability_manager",
-    "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
-    "bundle_framework:appexecfwk_core",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 

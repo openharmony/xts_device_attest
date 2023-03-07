@@ -17,6 +17,8 @@
 #define PERMISSION_H
 
 #include <string>
+#include "bundle_mgr_interface.h"
+#include "iremote_object.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -24,8 +26,22 @@ namespace DevAttest {
 class Permission {
     DECLARE_DELAYED_SINGLETON(Permission)
 public:
+    using IBundleMgr = OHOS::AppExecFwk::IBundleMgr;
+
+    bool IsSystemCore();
+    bool IsSystemBasic();
+    bool IsSystemApl();
+    bool IsSystemHap();
     bool IsSystem();
     bool IsPermissionGranted(const std::string& perm);
+    bool IsSystemHapPermGranted(const std::string& perm);
+
+private:
+    void InitPermissionInterface();
+    sptr<IBundleMgr> GetBundleMgr();
+
+private:
+    sptr<IBundleMgr> sptrBundleMgr_;
 };
 } // namespace DevAttest
 } // namespace OHOS

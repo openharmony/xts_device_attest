@@ -16,15 +16,41 @@
 #include "permission.h"
 
 #include "accesstoken_kit.h"
+#include "sys_mgr_client.h"
 #include "ipc_skeleton.h"
-#include "tokenid_kit.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 #include "devattest_log.h"
 
 using namespace OHOS;
+using namespace OHOS::AppExecFwk;
+using namespace OHOS::AppExecFwk::Constants;
 using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DevAttest {
+static bool IsTokenAplMatch(ATokenAplEnum apl)
+{
+    AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
+    pid_t pid = IPCSkeleton::GetCallingPid();
+    pid_t uid = IPCSkeleton::GetCallingUid();
+    ATokenTypeEnum type = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    HILOGD("[IsTokenAplMatch] checking apl, apl=%{public}d, type=%{public}d, pid=%{public}d, uid=%{public}d",
+        static_cast<int32_t>(apl), static_cast<int32_t>(type), pid, uid);
+    if (type == ATokenTypeEnum::TOKEN_HAP) {
+        HILOGE("[IsTokenAplMatch] type is hap");
+        return false;
+    }
+    NativeTokenInfo info;
+    AccessTokenKit::GetNativeTokenInfo(tokenId, info);
+    if (info.apl == apl) {
+        return true;
+    }
+    HILOGD("[IsTokenAplMatch] apl not match, info.apl=%{public}d, type=%{public}d, pid=%{public}d, uid=%{public}d",
+        static_cast<int32_t>(info.apl), static_cast<int32_t>(type), pid, uid);
+    return false;
+}
+
 Permission::Permission()
 {
 }
@@ -33,33 +59,81 @@ Permission::~Permission()
 {
 }
 
-bool Permission::IsSystem()
+bool Permission::IsSystemCore()
 {
+    bool isMatch = IsTokenAplMatch(ATokenAplEnum::APL_SYSTEM_CORE);
+    if (!isMatch) {
+        HILOGE("[IsSystemCore] access token denied");
+    }
+    return isMatch;
+}
+
+bool Permission::IsSystemBasic()
+{
+    bool isMatch = IsTokenAplMatch(ATokenAplEnum::APL_SYSTEM_BASIC);
+    if (!isMatch) {
+        HILOGE("[IsSystemBasic] access token denied");
+    }
+    return isMatch;
+}
+
+bool Permission::IsSystemApl()
+{
+    return IsSystemBasic() || IsSystemCore();
+}
+
+void Permission::InitPermissionInterface()
+{
+    HILOGI("[InitPermissionInterface] begin");
+    if (sptrBundleMgr_ != nullptr) {
+        HILOGE("[InitPermissionInterface] already init");
+        return;
+    }
+
+    sptrBundleMgr_ = GetBundleMgr();
+    HILOGI("[InitPermissionInterface] success");
+    return;
+}
+
+sptr<IBundleMgr> Permission::GetBundleMgr()
+{
+    auto bundleObj =
+        DelayedSingleton<AppExecFwk::SysMrgClient>::GetInstance()->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (bundleObj == nullptr) {
+        HILOGE("[GetBundleMgr][kemin] GetSystemAbility is null");
+        return nullptr;
+    }
+
+    sptr<AppExecFwk::IBundleMgr> bmgr = iface_cast<AppExecFwk::IBundleMgr>(bundleObj);
+    if (bmgr == nullptr) {
+        HILOGE("[GetBundleMgr][kemin] iface_cast get null");
+    }
+    return bmgr;
+}
+
+bool Permission::IsSystemHap()
+{
+    InitPermissionInterface();
     AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
     pid_t pid = IPCSkeleton::GetCallingPid();
     pid_t uid = IPCSkeleton::GetCallingUid();
     ATokenTypeEnum type = AccessTokenKit::GetTokenTypeFlag(tokenId);
-    HILOGD("[IsSystem] check permission, type=%{public}d, pid=%{public}d,uid=%{public}d",
+    HILOGD("[IsSystemHap] checking system hap, type=%{public}d, pid=%{public}d, uid=%{public}d",
         static_cast<int32_t>(type), pid, uid);
-    bool result = false;
-    switch (type) {
-        case ATokenTypeEnum::TOKEN_HAP:
-            result = TokenIdKit::IsSystemAppByFullTokenID(IPCSkeleton::GetCallingFullTokenID());
-            break;
-        case ATokenTypeEnum::TOKEN_NATIVE:
-        case ATokenTypeEnum::TOKEN_SHELL:
-            result = true;
-            break;
-        case ATokenTypeEnum::TOKEN_INVALID:
-        case ATokenTypeEnum::TOKEN_TYPE_BUTT:
-            break;
-    }
-    if (!result) {
-        HILOGW("[IsSystem] system denied, type=%{public}d, pid=%{public}d, uid=%{public}d",
-            static_cast<int32_t>(type), pid, uid);
+    if (type != ATokenTypeEnum::TOKEN_HAP) {
+        HILOGE("[IsSystemHap] type is not hap");
         return false;
     }
-    return true;
+    if (sptrBundleMgr_ == nullptr) {
+        HILOGE("[IsSystemHap] sptrBundleMgr_ is null");
+        return false;
+    }
+    return sptrBundleMgr_->CheckIsSystemAppByUid(uid);
+}
+
+bool Permission::IsSystem()
+{
+    return IsSystemApl() || IsSystemHap();
 }
 
 bool Permission::IsPermissionGranted(const std::string& perm)
@@ -89,6 +163,11 @@ bool Permission::IsPermissionGranted(const std::string& perm)
         return false;
     }
     return true;
+}
+
+bool Permission::IsSystemHapPermGranted(const std::string& perm)
+{
+    return IsSystemHap() && IsPermissionGranted(perm);
 }
 } // namespace DevAttest
 } // namespace OHOS

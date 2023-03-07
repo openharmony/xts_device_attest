@@ -24,7 +24,10 @@ namespace OHOS {
             DEVATTEST_FAIL = -1,
 
             DEVATTEST_SUCCESS = 0,
-            
+
+            DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP = 202,
+            DEVATTEST_ERR_JS_PARAMETER_ERROR = 401,
+            DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION = 20000001,
             // SA框架使用错误码
             DEVATTEST_SERVICE_FAILED = 0x10000 + 1,
             DEVATTEST_WRITE_FAIL = 0x10000 + 2,

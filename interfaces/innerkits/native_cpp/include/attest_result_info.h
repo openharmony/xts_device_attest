@@ -34,9 +34,9 @@ namespace OHOS {
 namespace DevAttest {
 class AttestResultInfo : public Parcelable {
 public:
-    int32_t authResult_ = -1;
-    int32_t softwareResult_ = -1;
-    std::vector<int32_t> softwareResultDetail_ = {-1, -1, -1, -1, -1};
+    int32_t authResult_ = -2;
+    int32_t softwareResult_ = -2;
+    std::vector<int32_t> softwareResultDetail_ = {-2, -2, -2, -2, -2};
     int32_t ticketLength_ = 0;
     std::string ticket_;
 

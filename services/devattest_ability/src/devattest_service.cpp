@@ -116,14 +116,14 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
         }
 
         attestResultInfo.ticketLength_ = ticketLenght;
-        attestResultInfo.ticket_ = ticketStr;
+        attestResultInfo.ticket_ = (ticketStr == NULL) ? "" : ticketStr;
         ret = CopyAttestResult(resultArray,  attestResultInfo);
         if (ret != DEVATTEST_SUCCESS) {
             HILOGE("copy attest result failed");
             break;
         }
     } while (0);
-    if (ticketStr != NULL && ticketLenght != 0) {
+    if (ticketStr != NULL) {
         free(ticketStr);
         ticketStr = NULL;
     }

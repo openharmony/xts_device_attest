@@ -138,7 +138,7 @@ int32_t AnonymiseStr(char* str)
         return ATTEST_ERR;
     }
     uint32_t strLen = strlen(str);
-    uint32_t ret;
+    int32_t ret;
     uint32_t tempLen = 8;
     if (strLen <= tempLen) {
         ret = memset_s((void*)str, strLen, '*', strLen);

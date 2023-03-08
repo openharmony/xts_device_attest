@@ -291,13 +291,12 @@ static int32_t CopyResultArray(AuthStatus* authStatus, int32_t** resultArray)
     if (softwareResultDetail == NULL) {
         ATTEST_LOG_ERROR("[CopyResultArray] failed to get softwareResultDetail");
         return ATTEST_ERR;
-    } else {
-        head[ATTEST_RESULT_VERSIONID] = softwareResultDetail->versionIdResult;
-        head[ATTEST_RESULT_PATCHLEVEL] = softwareResultDetail->patchLevelResult;
-        head[ATTEST_RESULT_ROOTHASH] = softwareResultDetail->rootHashResult;
-        head[ATTEST_RESULT_PCID] = softwareResultDetail->pcidResult;
-        head[ATTEST_RESULT_RESERVE] = DEVICE_ATTEST_INIT;
     }
+    head[ATTEST_RESULT_VERSIONID] = softwareResultDetail->versionIdResult;
+    head[ATTEST_RESULT_PATCHLEVEL] = softwareResultDetail->patchLevelResult;
+    head[ATTEST_RESULT_ROOTHASH] = softwareResultDetail->rootHashResult;
+    head[ATTEST_RESULT_PCID] = softwareResultDetail->pcidResult;
+    head[ATTEST_RESULT_RESERVE] = DEVICE_ATTEST_INIT;
     return ATTEST_OK;
 }
 

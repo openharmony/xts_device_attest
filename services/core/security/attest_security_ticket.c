@@ -41,7 +41,7 @@ int32_t WriteTicketToDevice(const char* ticket, uint8_t ticketLen)
     SecurityParam aesKeyParam = {aesKey, sizeof(aesKey)};
     SecurityParam saltParam = {salt, sizeof(salt)};
     VersionData versionData = {TOKEN_VER0_0, sizeof(TOKEN_VER0_0)};
-    uint32_t ret = GetAesKey(&saltParam, &versionData, &aesKeyParam);
+    int32_t ret = GetAesKey(&saltParam, &versionData, &aesKeyParam);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[WriteTicketToDevice] Get AesKey fail.");
         return ERR_ATTEST_SECURITY_GEN_AESKEY;

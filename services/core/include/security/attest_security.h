@@ -30,10 +30,6 @@ extern "C" {
 #endif
 #endif /* End of #ifdef __cplusplus */
 
-
-#define MAX_TICKET_LEN 48
-#define MIN_TICKET_LEN 32
-
 #define BASE64_PSK_LENGTH 24
 #define IV_LEN 16
 

@@ -70,7 +70,7 @@ static int32_t SendChallMsg(DevicePacket* devicePacket, char** respMsg, ATTEST_A
         return ATTEST_ERR;
     }
     char* recvMsg = NULL;
-    uint32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_CHALLENGE, &recvMsg);
+    int32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_CHALLENGE, &recvMsg);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[SendChallMsg] Send AttestMsg failed");
         return ret;
@@ -102,7 +102,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem currentTime failed.");
         return ATTEST_ERR;
     }
-    uint32_t ret = GetObjectItemValueStr(jsonStr, "challenge", &(challenge->challenge));
+    int32_t ret = GetObjectItemValueStr(jsonStr, "challenge", &(challenge->challenge));
     return ret;
 }
 

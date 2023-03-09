@@ -52,14 +52,17 @@ int32_t DevAttestServiceProxy::GetAttestStatus(AttestResultInfo &attestResultInf
         HILOGE("GetAttestStatus: authRet failed %{public}d", authRet);
         return DEVATTEST_FAIL;
     }
-    if (authRet == DEVATTEST_SUCCESS) {
-        sptr<AttestResultInfo> attestResultInfoPtr = AttestResultInfo::Unmarshalling(reply);
-        attestResultInfo = *attestResultInfoPtr;
-    } else {
+    if (authRet != DEVATTEST_SUCCESS) {
         HILOGE("GetAttestStatus: authRet failed code %{public}d", authRet);
         return DEVATTEST_FAIL;
     }
 
+    sptr<AttestResultInfo> attestResultInfoPtr = AttestResultInfo::Unmarshalling(reply);
+    if (attestResultInfoPtr == nullptr) {
+        HILOGE("GetAttestStatus: attestResultInfoPtr is nullptr");
+        return DEVATTEST_FAIL;
+    }
+    attestResultInfo = *attestResultInfoPtr;
     return DEVATTEST_SUCCESS;
 }
 }

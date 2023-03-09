@@ -50,7 +50,7 @@ bool IsAuthStatusChg(void)
         }
         uint64_t currentTime = GetCurrentTime();
         if (currentTime == 0) {
-            ret = ATTEST_ERR;
+            ret = ATTEST_OK;
             ATTEST_LOG_ERROR("[IsAuthStatusChg] CurrentTime invalied");
             break;
         }
@@ -444,7 +444,7 @@ uint64_t GetCurrentTime(void)
 {
     ATTEST_LOG_DEBUG("[GetCurrentTime] Begin.");
     ChallengeResult* challengeResult = NULL;
-    uint32_t ret = GetChallenge(&challengeResult, ATTEST_ACTION_CHALLENGE);
+    int32_t ret = GetChallenge(&challengeResult, ATTEST_ACTION_CHALLENGE);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetCurrentTime] Get challenge ret = %d.", ret);
         return 0;
@@ -816,7 +816,7 @@ int32_t SendAuthMsg(DevicePacket* devicePacket, char** respMsg)
         return ATTEST_ERR;
     }
     char* recvMsg = NULL;
-    uint32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_AUTHORIZE, &recvMsg);
+    int32_t ret = SendAttestMsg(devicePacket, ATTEST_ACTION_AUTHORIZE, &recvMsg);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[SendAuthMsg] Send AttestMsg failed");
         return ATTEST_ERR;

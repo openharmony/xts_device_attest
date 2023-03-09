@@ -210,7 +210,7 @@ static int32_t EncryptAesCbc(AesCryptBufferDatas* datas, const uint8_t* aesKey,
     mbedtls_cipher_context_t cipherCtx;
     mbedtls_cipher_init(&cipherCtx);
     cipherCtx.cipher_info = &cipherInfo;
-    uint32_t ret = mbedtls_cipher_set_padding_mode(&cipherCtx, MBEDTLS_PADDING_PKCS7);
+    int32_t ret = mbedtls_cipher_set_padding_mode(&cipherCtx, MBEDTLS_PADDING_PKCS7);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptAesCbc] Set padding mode failed, ret = -0x%x", ret);
         return ret;
@@ -256,7 +256,7 @@ static int32_t DecryptAesCbc(AesCryptBufferDatas* datas, const uint8_t* aesKey,
 
     mbedtls_aes_context aesCtx;
     mbedtls_aes_init(&aesCtx);
-    uint32_t ret = mbedtls_aes_setkey_dec(&aesCtx, aesKey, AES_CIPHER_BITS);
+    int32_t ret = mbedtls_aes_setkey_dec(&aesCtx, aesKey, AES_CIPHER_BITS);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptAesCbc] Set mbedtls enc key failed, ret = -0x%x", ret);
         return ret;

@@ -23,13 +23,6 @@ using namespace std;
 using namespace OHOS;
 using namespace OHOS::DevAttest;
 
-static const std::unordered_map<uint32_t, std::string> g_errorStringMap = {
-    {DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP,
-        "This api is system api, Please use the system application to call this api"},
-    {DEVATTEST_ERR_JS_PARAMETER_ERROR, "Input paramters wrong"},
-    {DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION, "System service exception, please try again or reboot your device"},
-};
-
 struct DevAttestAsyncContext {
     napi_async_work work;
     napi_ref callbackRef = nullptr; // 用于callback模式
@@ -67,30 +60,18 @@ static napi_value GenerateDevAttestHandle(napi_env env, int32_t auth, int32_t so
     return resultObject;
 }
 
-static string ConvertToJsErrMsg(int32_t jsErrCode)
-{
-    auto iter = g_errorStringMap.find(jsErrCode);
-    if (iter != g_errorStringMap.end()) {
-        return iter->second;
-    } else {
-        return "Unknown error, please reboot your device and try again";
-    }
-}
-
 static napi_value GenerateBusinessError(napi_env env, int32_t code)
 {
     napi_value result;
-    HILOGI("[GenerateBusinessError] code:%{public}d", code);
-    if (code == DEVATTEST_SUCCESS) {
+    int32_t jsErrCode = ConvertToJsErrCode(code);
+    HILOGI("[GenerateBusinessError] jsErrCode:%{public}d", jsErrCode);
+    if (jsErrCode == DEVATTEST_SUCCESS) {
         napi_get_undefined(env, &result);
     } else {
-        if (code == DEVATTEST_FAIL) {
-            code = DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION;
-        }
         napi_value errCode = nullptr;
-        napi_create_int32(env, code, &errCode);
+        napi_create_int32(env, jsErrCode, &errCode);
 
-        string errMsgStr = ConvertToJsErrMsg(code);
+        string errMsgStr = ConvertToJsErrMsg(jsErrCode);
         napi_value errMsg = nullptr;
         napi_create_string_utf8(env, errMsgStr.c_str(), NAPI_AUTO_LENGTH, &errMsg);
         
@@ -105,7 +86,6 @@ static napi_value GenerateReturnValue(napi_env env, DevAttestAsyncContext* callb
 {
     napi_value result;
     if (callback->ret == DEVATTEST_SUCCESS) {
-        napi_create_object(env, &result);
         result = GenerateDevAttestHandle(env, callback->value.authResult_, callback->value.softwareResult_,
             callback->value.ticket_, callback->value.softwareResultDetail_);
     } else {
@@ -171,8 +151,7 @@ napi_value DevAttestNapi::GetAttestResultInfo(napi_env env, napi_callback_info i
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (argc > PARAM1) {
         HILOGE("[GetAttestResultInfo] Input at most 1 paramter");
-        napi_throw(env, GenerateBusinessError(env, DEVATTEST_ERR_JS_PARAMETER_ERROR));
-        return nullptr;
+        DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, DEVATTEST_ERR_JS_PARAMETER_ERROR);
     }
 
     // 判断入参的类型是否正确
@@ -181,8 +160,7 @@ napi_value DevAttestNapi::GetAttestResultInfo(napi_env env, napi_callback_info i
         napi_typeof(env, argv[0], &type);
         if (type != napi_function) {
             HILOGE("[GetAttestResultInfo] the type of argv[0] is not function");
-            napi_throw(env, GenerateBusinessError(env, DEVATTEST_ERR_JS_PARAMETER_ERROR));
-            return nullptr;
+            DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, DEVATTEST_ERR_JS_PARAMETER_ERROR);
         }
     }
 
@@ -220,14 +198,11 @@ napi_value DevAttestNapi::GetAttestResultInfoSync(napi_env env, napi_callback_in
     int32_t errCode = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
     if (errCode != DEVATTEST_SUCCESS) {
         HILOGE("[GetAttestResultInfoSync] GetAttestStatus failed errCode:%{public}d", errCode);
-        napi_throw(env, GenerateBusinessError(env, errCode));
-        return nullptr;
+        DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, errCode);
     }
-    napi_value destObject;
-    napi_create_object(env, &destObject);
-    destObject = GenerateDevAttestHandle(env, attestResultInfo.authResult_, attestResultInfo.softwareResult_,
+
+    return GenerateDevAttestHandle(env, attestResultInfo.authResult_, attestResultInfo.softwareResult_,
         attestResultInfo.ticket_, attestResultInfo.softwareResultDetail_);
-    return destObject;
 }
 
 napi_value DevAttestNapi::Init(napi_env env, napi_value exports)

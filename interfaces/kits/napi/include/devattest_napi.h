@@ -24,14 +24,14 @@ namespace DevAttest {
 
 #define PARAM1 1
 
-#define DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, errCode)                           \
-do {                                                                            \
-    napi_value undefined;                                                       \
-    napi_get_undefined((env), &undefined);                                      \
-    int32_t jsErrCode = ConvertToJsErrCode((errCode));                          \
-    std::string jsErrMsg = ConvertToJsErrMsg(jsErrCode);                        \
-    napi_throw_error(env, std::to_string(jsErrCode).c_str(), jsErrMsg.c_str()); \
-    return undefined;                                                           \
+#define DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, errCode)                             \
+do {                                                                              \
+    napi_value undefined;                                                         \
+    napi_get_undefined((env), &undefined);                                        \
+    int32_t jsErrCode = ConvertToJsErrCode((errCode));                            \
+    std::string jsErrMsg = ConvertToJsErrMsg(jsErrCode);                          \
+    napi_throw_error((env), std::to_string(jsErrCode).c_str(), jsErrMsg.c_str()); \
+    return undefined;                                                             \
 } while (0)
 
 class DevAttestNapi {

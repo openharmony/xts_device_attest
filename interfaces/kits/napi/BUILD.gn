@@ -29,7 +29,7 @@ ohos_shared_library("deviceattest") {
   include_dirs = []
   configs = [ ":devattest_kit_config" ]
   public_configs = [ ":devattest_kit_config" ]
-  sources = [ 
+  sources = [
     "src/devattest_napi.cpp",
     "src/devattest_napi_error.cpp",
   ]

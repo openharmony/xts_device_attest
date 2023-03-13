@@ -17,14 +17,11 @@
 
 #include <string>
 
-
 namespace OHOS {
 namespace DevAttest {
-
 int32_t ConvertToJsErrCode(int32_t errCode);
-std::string ConvertToJsErrMsg(int32_t jsErrCode);
 
+std::string ConvertToJsErrMsg(int32_t jsErrCode);
 } // namespace DevAttest
 } // namespace OHOS
-
 #endif // DEVATTEST_NAPI_ERROR_H

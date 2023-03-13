@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DevAttest {
-
 #define PARAM1 1
 
 #define DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, errCode)                             \
@@ -45,5 +44,4 @@ private:
 };
 } // namespace DevAttest
 } // namespace OHOS
-
 #endif // DEVATTEST_NAPI_H

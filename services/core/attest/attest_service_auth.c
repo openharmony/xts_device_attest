@@ -207,13 +207,12 @@ static int32_t ParseSoftwareResultDetail(const cJSON* root, AuthStatus* authStat
         return ATTEST_ERR;
     }
 
-    size_t len = sizeof(SoftwareResultDetail);
-    authStatus->softwareResultDetail = (char *)ATTEST_MEM_MALLOC(len);
+    authStatus->softwareResultDetail = (SoftwareResultDetail *)ATTEST_MEM_MALLOC(sizeof(SoftwareResultDetail));
     if (authStatus->softwareResultDetail == NULL) {
         ATTEST_LOG_ERROR("[ParseSoftwareResultDetail] Failed to malloc.");
         return ATTEST_ERR;
     }
-    (void)memset_s(authStatus->softwareResultDetail, len, 0, len);
+    InitSoftwareResultDetail(authStatus->softwareResultDetail);
     int32_t ret = ATTEST_ERR;
     do {
         if (ParseVersionIdResult(json, (SoftwareResultDetail *)authStatus->softwareResultDetail) != ATTEST_OK) {
@@ -553,6 +552,19 @@ AuthStatus* CreateAuthStatus(void)
     authStatus->hardwareResult = DEVICE_ATTEST_INIT;
     authStatus->expireTime = 0;
     return authStatus;
+}
+
+void InitSoftwareResultDetail(SoftwareResultDetail* softwareResultDetail)
+{
+    if (softwareResultDetail == NULL) {
+        ATTEST_LOG_ERROR("[InitSoftwareResultDetail] Parameter invalid");
+        return;
+    }
+    softwareResultDetail->patchLevelResult = DEVICE_ATTEST_INIT;
+    softwareResultDetail->rootHashResult = DEVICE_ATTEST_INIT;
+    softwareResultDetail->versionIdResult = DEVICE_ATTEST_INIT;
+    softwareResultDetail->pcidResult = DEVICE_ATTEST_INIT;
+    return;
 }
 
 void DestroyAuthStatus(AuthStatus** authStat)

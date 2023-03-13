@@ -250,3 +250,13 @@ int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen)
 {
     return OEMReadNetworkConfig(buffer, bufferLen);
 }
+
+int32_t AttestWriteAuthResultCode(const char* data, uint32_t len)
+{
+    return OEMWriteAuthResultCode(data, len);
+}
+
+int32_t AttestReadAuthResultCode(char* buffer, uint32_t bufferLen)
+{
+    return OEMReadAuthResultCode(buffer, bufferLen);
+}

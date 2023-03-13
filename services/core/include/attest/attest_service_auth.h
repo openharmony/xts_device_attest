@@ -40,6 +40,8 @@ int32_t CheckAuthResult(AuthStatus* authStatus, uint64_t currentTime);
 
 AuthStatus* CreateAuthStatus(void);
 
+void InitSoftwareResultDetail(SoftwareResultDetail* softwareResultDetail);
+
 void DestroyAuthStatus(AuthStatus** authStats);
 
 AuthResult* CreateAuthResult(void);

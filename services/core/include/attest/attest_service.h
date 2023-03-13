@@ -22,6 +22,8 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
+#define AUTH_SUCCESS 0
+#define AUTH_FAILED  (1)
 
 int32_t ProcAttest(void);
 

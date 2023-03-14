@@ -32,7 +32,26 @@
 #include "attest_service.h"
 
 pthread_mutex_t g_mtxAttest = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t g_authStatusMutex;
+static uint8_t g_authResultCode = 2;
 
+static int32_t GetAuthResultCode(void)
+{
+    int32_t ret;
+    pthread_mutex_lock(&g_authStatusMutex);
+    AttestReadAuthResultCode((char*)&g_authResultCode, 1);
+    ret = g_authResultCode;
+    pthread_mutex_unlock(&g_authStatusMutex);
+    return ret;
+}
+
+static void UpdateAuthResultCode(uint8_t authResultCode)
+{
+    pthread_mutex_lock(&g_authStatusMutex);
+    AttestWriteAuthResultCode((char*)&authResultCode, 1);
+    g_authResultCode = authResultCode;
+    pthread_mutex_unlock(&g_authStatusMutex);
+}
 
 static int32_t ResetDevice(void)
 {
@@ -182,6 +201,7 @@ static int32_t ProcAttestImpl(void)
 
     if (!IsAuthStatusChg()) { // 检查本地数据是否修改或过期，进行重新认证
         ATTEST_LOG_WARN("[ProcAttestImpl] There is no change on auth status.");
+        UpdateAuthResultCode(AUTH_SUCCESS);
         DestroySysData();
         return ATTEST_OK;
     }
@@ -217,6 +237,7 @@ static int32_t ProcAttestImpl(void)
             }
         }
         if (ret != ATTEST_OK) {
+            UpdateAuthResultCode(AUTH_FAILED);
             ATTEST_LOG_ERROR("[ProcAttestImpl] Auth token failed, ret = %d.", ret);
             break;
         }
@@ -227,6 +248,7 @@ static int32_t ProcAttestImpl(void)
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ProcAttestImpl] Flush auth result failed, ret = %d.", ret);
         }
+        UpdateAuthResultCode(AUTH_SUCCESS);
         // 结果保存到启动子系统parameter,方便展示
         ret = FlushAttestStatusPara(authResult->authStatus);
         if (ret != ATTEST_OK) {
@@ -279,95 +301,140 @@ int32_t ProcAttest(void)
     return ret;
 }
 
+static int32_t AttestStatusTrans(int32_t attestStatus)
+{
+    return (attestStatus == 0) ? 0 : -1;
+}
+
 static int32_t CopyResultArray(AuthStatus* authStatus, int32_t** resultArray)
 {
     if (authStatus == NULL || resultArray == NULL) {
         return ATTEST_ERR;
     }
     int32_t *head = *resultArray;
-    head[ATTEST_RESULT_AUTH] = authStatus->hardwareResult;
-    head[ATTEST_RESULT_SOFTWARE] = authStatus->softwareResult;
+    head[ATTEST_RESULT_AUTH] = AttestStatusTrans(authStatus->hardwareResult);
+    head[ATTEST_RESULT_SOFTWARE] = AttestStatusTrans(authStatus->softwareResult);
     SoftwareResultDetail *softwareResultDetail = (SoftwareResultDetail *)authStatus->softwareResultDetail;
     if (softwareResultDetail == NULL) {
         ATTEST_LOG_ERROR("[CopyResultArray] failed to get softwareResultDetail");
         return ATTEST_ERR;
     }
-    head[ATTEST_RESULT_VERSIONID] = softwareResultDetail->versionIdResult;
-    head[ATTEST_RESULT_PATCHLEVEL] = softwareResultDetail->patchLevelResult;
-    head[ATTEST_RESULT_ROOTHASH] = softwareResultDetail->rootHashResult;
-    head[ATTEST_RESULT_PCID] = softwareResultDetail->pcidResult;
+    head[ATTEST_RESULT_VERSIONID] = AttestStatusTrans(softwareResultDetail->versionIdResult);
+    head[ATTEST_RESULT_PATCHLEVEL] = AttestStatusTrans(softwareResultDetail->patchLevelResult);
+    head[ATTEST_RESULT_ROOTHASH] = AttestStatusTrans(softwareResultDetail->rootHashResult);
+    head[ATTEST_RESULT_PCID] = AttestStatusTrans(softwareResultDetail->pcidResult);
     head[ATTEST_RESULT_RESERVE] = DEVICE_ATTEST_INIT;
     return ATTEST_OK;
 }
 
-static int32_t LoadDefaultResultArray(int32_t** resultArray)
+static int32_t SetAttestResultArray(int32_t** resultArray, int32_t value)
 {
     if (resultArray == NULL) {
         return ATTEST_ERR;
     }
     int32_t *head = *resultArray;
     for (int32_t i = 0; i < ATTEST_RESULT_MAX; i++) {
-        head[i] = DEVICE_ATTEST_INIT;
+        head[i] = value;
     }
     return ATTEST_OK;
 }
 
-static int32_t QueryAttestStatusImpl(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength)
+static int32_t SetAttestStatusDefault(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength)
 {
-    if (resultArray == NULL || arraySize != ATTEST_RESULT_MAX || ticket == NULL) {
-        ATTEST_LOG_ERROR("[QueryAttestStatusImpl] parameter wrong");
-        return ATTEST_ERR;
-    }
+    int32_t ret = SetAttestResultArray(resultArray, DEVICE_ATTEST_INIT);
+    *ticket = "";
+    *ticketLength = 0;
+    return ret;
+}
+
+static int32_t SetAttestStatusFailed(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength)
+{
+    int32_t ret = SetAttestResultArray(resultArray, DEVICE_ATTEST_FAIL);
+    *ticket = "";
+    *ticketLength = 0;
+    return ret;
+}
+
+static int32_t SetAttestStatusSucc(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength)
+{
     char* authStatusBase64 = NULL;
     AuthStatus* authStatus = CreateAuthStatus();
-    int32_t retCode = ATTEST_OK;
+    int32_t ret = ATTEST_OK;
     do {
-        *ticket = NULL;
+        *ticket = "";
         *ticketLength = 0;
         // 获取认证结果
         if (GetAuthStatus(&authStatusBase64) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[QueryAttestStatusImpl] Load Auth Status failed, auth file not exist");
-            retCode = ATTEST_ERR;
+            ret = ATTEST_ERR;
             break;
         }
         if (DecodeAuthStatus((const char*)authStatusBase64, authStatus) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[QueryAttestStatusImpl] Decode Auth Status failed");
-            retCode = ATTEST_ERR;
+            ret = ATTEST_ERR;
+            break;
+        }
+        if (authStatus->hardwareResult != 0) {
             break;
         }
         // 获取token
         char* decryptedTicket = (char *)ATTEST_MEM_MALLOC(MAX_TICKET_LEN + 1);
         if (decryptedTicket == NULL) {
             ATTEST_LOG_ERROR("[QueryAttestStatusImpl] buff malloc memory failed");
-            retCode = ATTEST_ERR;
+            ret = ATTEST_ERR;
             break;
         }
         if (ReadTicketFromDevice(decryptedTicket, MAX_TICKET_LEN) != ATTEST_OK) {
             ATTEST_LOG_ERROR("[QueryAttestStatusImpl] read ticket from device failed");
             ATTEST_MEM_FREE(decryptedTicket);
-            retCode = ATTEST_ERR;
+            ret = ATTEST_ERR;
             break;
         }
         *ticket = decryptedTicket;
         *ticketLength = strlen(*ticket);
     } while (0);
     ATTEST_MEM_FREE(authStatusBase64);
-    if (retCode != ATTEST_OK) {
+    if (ret != ATTEST_OK) {
         DestroyAuthStatus(&authStatus);
-        return LoadDefaultResultArray(resultArray);
+        return ret;
     }
-    retCode = CopyResultArray(authStatus, resultArray);
-    if (retCode != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[QueryAttestStatusImpl] CopyResultArray failed");
-    }
+    ret = CopyResultArray(authStatus, resultArray);
     DestroyAuthStatus(&authStatus);
-    return ATTEST_OK;
+    return ret;
+}
+
+static int32_t QueryAttestStatusSwitch(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength)
+{
+    if (resultArray == NULL || arraySize != ATTEST_RESULT_MAX || ticket == NULL) {
+        ATTEST_LOG_ERROR("[QueryAttestStatusImpl] parameter wrong");
+        return ATTEST_ERR;
+    }
+    int32_t ret = ATTEST_ERR;
+    int32_t authResultCode = GetAuthResultCode();
+    switch (authResultCode) {
+        case (AUTH_UNKNOWN):
+            ret = SetAttestStatusDefault(resultArray, arraySize, ticket, ticketLength);
+            ATTEST_LOG_INFO("[QueryAttestStatusImpl] authResultCode is 2, ret = %d", ret);
+            break;
+        case (AUTH_FAILED):
+            ret = SetAttestStatusFailed(resultArray, arraySize, ticket, ticketLength);
+            ATTEST_LOG_INFO("[QueryAttestStatusImpl] authResultCode is 1, ret = %d", ret);
+            break;
+        case (AUTH_SUCCESS):
+            ret = SetAttestStatusSucc(resultArray, arraySize, ticket, ticketLength);
+            ATTEST_LOG_INFO("[QueryAttestStatusImpl] authResultCode is 0, ret = %d", ret);
+            break;
+        default:
+            ATTEST_LOG_INFO("[QueryAttestStatusImpl] authResultCode is invalid");
+            break;
+    }
+    return ret;
 }
 
 int32_t QueryAttestStatus(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength)
 {
     pthread_mutex_lock(&g_mtxAttest);
-    int32_t ret = QueryAttestStatusImpl(resultArray, arraySize, ticket, ticketLength);
+    int32_t ret = QueryAttestStatusSwitch(resultArray, arraySize, ticket, ticketLength);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[QueryAttestStatus] failed ret = %d.", ret);
     }

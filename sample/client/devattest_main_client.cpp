@@ -16,13 +16,13 @@
 #include "devattest_client.h"
 
 #include <string>
+#include <stdio.h>
 
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "system_ability.h"
 #include "singleton.h"
 
-#include "devattest_log.h"
 #include "devattest_errno.h"
 #include "attest_result_info.h"
 
@@ -30,32 +30,27 @@ using namespace OHOS;
 using namespace OHOS::DevAttest;
 int main(int argc, char *arg[])
 {
-    HILOGI("Test client main begin");
-
+    printf("[DEVATTEST]Test client main begin\n");
     AttestResultInfo attestResultInfo;
     attestResultInfo.authResult_ = 3;
     attestResultInfo.softwareResult_ = 3;
     attestResultInfo.ticket_ = "test";
     attestResultInfo.ticketLength_ = strlen("test");
-    HILOGI("attestResultInfo authResult %{public}d", attestResultInfo.authResult_);
-    HILOGI("attestResultInfo softwareResult %{public}d", attestResultInfo.softwareResult_);
-    HILOGI("attestResultInfo ticket %{public}s", attestResultInfo.ticket_.c_str());
 
     int res = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
-    HILOGI("Test client GetAuthRes = %{public}d", res);
     if (res != DEVATTEST_SUCCESS) {
-        HILOGI("AttestTest client main fail!");
+        printf("[DEVATTEST]AttestTest client main fail!\n");
         return DEVATTEST_FAIL;
     }
-    HILOGI("attestResultInfo authResult %{public}d", attestResultInfo.authResult_);
-    HILOGI("attestResultInfo softwareResult %{public}d", attestResultInfo.softwareResult_);
-    HILOGI("attestResultInfo ticket %{public}s", attestResultInfo.ticket_.c_str());
-    HILOGI("attestResultInfo ticketLength %{public}d", attestResultInfo.ticketLength_);
-    HILOGI("attestResultInfo softwareResultDetail");
-    for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
-        HILOGI("[%{public}d] %{public}d", i, attestResultInfo.softwareResultDetail_[i]);
-    }
+    printf("[DEVATTEST]attestResultInfo authResult %d\n", attestResultInfo.authResult_);
+    printf("[DEVATTEST]attestResultInfo softwareResult %d\n", attestResultInfo.softwareResult_);
+    printf("[DEVATTEST]attestResultInfo ticket %s\n", attestResultInfo.ticket_.c_str());
+    printf("[DEVATTEST]attestResultInfo ticketLength %d\n", attestResultInfo.ticketLength_);
 
-    HILOGI("Test client main end");
+    for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
+        printf("[DEVATTEST]attestResultInfo softwareResultDetail[%d] %d\n",
+            i, attestResultInfo.softwareResultDetail_[i]);
+    }
+    printf("[DEVATTEST]Test client main ended successfully!\n");
     return DEVATTEST_SUCCESS;
 }

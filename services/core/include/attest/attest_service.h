@@ -24,6 +24,7 @@ extern "C" {
 
 #define AUTH_SUCCESS 0
 #define AUTH_FAILED  (1)
+#define AUTH_UNKNOWN (2)
 
 int32_t ProcAttest(void);
 

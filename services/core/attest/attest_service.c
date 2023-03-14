@@ -361,7 +361,7 @@ static int32_t SetAttestStatusSucc(int32_t** resultArray, int32_t arraySize, cha
     AuthStatus* authStatus = CreateAuthStatus();
     int32_t ret = ATTEST_OK;
     do {
-        *ticket = NULL;
+        *ticket = "";
         *ticketLength = 0;
         // 获取认证结果
         if (GetAuthStatus(&authStatusBase64) != ATTEST_OK) {
@@ -375,7 +375,6 @@ static int32_t SetAttestStatusSucc(int32_t** resultArray, int32_t arraySize, cha
             break;
         }
         if (authStatus->hardwareResult != 0) {
-            *ticket = "";
             break;
         }
         // 获取token
@@ -413,15 +412,15 @@ static int32_t QueryAttestStatusSwitch(int32_t** resultArray, int32_t arraySize,
     int32_t ret = ATTEST_ERR;
     int32_t authResultCode = GetAuthResultCode();
     switch (authResultCode) {
-        case (2):
+        case (AUTH_UNKNOWN):
             ret = SetAttestStatusDefault(resultArray, arraySize, ticket, ticketLength);
             ATTEST_LOG_INFO("[QueryAttestStatusImpl] authResultCode is 2, ret = %d", ret);
             break;
-        case (1):
+        case (AUTH_FAILED):
             ret = SetAttestStatusFailed(resultArray, arraySize, ticket, ticketLength);
             ATTEST_LOG_INFO("[QueryAttestStatusImpl] authResultCode is 1, ret = %d", ret);
             break;
-        case (0):
+        case (AUTH_SUCCESS):
             ret = SetAttestStatusSucc(resultArray, arraySize, ticket, ticketLength);
             ATTEST_LOG_INFO("[QueryAttestStatusImpl] authResultCode is 0, ret = %d", ret);
             break;

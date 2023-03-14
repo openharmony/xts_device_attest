@@ -90,16 +90,6 @@ typedef struct {
     char* authStatus;
 } AuthResult;
 
-// 认证返回结果中的authStatus结构
-typedef struct {
-    char* versionId;
-    char* authType;
-    char* softwareResultDetail;
-    int32_t softwareResult;
-    int32_t hardwareResult;
-    uint64_t expireTime;  // 项目新增字段，参考接口文档
-} AuthStatus;
-
 // 认证返回结果中的softwareResultDetail结构
 typedef struct {
     int32_t versionIdResult;
@@ -107,6 +97,16 @@ typedef struct {
     int32_t rootHashResult;
     int32_t pcidResult;
 } SoftwareResultDetail;
+
+// 认证返回结果中的authStatus结构
+typedef struct {
+    char* versionId;
+    char* authType;
+    SoftwareResultDetail* softwareResultDetail;
+    int32_t softwareResult;
+    int32_t hardwareResult;
+    uint64_t expireTime;  // 项目新增字段，参考接口文档
+} AuthStatus;
 
 // 获取挑战值返回结果
 typedef struct {

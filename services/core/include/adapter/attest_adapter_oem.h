@@ -24,6 +24,7 @@ extern "C" {
 
 #define AUTH_RESULT_PATH "/data/device_attest" // 具体读写路径待和浩哥讨论
 #define AUTH_STATUS_FILE_NAME "auth_status"
+#define AUTH_RESULT_CODE_FILE_NAME "auth_result_code"
 #define TICKET_FILE_NAME "ticket"
 #define RESET_FLAG_FILE_NAME "reset_flag"
 
@@ -40,6 +41,10 @@ int32_t OEMGetAuthStatusFileSize(uint32_t* len);
 int32_t OEMCreateResetFlag(void);
 
 bool OEMIsResetFlagExist(void);
+
+int32_t OEMWriteAuthResultCode(const char* data, uint32_t len);
+
+int32_t OEMReadAuthResultCode(char* buffer, uint32_t bufferLen);
 
 #ifdef __cplusplus
 #if __cplusplus

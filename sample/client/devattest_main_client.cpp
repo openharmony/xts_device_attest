@@ -16,7 +16,7 @@
 #include "devattest_client.h"
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -30,22 +30,16 @@ using namespace OHOS;
 using namespace OHOS::DevAttest;
 int main(int argc, char *arg[])
 {
-    printf("[DEVATTEST]Test client main begin\n");
     AttestResultInfo attestResultInfo;
-    attestResultInfo.authResult_ = 3;
-    attestResultInfo.softwareResult_ = 3;
-    attestResultInfo.ticket_ = "test";
-    attestResultInfo.ticketLength_ = strlen("test");
-
     int res = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
     if (res != DEVATTEST_SUCCESS) {
         printf("[DEVATTEST]AttestTest client main fail!\n");
         return DEVATTEST_FAIL;
     }
-    printf("[DEVATTEST]attestResultInfo authResult %d\n", attestResultInfo.authResult_);
-    printf("[DEVATTEST]attestResultInfo softwareResult %d\n", attestResultInfo.softwareResult_);
-    printf("[DEVATTEST]attestResultInfo ticket %s\n", attestResultInfo.ticket_.c_str());
-    printf("[DEVATTEST]attestResultInfo ticketLength %d\n", attestResultInfo.ticketLength_);
+    printf("[DEVATTEST]attestResultInfo authResult [%d] softwareResult [%d]\n",
+        attestResultInfo.authResult_, attestResultInfo.softwareResult_);
+    printf("[DEVATTEST]attestResultInfo ticketLength [%d] ticket [%s]\n",
+        attestResultInfo.ticketLength_, attestResultInfo.ticket_.c_str());
 
     for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
         printf("[DEVATTEST]attestResultInfo softwareResultDetail[%d] %d\n",

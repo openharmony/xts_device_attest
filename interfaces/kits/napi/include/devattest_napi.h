@@ -12,16 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DEVATTEST_NAPI__H
-#define DEVATTEST_NAPI__H
+#ifndef DEVATTEST_NAPI_H
+#define DEVATTEST_NAPI_H
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-
-#define PARAM1 1
+#include "devattest_napi_error.h"
 
 namespace OHOS {
 namespace DevAttest {
+#define PARAM1 1
+
+#define DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, errCode)                             \
+do {                                                                              \
+    napi_value undefined;                                                         \
+    napi_get_undefined((env), &undefined);                                        \
+    int32_t jsErrCode = ConvertToJsErrCode((errCode));                            \
+    std::string jsErrMsg = ConvertToJsErrMsg(jsErrCode);                          \
+    napi_throw_error((env), std::to_string(jsErrCode).c_str(), jsErrMsg.c_str()); \
+    return undefined;                                                             \
+} while (0)
+
 class DevAttestNapi {
 public:
     static napi_value Init(napi_env env, napi_value exports);
@@ -33,5 +44,4 @@ private:
 };
 } // namespace DevAttest
 } // namespace OHOS
-
-#endif // DEVATTEST_NAPI__H
+#endif // DEVATTEST_NAPI_H

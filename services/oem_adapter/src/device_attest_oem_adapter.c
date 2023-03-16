@@ -216,6 +216,7 @@ int32_t OEMGetProductId(char* productId, uint32_t len)
     return ret;
 }
 
+/* It is temporarily useless */
 int32_t OEMGetProductKey(char* productKey, uint32_t len)
 {
     if ((productKey == NULL) || (len == 0)) {

@@ -105,25 +105,25 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
         return DEVATTEST_FAIL;
     }
     (void)memset_s(resultArray, resultArraySize, 0, resultArraySize);
-    int32_t ticketLenght = 0;
+    int32_t ticketLength = 0;
     char* ticketStr = NULL;
     int32_t ret = DEVATTEST_SUCCESS;
     do {
-        ret = QueryAttest(&resultArray, MAX_ATTEST_RESULT_SIZE, &ticketStr, &ticketLenght);
+        ret = QueryAttest(&resultArray, MAX_ATTEST_RESULT_SIZE, &ticketStr, &ticketLength);
         if (ret != DEVATTEST_SUCCESS) {
             HILOGE("QueryAttest failed");
             break;
         }
 
-        attestResultInfo.ticketLength_ = ticketLenght;
-        attestResultInfo.ticket_ = (ticketStr == NULL) ? "" : ticketStr;
+        attestResultInfo.ticketLength_ = ticketLength;
+        attestResultInfo.ticket_ = ticketStr;
         ret = CopyAttestResult(resultArray,  attestResultInfo);
         if (ret != DEVATTEST_SUCCESS) {
             HILOGE("copy attest result failed");
             break;
         }
     } while (0);
-    if (ticketStr != NULL) {
+    if (ticketStr != NULL && ticketLength != 0) {
         free(ticketStr);
         ticketStr = NULL;
     }

@@ -28,12 +28,11 @@
 #include "devattest_log.h"
 #include "devattest_network_callback.h"
 
-#define RETRY_REGISTER_NET_CALLBACK_TIME 5
-
 namespace OHOS {
 namespace DevAttest {
 using namespace NetManagerStandard;
 constexpr std::int32_t WAIT_FOR_KVSTORE = 1000;
+constexpr std::int32_t RETRY_REGISTER_NET_CALLBACK_TIME = 5;
 
 void DevAttestSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {

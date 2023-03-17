@@ -43,7 +43,8 @@ DevAttestServiceStub::~DevAttestServiceStub()
     requestFuncMap_.clear();
 }
 
-int DevAttestServiceStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
+int DevAttestServiceStub::OnRemoteRequest(uint32_t code,
+    MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     HILOGD("DevAttestServiceStub::OnRemoteRequest, cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
     std::u16string remoteDescriptor = data.ReadInterfaceToken();

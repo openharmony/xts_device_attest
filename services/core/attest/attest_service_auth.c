@@ -474,10 +474,10 @@ int32_t CheckVersionChanged(AuthStatus* authStatus)
     return ret;
 }
 
-int32_t DecodeAuthStatus(const char* infoByBase64, AuthStatus* authStats)
+static int32_t AnalysisInfoByBase64(const char* infoByBase64, char** outputBuffer, int32_t* outputLen)
 {
-    if (infoByBase64 == NULL || strlen(infoByBase64) == 0) {
-        ATTEST_LOG_ERROR("[DecodeAuthStatus] Invalid parameter");
+    if (infoByBase64 == NULL || strlen(infoByBase64) == 0 || outputLen == NULL || outputBuffer == NULL) {
+        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] Invalid parameter");
         return ATTEST_ERR;
     }
 
@@ -486,22 +486,41 @@ int32_t DecodeAuthStatus(const char* infoByBase64, AuthStatus* authStats)
     int32_t secondCommaIndex = firstCommaIndex + 1;
     secondCommaIndex = GetCommaIndex(infoByBase64, secondCommaIndex);
     if ((firstCommaIndex < 0) || (secondCommaIndex < 0) || (firstCommaIndex >= secondCommaIndex)) {
-        ATTEST_LOG_ERROR("[DecodeAuthStatus] Invalid auth status file format");
+        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] Invalid auth status file format");
         return ATTEST_ERR;
     }
 
     uint32_t bufferLen = secondCommaIndex - firstCommaIndex;
     char* authStatusBuffer = (char *)ATTEST_MEM_MALLOC(bufferLen);
     if (authStatusBuffer == NULL) {
-        ATTEST_LOG_ERROR("[DecodeAuthStatus] authStatusBuffer malloc memory failed");
+        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] authStatusBuffer malloc memory failed");
         return ATTEST_ERR;
     }
-    int32_t ret = strncpy_s(authStatusBuffer, bufferLen, infoByBase64 + firstCommaIndex + 1, bufferLen - 1);
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[DecodeAuthStatus] authStatusBuffer strncpy_s failed");
+    if (strncpy_s(authStatusBuffer, bufferLen, infoByBase64 + firstCommaIndex + 1, bufferLen - 1) != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] authStatusBuffer strncpy_s failed");
         ATTEST_MEM_FREE(authStatusBuffer);
-        return ret;
+        return ATTEST_ERR;
     }
+    *outputLen = bufferLen;
+    *outputBuffer = authStatusBuffer;
+    return ATTEST_OK;
+}
+
+int32_t DecodeAuthStatus(const char* infoByBase64, AuthStatus* authStats)
+{
+    if (infoByBase64 == NULL || strlen(infoByBase64) == 0) {
+        ATTEST_LOG_ERROR("[DecodeAuthStatus] Invalid parameter");
+        return ATTEST_ERR;
+    }
+
+    char* authStatusBuffer = NULL;
+    int32_t bufferLen = 0;
+    int32_t ret = AnalysisInfoByBase64(infoByBase64, &authStatusBuffer, &bufferLen);
+    if (authStatusBuffer == NULL) {
+        ATTEST_LOG_ERROR("[DecodeAuthStatus] authStatusBuffer analysis failed");
+        return ATTEST_ERR;
+    }
+
     size_t base64Len;
     uint8_t* base64Str = NULL;
     URLSafeBase64ToBase64(authStatusBuffer, bufferLen - 1, &base64Str, &base64Len);

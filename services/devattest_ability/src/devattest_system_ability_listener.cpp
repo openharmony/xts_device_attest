@@ -15,8 +15,8 @@
 
 #include "devattest_system_ability_listener.h"
 
-#include "cstdint"
 #include <thread>
+#include "cstdint"
 
 #include "net_conn_client.h"
 #include "net_conn_constants.h"
@@ -27,6 +27,8 @@
 
 #include "devattest_log.h"
 #include "devattest_network_callback.h"
+
+#define RETRY_REGISTER_NET_CALLBACK_TIME 5
 
 namespace OHOS {
 namespace DevAttest {
@@ -45,7 +47,7 @@ void DevAttestSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId,
 
     sptr<DevAttestNetworkCallback> callback = (std::make_unique<DevAttestNetworkCallback>()).release();
     int32_t ret = 0;
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < RETRY_REGISTER_NET_CALLBACK_TIME; i++) {
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_FOR_KVSTORE));
         ret = netManager->RegisterNetConnCallback(callback);
         if (ret == NETMANAGER_SUCCESS) {

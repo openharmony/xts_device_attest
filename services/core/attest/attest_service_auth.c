@@ -476,7 +476,7 @@ int32_t CheckVersionChanged(AuthStatus* authStatus)
 
 static int32_t AnalysisInfoByBase64(const char* infoByBase64, char** outputBuffer, int32_t* outputLen)
 {
-    if (infoByBase64 == NULL || strlen(infoByBase64) == 0 || outputLen == NULL || outputBuffer == NULL) {
+    if (infoByBase64 == NULL || strlen(infoByBase64) == 0 || outputBuffer == NULL || outputLen == NULL) {
         ATTEST_LOG_ERROR("[AnalysisInfoByBase64] Invalid parameter");
         return ATTEST_ERR;
     }

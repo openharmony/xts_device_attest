@@ -191,7 +191,7 @@ static int32_t ActiveToken(AuthResult* authResult)
 static void FlushAttestData(const char* ticket, const char* authStatus)
 {
     if (ticket == NULL || authStatus == NULL) {
-        ATTEST_LOG_ERROR("[FlushAttestData] parameter wrong");
+        ATTEST_LOG_ERROR("[FlushAttestData] Invalid parameter");
         return;
     }
     // 结果保存到本地
@@ -207,7 +207,7 @@ static void FlushAttestData(const char* ticket, const char* authStatus)
 static int32_t AttestStartup(AuthResult *authResult)
 {
     if (authResult == NULL) {
-        ATTEST_LOG_ERROR("[AttestStartup] parameter wrong");
+        ATTEST_LOG_ERROR("[AttestStartup] Invalid parameter");
         return ATTEST_ERR;
     }
     int32_t ret = ATTEST_OK;

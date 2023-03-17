@@ -24,7 +24,6 @@ namespace DevAttest {
 using namespace NetManagerStandard;
 
 class DevAttestNetworkCallback : public NetConnCallbackStub {
-    // int32_t NetAvailable(sptr<NetHandle> &netHandle) override;
     int32_t NetCapabilitiesChange(sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap) override;
 };
 } // DevAttest

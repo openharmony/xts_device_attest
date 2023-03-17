@@ -281,7 +281,7 @@ static int32_t InitAddrInfo(struct addrinfo **resAddr)
 static int32_t InitSocketClientImpl(struct addrinfo *resAddr, int32_t *socketFd)
 {
     if (resAddr == NULL || socketFd == NULL) {
-        ATTEST_LOG_ERROR("[InitSocketClient] InitSocket Parameter is NULL");
+        ATTEST_LOG_ERROR("[InitSocketClientImpl] InitSocket Parameter is NULL");
         return ATTEST_ERR;
     }
 
@@ -528,6 +528,7 @@ static int32_t BuildTokenInfo(DevicePacket *postValue, cJSON **postData)
     if (cJSON_AddStringToObject(tokenInfo, "uuid", postValue->tokenInfo.uuid) == NULL ||
         cJSON_AddStringToObject(tokenInfo, "token", postValue->tokenInfo.token) == NULL) {
         ATTEST_LOG_ERROR("[BuildTokenInfo] tokenInfo Add uuid or token fail");
+        cJSON_Delete(tokenInfo);
         return ATTEST_ERR;
     }
     return ATTEST_OK;
@@ -559,6 +560,7 @@ static int32_t Buildsoftware(DevicePacket *postValue, cJSON **postData)
         cJSON_AddStringToObject(software, "patchLevel", postValue->productInfo.patchTag) == NULL ||
         cJSON_AddStringToObject(software, "pcid", postValue->pcid) == NULL) {
         ATTEST_LOG_ERROR("[Buildsoftware] software Add productInfo values fail");
+        cJSON_Delete(software);
         return ATTEST_ERR;
     }
     return ATTEST_OK;

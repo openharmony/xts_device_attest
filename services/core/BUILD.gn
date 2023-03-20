@@ -75,6 +75,7 @@ config("devattest_core_config") {
   }
 
   defines += [ "MBEDTLS_ALLOW_PRIVATE_ACCESS" ]
+  defines += [ "OPENSSL_SUPPRESS_DEPRECATED" ]
 }
 
 ohos_prebuilt_etc("network_config.json") {

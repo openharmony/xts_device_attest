@@ -287,8 +287,7 @@ static int32_t InitSocketClientImpl(struct addrinfo *resAddr, int32_t *socketFd)
 
     int32_t ret = ATTEST_OK;
     int32_t sockfd = 0;
-    struct addrinfo *curAddr;
-    for (curAddr = resAddr; curAddr != NULL; curAddr = curAddr->ai_next) {
+    for (struct addrinfo *curAddr = resAddr; curAddr != NULL; curAddr = curAddr->ai_next) {
         sockfd = (int)socket(curAddr->ai_family, curAddr->ai_socktype, IPPROTO_IP);
         if (sockfd < 0) {
             ret = ATTEST_ERR;

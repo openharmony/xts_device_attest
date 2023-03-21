@@ -26,6 +26,8 @@
 #define DEV_BUF_LENGTH   3
 #define HASH_LENGTH      32
 #define DECIMAL_BASE     10
+#define PER_BYTE_BITS    8
+#define RANDOM_BYTES     4
 
 #if defined(MBEDTLS_VERSION_NUMBER) && (MBEDTLS_VERSION_NUMBER >= 0x03000000)
 #define mbedtls_sha256_starts_ret mbedtls_sha256_starts
@@ -41,8 +43,7 @@ int32_t GetRandomNum(void)
     mbedtls_entropy_init(&randomEntropy);
     const char* pers = "CTR_DRBG";
     int32_t result = 0;
-    const int32_t randomBytes = 4;
-    unsigned char* random = (unsigned char *)ATTEST_MEM_MALLOC(randomBytes);
+    unsigned char* random = (unsigned char *)ATTEST_MEM_MALLOC(RANDOM_BYTES);
     if (random == NULL) {
         return 0;
     }
@@ -52,14 +53,14 @@ int32_t GetRandomNum(void)
         if (ret != ATTEST_OK) {
             break;
         }
-        ret = mbedtls_ctr_drbg_random(&randomContext, random, randomBytes);
+        ret = mbedtls_ctr_drbg_random(&randomContext, random, RANDOM_BYTES);
         if (ret != ATTEST_OK) {
             break;
         }
 
-        result = random[randomBytes - 1];
-        for (int i = randomBytes - 2; i >= 0; --i) {
-            result <<= 8;
+        result = random[RANDOM_BYTES - 1];
+        for (int i = RANDOM_BYTES - 2; i >= 0; --i) {
+            result <<= PER_BYTE_BITS;
             result |= random[i];
         }
     } while (0);

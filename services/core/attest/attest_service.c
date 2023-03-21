@@ -56,7 +56,7 @@ static void UpdateAuthResultCode(uint8_t authResultCode)
 static int32_t ResetDevice(void)
 {
     ATTEST_LOG_DEBUG("[ResetDevice] Begin.");
-    int32_t ret;
+    int32_t ret = ATTEST_OK;
     ChallengeResult* challenge = NULL;
     DevicePacket* reqMsg = NULL;
     char* respMsg = NULL;
@@ -188,18 +188,85 @@ static int32_t ActiveToken(AuthResult* authResult)
     return ret;
 }
 
+static void FlushAttestData(const char* ticket, const char* authStatus)
+{
+    if (ticket == NULL || authStatus == NULL) {
+        ATTEST_LOG_ERROR("[FlushAttestData] Invalid parameter");
+        return;
+    }
+    // 结果保存到本地
+    if (FlushAuthResult(ticket, authStatus) != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[FlushAttestData] Flush auth result failed");
+    }
+    // 结果保存到启动子系统parameter,方便展示
+    if (FlushAttestStatusPara(authStatus) != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[FlushAttestData] Flush attest para failed");
+    }
+}
+
+static int32_t AttestStartup(AuthResult *authResult)
+{
+    if (authResult == NULL) {
+        ATTEST_LOG_ERROR("[AttestStartup] Invalid parameter");
+        return ATTEST_ERR;
+    }
+    int32_t ret = ATTEST_OK;
+    // 重置设备
+    ATTEST_LOG_INFO("[AttestStartup] Reset device.");
+    if (!AttestIsResetFlagExist()) {
+        for (int32_t i = 0; i <= WISE_RETRY_CNT; i++) {
+            ret = ResetDevice();
+            if (!IS_WISE_RETRY(-ret)) {
+                break;
+            }
+        }
+        if (ret == ATTEST_OK) {
+            AttestCreateResetFlag();
+        }
+    }
+    // token认证
+    ATTEST_LOG_INFO("[AttestStartup] Auth device.");
+    for (int32_t i = 0; i <= WISE_RETRY_CNT; i++) {
+        ret = AuthDevice(authResult);
+        if (!IS_WISE_RETRY(-ret)) {
+            break;
+        }
+    }
+    if (ret != ATTEST_OK) {
+        UpdateAuthResultCode(AUTH_FAILED);
+        ATTEST_LOG_ERROR("[AttestStartup] Auth token failed, ret = %d.", ret);
+        return ATTEST_ERR;
+    }
+    // 保存结果
+    ATTEST_LOG_INFO("[AttestStartup] Flush auth result.");
+    FlushAttestData(authResult->ticket, authResult->authStatus);
+    UpdateAuthResultCode(AUTH_SUCCESS);
+    // token激活
+    ATTEST_LOG_INFO("[AttestStartup] Active token.");
+    for (int32_t i = 0; i <= WISE_RETRY_CNT; i++) {
+        ret = ActiveToken(authResult);
+        if (!IS_WISE_RETRY(-ret)) {
+            break;
+        }
+    }
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[AttestStartup] Active token failed, ret = %d.", ret);
+        return ATTEST_ERR;
+    }
+    return ATTEST_OK;
+}
+
 static int32_t ProcAttestImpl(void)
 {
-    ATTEST_LOG_DEBUG("[ProcAttestImpl] Proc attest begin.");
-
-    int32_t ret = InitSysData(); // 初始化系统参数
+    // 初始化系统参数
+    int32_t ret = InitSysData();
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ProcAttestImpl] Init system device param failed, ret = %d.", ret);
         DestroySysData();
         return ATTEST_ERR;
     }
-
-    if (!IsAuthStatusChg()) { // 检查本地数据是否修改或过期，进行重新认证
+    // 检查本地数据是否修改或过期，进行重新认证
+    if (!IsAuthStatusChg()) {
         ATTEST_LOG_WARN("[ProcAttestImpl] There is no change on auth status.");
         UpdateAuthResultCode(AUTH_SUCCESS);
         DestroySysData();
@@ -211,63 +278,8 @@ static int32_t ProcAttestImpl(void)
         DestroySysData();
         return ATTEST_ERR;
     }
-    do {
-        // 重置设备
-        ATTEST_LOG_INFO("[ProcAttestImpl] Reset device.");
-        if (!AttestIsResetFlagExist()) {
-            for (int32_t i = 0; i <= WISE_RETRY_CNT; i++) {
-                ret = ResetDevice();
-                if (!IS_WISE_RETRY(-ret)) {
-                    break;
-                }
-            }
-            if (ret == ATTEST_OK) {
-                AttestCreateResetFlag();
-            } else {
-                ATTEST_LOG_ERROR("[ProcAttestImpl] Reset token failed, ret = %d.", ret);
-            }
-        }
-        
-        // token认证
-        ATTEST_LOG_INFO("[ProcAttestImpl] Auth device.");
-        for (int32_t i = 0; i <= WISE_RETRY_CNT; i++) {
-            ret = AuthDevice(authResult);
-            if (!IS_WISE_RETRY(-ret)) {
-                break;
-            }
-        }
-        if (ret != ATTEST_OK) {
-            UpdateAuthResultCode(AUTH_FAILED);
-            ATTEST_LOG_ERROR("[ProcAttestImpl] Auth token failed, ret = %d.", ret);
-            break;
-        }
+    ret = AttestStartup(authResult);
 
-        // 结果保存到本地
-        ATTEST_LOG_INFO("[ProcAttestImpl] Flush auth result.");
-        ret = FlushAuthResult(authResult->ticket, authResult->authStatus);
-        if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ProcAttestImpl] Flush auth result failed, ret = %d.", ret);
-        }
-        UpdateAuthResultCode(AUTH_SUCCESS);
-        // 结果保存到启动子系统parameter,方便展示
-        ret = FlushAttestStatusPara(authResult->authStatus);
-        if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ProcAttestImpl] Flush attest para failed, ret = %d.", ret);
-        }
-
-        // token激活
-        ATTEST_LOG_INFO("[ProcAttestImpl] Active token.");
-        for (int32_t i = 0; i <= WISE_RETRY_CNT; i++) {
-            ret = ActiveToken(authResult);
-            if (!IS_WISE_RETRY(-ret)) {
-                break;
-            }
-        }
-        if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ProcAttestImpl] Active token failed, ret = %d.", ret);
-            break;
-        }
-    } while (0);
     DestroySysData();
     DestroyAuthResult(&authResult);
     return ret;
@@ -287,6 +299,7 @@ int32_t ProcAttest(void)
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ProcAttest] InitNetworkServerInfo failed, ret = %d.", ret);
     }
+    // 主流程
     ret = ProcAttestImpl();
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);
@@ -441,4 +454,3 @@ int32_t QueryAttestStatus(int32_t** resultArray, int32_t arraySize, char** ticke
     pthread_mutex_unlock(&g_mtxAttest);
     return ret;
 }
-

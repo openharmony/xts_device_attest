@@ -54,7 +54,7 @@ int32_t DevAttestServiceProxy::GetAttestStatus(AttestResultInfo &attestResultInf
     }
     if (authRet != DEVATTEST_SUCCESS) {
         HILOGE("GetAttestStatus: authRet failed code %{public}d", authRet);
-        return DEVATTEST_FAIL;
+        return authRet;
     }
 
     sptr<AttestResultInfo> attestResultInfoPtr = AttestResultInfo::Unmarshalling(reply);

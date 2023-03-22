@@ -17,7 +17,6 @@
 #define __ATTEST_UTILS_LIST_H__
 
 #include <stdint.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 #if __cplusplus

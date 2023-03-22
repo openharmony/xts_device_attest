@@ -21,7 +21,7 @@
 #include "iremote_object.h"
 #include "iremote_stub.h"
 #include "iservice_registry.h"
-
+#include "permission.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
 #include "attest_result_info.h"
@@ -66,6 +66,15 @@ int DevAttestServiceStub::OnRemoteRequest(uint32_t code,
 int DevAttestServiceStub::GetAttestStatusInner(MessageParcel& data, MessageParcel& reply)
 {
     HILOGD("DevAttestServiceStub::GetAttestStatusInner");
+    if (!DelayedSingleton<Permission>::GetInstance()->IsSystem()) {
+        HILOGE("GetAttestStatusInner: not a system");
+        if (!reply.WriteInt32(DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP)) {
+            HILOGE("GetAttestStatusInner: write DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP fail");
+            return DEVATTEST_FAIL;
+        }
+        return DEVATTEST_SUCCESS;
+    }
+
     AttestResultInfo attestResultInfo;
     int ret = GetAttestStatus(attestResultInfo);
     if (!reply.WriteInt32(ret)) {

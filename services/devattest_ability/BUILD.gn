@@ -42,11 +42,12 @@ ohos_shared_library("devattest_service") {
   configs = [ ":devattest_service_config" ]
 
   deps = [
-    "${devattest_path}/services/core:devattest_core",
     "${devattest_path}/common/permission:devattest_permission",
+    "${devattest_path}/services/core:devattest_core",
   ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
@@ -54,7 +55,6 @@ ohos_shared_library("devattest_service") {
     "safwk:system_ability_fwk",
     "samgr:samgr_common",
     "samgr:samgr_proxy",
-    "bundle_framework:appexecfwk_core",
   ]
 
   subsystem_name = "xts"

@@ -258,16 +258,17 @@ static int32_t InitReqHost(HttpPacket *msgHttpPack)
 
 static int32_t InitAddrInfo(struct addrinfo **resAddr)
 {
-    if (resAddr == NULL || g_attestNetworkList.head == NULL) {
+    if (resAddr == NULL) {
         ATTEST_LOG_ERROR("[InitAddrInfo] Invalid parameter");
         return ATTEST_ERR;
     }
 
     /* 获取网络基础数据 */
-    int32_t retCode = InitReqHost(&msgHttpPack);
-    if (retCode != ATTEST_OK) {
+    HttpPacket msgHttpPack = { 0 };
+    int32_t ret = InitReqHost(&msgHttpPack);
+    if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[InitSocketClient] Init Request Host failed");
-        return retCode;
+        return ret;
     }
 
     struct addrinfo hints;

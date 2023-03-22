@@ -22,6 +22,7 @@ config("devattest_service_config") {
     "${devattest_path}/services/core",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
+    "${devattest_path}/common/permission/include",
     "${devattest_innerkit_path}/native_cpp/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
@@ -40,9 +41,13 @@ ohos_shared_library("devattest_service") {
 
   configs = [ ":devattest_service_config" ]
 
-  deps = [ "${devattest_path}/services/core:devattest_core" ]
+  deps = [
+    "${devattest_path}/common/permission:devattest_permission",
+    "${devattest_path}/services/core:devattest_core",
+  ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

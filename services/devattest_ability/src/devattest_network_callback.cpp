@@ -21,6 +21,7 @@
 #include "net_conn_constants.h"
 
 #include "devattest_log.h"
+#include "devattest_errno.h"
 #include "attest_entry.h"
 
 namespace OHOS {
@@ -30,9 +31,9 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
 {
     if (netHandle == nullptr || netAllCap == nullptr) {
         HILOGI("[NetCapabilitiesChange] invalid parameter");
-        return 0;
+        return DEVATTEST_SUCCESS;
     }
-
+    int32_t ret = DEVATTEST_SUCCESS;
     for (auto netCap : netAllCap->netCaps_) {
         switch (netCap) {
             case NET_CAPABILITY_MMS:
@@ -42,12 +43,10 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_NOT_METERED start");
                 break;
             case NET_CAPABILITY_INTERNET:
-            {
                 HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_INTERNET start");
-                int ret = AttestTask();
+                ret = AttestTask();
                 HILOGI("DevAttestService test success, ret = %{public}d", ret);
                 break;
-            }
             case NET_CAPABILITY_NOT_VPN:
                 HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_NOT_VPN start");
                 break;
@@ -62,7 +61,7 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 break;
         }
     }
-    return 0;
+    return DEVATTEST_SUCCESS;
 }
 } // DevAttest
 } // OHOS

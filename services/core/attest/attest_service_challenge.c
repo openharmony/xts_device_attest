@@ -91,7 +91,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         ATTEST_LOG_ERROR("[ParseChallengeResult] Parse msg failed.");
         return ATTEST_ERR;
     }
-    if (errorCode != ATTEST_OK) {
+    if ((int32_t)errorCode != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ParseChallengeResult] -errorCode = %d.", -(int32_t)(errorCode));
         return -(int32_t)(errorCode);
     }

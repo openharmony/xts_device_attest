@@ -474,10 +474,10 @@ int32_t CheckVersionChanged(AuthStatus* authStatus)
     return ret;
 }
 
-static int32_t AnalysisInfoByBase64(const char* infoByBase64, char** outputBuffer, int32_t* outputLen)
+static int32_t ParseInfoByBase64(const char* infoByBase64, char** outputBuffer, int32_t* outputLen)
 {
     if (infoByBase64 == NULL || strlen(infoByBase64) == 0 || outputBuffer == NULL || outputLen == NULL) {
-        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] Invalid parameter");
+        ATTEST_LOG_ERROR("[ParseInfoByBase64] Invalid parameter");
         return ATTEST_ERR;
     }
 
@@ -486,18 +486,18 @@ static int32_t AnalysisInfoByBase64(const char* infoByBase64, char** outputBuffe
     int32_t secondCommaIndex = firstCommaIndex + 1;
     secondCommaIndex = GetCommaIndex(infoByBase64, secondCommaIndex);
     if ((firstCommaIndex < 0) || (secondCommaIndex < 0) || (firstCommaIndex >= secondCommaIndex)) {
-        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] Invalid auth status file format");
+        ATTEST_LOG_ERROR("[ParseInfoByBase64] Invalid auth status file format");
         return ATTEST_ERR;
     }
 
     uint32_t bufferLen = secondCommaIndex - firstCommaIndex;
     char* authStatusBuffer = (char *)ATTEST_MEM_MALLOC(bufferLen);
     if (authStatusBuffer == NULL) {
-        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] authStatusBuffer malloc memory failed");
+        ATTEST_LOG_ERROR("[ParseInfoByBase64] authStatusBuffer malloc memory failed");
         return ATTEST_ERR;
     }
     if (strncpy_s(authStatusBuffer, bufferLen, infoByBase64 + firstCommaIndex + 1, bufferLen - 1) != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[AnalysisInfoByBase64] authStatusBuffer strncpy_s failed");
+        ATTEST_LOG_ERROR("[ParseInfoByBase64] authStatusBuffer strncpy_s failed");
         ATTEST_MEM_FREE(authStatusBuffer);
         return ATTEST_ERR;
     }
@@ -515,8 +515,8 @@ int32_t DecodeAuthStatus(const char* infoByBase64, AuthStatus* authStats)
 
     char* authStatusBuffer = NULL;
     int32_t bufferLen = 0;
-    int32_t ret = AnalysisInfoByBase64(infoByBase64, &authStatusBuffer, &bufferLen);
-    if (authStatusBuffer == NULL) {
+    int32_t ret = ParseInfoByBase64(infoByBase64, &authStatusBuffer, &bufferLen);
+    if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecodeAuthStatus] authStatusBuffer analysis failed");
         return ATTEST_ERR;
     }

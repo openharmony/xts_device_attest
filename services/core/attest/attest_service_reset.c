@@ -91,7 +91,7 @@ int32_t ParseResetResult(const char* jsonStr)
         ATTEST_LOG_ERROR("[ParseResetResult] errorCode is nan.");
         return ATTEST_ERR;
     }
-    if (errorCode != ATTEST_OK) {
+    if ((int32_t)errorCode != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ParseResetResult] -errorCode = %d.", -(int32_t)errorCode);
         return -(int32_t)(errorCode);
     }

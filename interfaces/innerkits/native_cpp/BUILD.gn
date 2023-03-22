@@ -21,7 +21,6 @@ config("devattest_sdk_config") {
     "include",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
-    "${devattest_path}/common/permission/include",
     "${devattest_path}/services/devattest_ability/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
@@ -37,13 +36,10 @@ ohos_shared_library("devattest_sdk") {
 
   configs = [ ":devattest_sdk_config" ]
 
-  deps = [ "${devattest_path}/common/permission:devattest_permission" ]
-
   external_deps = [
     "ability_runtime:ability_manager",
     "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

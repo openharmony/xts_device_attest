@@ -135,14 +135,14 @@ char* OsGetSecurityPatchTagStub(void)
     return GetDeviceParaStub("securityPatchTag");
 }
 
-char* OsGetUdidStub(void)
+static int32_t OsGetUnencryptedUdidStub(char **outputBuff, int32_t *outputSize)
 {
     char* manufacture = NULL;
     char* model = NULL;
     char* sn = NULL;
     char *udid = NULL;
-    char *udidSha256 = NULL;
-    int32_t ret;
+    int udidSize = 0;
+    int32_t ret = ATTEST_OK;
     do {
         manufacture = GetDeviceParaStub("manufacture");
         if (manufacture == NULL) {
@@ -159,7 +159,8 @@ char* OsGetUdidStub(void)
             ret = ATTEST_ERR;
             break;
         }
-        int udidSize = strlen(manufacture) + strlen(model) + strlen(sn) + 1;
+
+        udidSize = strlen(manufacture) + strlen(model) + strlen(sn) + 1;
         udid = (char *)ATTEST_MEM_MALLOC(udidSize);
         if (udid == NULL) {
             ret = ATTEST_ERR;
@@ -167,26 +168,57 @@ char* OsGetUdidStub(void)
         }
         if ((strcat_s(udid, udidSize, manufacture) != 0) || (strcat_s(udid, udidSize, model) != 0) ||
             (strcat_s(udid, udidSize, sn) != 0)) {
+            ATTEST_MEM_FREE(udid);
             ret = ATTEST_ERR;
             break;
         }
-        ATTEST_LOG_INFO_ANONY("[OsGetUdidStub] udid = %s", udid);
-        udidSha256 = (char *)ATTEST_MEM_MALLOC(UDID_STRING_LEN + 1);
-        if (udidSha256 == NULL) {
-            ret = ATTEST_ERR;
-            break;
-        }
-        ret = Sha256Value((const unsigned char *)udid, udidSize, udidSha256, UDID_STRING_LEN + 1);
+        ATTEST_LOG_INFO_ANONY("[OsGetUnencryptedUdidStub] udid = %s", udid);
     } while (0);
     ATTEST_MEM_FREE(manufacture);
     ATTEST_MEM_FREE(model);
     ATTEST_MEM_FREE(sn);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[OsGetUnencryptedUdidStub] failed to get udid");
+        return ATTEST_ERR;
+    }
+    *outputSize = udidSize;
+    *outputBuff = udid;
+    return ATTEST_OK;
+}
+
+char* OsGetUdidStub(void)
+{
+    char *udid = NULL;
+    char *udidSha256 = NULL;
+    int32_t udidSize = 0;
+    int32_t ret = ATTEST_OK;
+    do {
+        ret = OsGetUnencryptedUdidStub(&udid, &udidSize);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[OsGetUdidStub] failed to get udid");
+            break;
+        }
+
+        udidSha256 = (char *)ATTEST_MEM_MALLOC(UDID_STRING_LEN + 1);
+        if (udidSha256 == NULL) {
+            ATTEST_LOG_ERROR("[OsGetUdidStub] failed to malloc");
+            ret = ATTEST_ERR;
+            break;
+        }
+
+        ret = Sha256Value((const unsigned char *)udid, udidSize, udidSha256, UDID_STRING_LEN + 1);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[OsGetUdidStub] failed to Sha256");
+            ATTEST_MEM_FREE(udidSha256);
+            break;
+        }
+    } while (0);
     ATTEST_MEM_FREE(udid);
     if (ret != ATTEST_OK) {
-        ATTEST_LOG_INFO("[OsGetUdidStub] Get udid failed, ret = %d", ret);
-        ATTEST_MEM_FREE(udidSha256);
+        ATTEST_LOG_ERROR("[OsGetUdidStub] Get udid failed, ret = %d", ret);
         return NULL;
     }
+
     ATTEST_LOG_INFO_ANONY("[OsGetUdidStub] Sha256(udid) = %s\n", udidSha256);
     return udidSha256;
 }

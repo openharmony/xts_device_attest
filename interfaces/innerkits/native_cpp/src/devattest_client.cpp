@@ -21,7 +21,6 @@
 
 #include "devattest_log.h"
 #include "devattest_errno.h"
-#include "permission.h"
 #include "attest_result_info.h"
 
 using namespace std;
@@ -65,9 +64,6 @@ int DevAttestClient::InitClientService()
 int DevAttestClient::GetAttestStatus(AttestResultInfo &attestResultInfo)
 {
     HILOGI("DevAttestClient GetAttestStatus Begin");
-    if (!DelayedSingleton<Permission>::GetInstance()->IsSystem()) {
-        return DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP;
-    }
     if (attestClientInterface_ == nullptr) {
         HILOGE("DevAttestClient GetAttestStatus attestClientInterface_ is null");
         return DEVATTEST_FAIL;
@@ -75,7 +71,7 @@ int DevAttestClient::GetAttestStatus(AttestResultInfo &attestResultInfo)
     int ret = attestClientInterface_->GetAttestStatus(attestResultInfo);
     if (ret != DEVATTEST_SUCCESS) {
         HILOGE("DevAttestClient GetAttestStatus failed ret = %{public}d", ret);
-        return DEVATTEST_FAIL;
+        return ret;
     }
     HILOGI("DevAttestClient GetAttestStatus end");
     return DEVATTEST_SUCCESS;

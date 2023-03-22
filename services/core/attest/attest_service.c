@@ -196,11 +196,11 @@ static void FlushAttestData(const char* ticket, const char* authStatus)
     }
     // 结果保存到本地
     if (FlushAuthResult(ticket, authStatus) != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[FlushAttestData] Flush auth result failed");
+        ATTEST_LOG_WARN("[FlushAttestData] Flush auth result failed");
     }
     // 结果保存到启动子系统parameter,方便展示
     if (FlushAttestStatusPara(authStatus) != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[FlushAttestData] Flush attest para failed");
+        ATTEST_LOG_WARN("[FlushAttestData] Flush attest para failed");
     }
 }
 
@@ -279,7 +279,6 @@ static int32_t ProcAttestImpl(void)
         return ATTEST_ERR;
     }
     ret = AttestStartup(authResult);
-
     DestroySysData();
     DestroyAuthResult(&authResult);
     return ret;

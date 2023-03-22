@@ -168,6 +168,7 @@ static int32_t OsGetUnencryptedUdidStub(char **outputBuff, int32_t *outputSize)
         }
         if ((strcat_s(udid, udidSize, manufacture) != 0) || (strcat_s(udid, udidSize, model) != 0) ||
             (strcat_s(udid, udidSize, sn) != 0)) {
+            ATTEST_MEM_FREE(udid);
             ret = ATTEST_ERR;
             break;
         }

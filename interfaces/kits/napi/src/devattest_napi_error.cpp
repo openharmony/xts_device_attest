@@ -28,11 +28,11 @@ static const std::unordered_map<uint32_t, std::string> g_errorStringMap = {
 
 int32_t ConvertToJsErrCode(int32_t errCode)
 {
-    int32_t JsErrCode = errCode;
-    if (JsErrCode == DEVATTEST_FAIL) {
-        JsErrCode = DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION;
+    int32_t jsErrCode = errCode;
+    if (jsErrCode == DEVATTEST_FAIL) {
+        jsErrCode = DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION;
     }
-    return JsErrCode;
+    return jsErrCode;
 }
 
 std::string ConvertToJsErrMsg(int32_t jsErrCode)

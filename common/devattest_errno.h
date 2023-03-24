@@ -21,6 +21,8 @@
 namespace OHOS {
     namespace DevAttest {
         enum {
+            DEVATTEST_INIT = -2,
+
             DEVATTEST_FAIL = -1,
 
             DEVATTEST_SUCCESS = 0,

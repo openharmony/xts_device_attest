@@ -867,8 +867,7 @@ static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, Auth
             break;
         }
         if ((ret = ParseAuthStats(json, authResult)) != ATTEST_OK) {
-            ATTEST_LOG_ERROR(
-                "[ParseAuthResultRespImpl] Parse auth status from symbol authentication response failed, ret = %d", ret);
+            ATTEST_LOG_ERROR("[ParseAuthResultRespImpl] Parse auth status failed, ret = %d", ret);
             break;
         }
         if ((ret = DecodeAuthStatus(authResult->authStatus, authStatus)) != ATTEST_OK) {
@@ -881,15 +880,15 @@ static int32_t ParseAuthResultRespImpl(cJSON *json, AuthResult* authResult, Auth
             break;
         }
         if (ParseTicket(json, authResult) != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ParseAuthResultRespImpl] Parse ticket from symbol authentication response failed");
+            ATTEST_LOG_ERROR("[ParseAuthResultRespImpl] Parse ticket failed");
             break;
         }
         if (ParseTokenValue(json, authResult) != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ParseAuthResultRespImpl] Parse token value from symbol authentication response failed");
+            ATTEST_LOG_ERROR("[ParseAuthResultRespImpl] Parse token value failed");
             break;
         }
         if (ParseTokenId(json, authResult) != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ParseAuthResultRespImpl] Parse token id from symbol authentication response failed");
+            ATTEST_LOG_ERROR("[ParseAuthResultRespImpl] Parse token id failed");
             break;
         }
         ret = ATTEST_OK;

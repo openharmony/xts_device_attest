@@ -79,6 +79,12 @@ int32_t OEMWriteTicket(const TicketInfo* ticketInfo)
     return WriteFile(AUTH_RESULT_PATH, TICKET_FILE_NAME, ticket, sizeof(ticket));
 }
 
+// 读取网络配置信息
+int32_t OEMReadNetworkConfig(char* buffer, uint32_t bufferLen)
+{
+    return ReadFile(AUTH_RESULT_PATH, NETWORK_CONFIG_FILE_NAME, buffer, bufferLen);
+}
+
 // 写入认证结果
 int32_t OEMWriteAuthResultCode(const char* data, uint32_t len)
 {

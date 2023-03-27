@@ -246,6 +246,11 @@ int32_t AttestGetParameter(const char *key, const char *def, char *value, uint32
     return OsGetParameter(key, def, value, len);
 }
 
+int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen)
+{
+    return OEMReadNetworkConfig(buffer, bufferLen);
+}
+
 int32_t AttestWriteAuthResultCode(const char* data, uint32_t len)
 {
     return OEMWriteAuthResultCode(data, len);

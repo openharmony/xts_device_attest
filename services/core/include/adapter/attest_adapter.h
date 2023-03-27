@@ -72,6 +72,8 @@ int32_t AttestSetParameter(const char *key, const char *value);
 
 int32_t AttestGetParameter(const char *key, const char *def, char *value, uint32_t len);
 
+int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen);
+
 int32_t AttestWriteAuthResultCode(const char* data, uint32_t len);
 
 int32_t AttestReadAuthResultCode(char* buffer, uint32_t bufferLen);

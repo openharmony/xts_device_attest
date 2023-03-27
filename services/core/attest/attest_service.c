@@ -275,7 +275,7 @@ static int32_t ProcAttestImpl(void)
         return ATTEST_OK;
     }
     AuthResult *authResult = CreateAuthResult();
-    if (ret != ATTEST_OK) {
+    if (authResult == NULL) {
         ATTEST_LOG_ERROR("[ProcAttestImpl] Create auth result failed");
         DestroySysData();
         return ATTEST_ERR;

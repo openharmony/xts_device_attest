@@ -35,7 +35,8 @@ int32_t ReadFile(const char* path, const char* fileName, char* buffer, uint32_t 
 int32_t CreateFile(const char* path, const char* fileName);
 
 bool IsFileExist(const char* path, const char* fileName);
-int32_t ReadFileBuffer(const char* path, const char* fileName, char** jsonStr);
+
+int32_t ReadFileBuffer(const char* path, const char* fileName, char** outStr);
 
 #ifdef __cplusplus
 #if __cplusplus

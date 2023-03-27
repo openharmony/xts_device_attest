@@ -948,7 +948,7 @@ int32_t SendAttestMsg(DevicePacket *devPacket, ATTEST_ACTION_TYPE actionType, ch
         ATTEST_LOG_ERROR("[SendAttestMsg] Input Parameter is null.");
         return ATTEST_ERR;
     }
-    
+
     do {
         retCode = GenHttpsMsg(devPacket, actionType, &reqData);
         if (retCode != ATTEST_OK) {
@@ -979,48 +979,29 @@ static int32_t SplitNetworkInfoSymbol(char *inputData, List *list)
         return ATTEST_ERR;
     }
 
-    if (CountSymbolNum(inputData, ':') != 1) {
-        ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] inputData form wrong.");
-        return ATTEST_ERR;
-    }
-
-    char *next = NULL;
-    char *pNext = strtok_s(inputData, ":", &next);
-    if (pNext == NULL || next == NULL) {
-        ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] Detach failed.");
-        return ATTEST_ERR;
-    }
-
     ServerInfo* networkServerInfo = (ServerInfo*)ATTEST_MEM_MALLOC(sizeof(ServerInfo));
     if (networkServerInfo == NULL) {
         ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] network infomation malloc failed.");
         return ATTEST_ERR;
     }
 
-    int32_t ret = ATTEST_OK;
-    do {
-        if (sprintf_s(networkServerInfo->hostName, MAX_HOST_NAME_LEN, "%s", pNext) <= 0) {
-            ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] failed to copy host");
-            ret = ATTEST_ERR;
-            break;
-        }
-        if (sprintf_s(networkServerInfo->port, MAX_PORT_LEN, "%s", next) <= 0) {
-            ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] failed to copy port");
-            ret = ATTEST_ERR;
-            break;
-        }
-    } while (0);
-    if (ret != ATTEST_OK) {
+    int32_t ret = sscanf_s(inputData, "%" HOST_PATTERN ":%" PORT_PATTERN,
+        networkServerInfo->hostName, MAX_HOST_NAME_LEN,
+        networkServerInfo->port, MAX_PORT_LEN);
+
+    if (ret != PARAM_TWO) {
+        ATTEST_LOG_ERROR("[SplitNetworkInfoSymbol] failed to split NetworkInfo, host[%s] port[%s]",
+            networkServerInfo->hostName, networkServerInfo->port);
         ATTEST_MEM_FREE(networkServerInfo);
-        return ret;
+        return ATTEST_ERR;
     }
     ret = AddListNode(list, (char *)networkServerInfo);
     return ret;
 }
 
-static int32_t ParseNetworkInfosConfig(char *inputData, int32_t inputLen, List *list)
+static int32_t ParseNetworkInfosConfig(char *inputData, List *list)
 {
-    if (inputData == NULL || inputLen == 0 || list == NULL) {
+    if (inputData == NULL || list == NULL) {
         ATTEST_LOG_ERROR("[ParseNetworkInfoConfig] parameter wrong.");
         return ATTEST_ERR;
     }
@@ -1071,7 +1052,7 @@ static int32_t NetworkInfoConfig(List* list)
     }
 
     // For reading network_config.json
-    char *buffer = (char *)ATTEST_MEM_MALLOC(NETWORK_CONFIG_SIZE);
+    char *buffer = (char *)ATTEST_MEM_MALLOC(NETWORK_CONFIG_SIZE + 1);
     if (buffer == NULL) {
         ATTEST_LOG_ERROR("[NetworkInfoConfig] buffer malloc failed.");
         ReleaseList(list);
@@ -1084,7 +1065,7 @@ static int32_t NetworkInfoConfig(List* list)
             break;
         }
 
-        ret = ParseNetworkInfosConfig(buffer, NETWORK_CONFIG_SIZE, list);
+        ret = ParseNetworkInfosConfig(buffer, list);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[NetworkInfoConfig] parse networkconfig failed.");
             break;

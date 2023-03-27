@@ -27,6 +27,7 @@ extern "C" {
 #define AUTH_RESULT_CODE_FILE_NAME "auth_result_code"
 #define TICKET_FILE_NAME "ticket"
 #define RESET_FLAG_FILE_NAME "reset_flag"
+#define NETWORK_CONFIG_FILE_NAME "network_config.json"
 
 int32_t OEMWriteTicket(const TicketInfo* ticketInfo);
 
@@ -41,6 +42,8 @@ int32_t OEMGetAuthStatusFileSize(uint32_t* len);
 int32_t OEMCreateResetFlag(void);
 
 bool OEMIsResetFlagExist(void);
+
+int32_t OEMReadNetworkConfig(char* buffer, uint32_t bufferLen);
 
 int32_t OEMWriteAuthResultCode(const char* data, uint32_t len);
 

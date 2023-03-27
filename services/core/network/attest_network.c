@@ -681,7 +681,7 @@ char* BuildHttpsAuthBody(DevicePacket *postValue)
     char *bodyData = cJSON_Print(postData);
     cJSON_Delete(postData);
     if (ATTEST_NETWORK_DEBUG_LOG_FLAG) {
-        ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] AuthBody [%u, %u]\n%s\n", strlen(bodyData), strlen(bodyData), bodyData);
+        ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] AuthBody [%u]\n%s\n", strlen(bodyData), bodyData);
     }
     ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] End.");
     return bodyData;

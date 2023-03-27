@@ -15,8 +15,6 @@
 
 #include "devattest_service_stub.h"
 
-#include <string>
-
 #include "system_ability_definition.h"
 #include "iremote_object.h"
 #include "iremote_stub.h"

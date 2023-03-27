@@ -77,7 +77,6 @@ static napi_value GenerateBusinessError(napi_env env, int32_t code)
         
         napi_create_error(env, nullptr, errMsg, &result);
         napi_set_named_property(env, result, "code", errCode);
-        napi_set_named_property(env, result, "message", errMsg);
     }
     return result;
 }
@@ -151,7 +150,7 @@ napi_value DevAttestNapi::GetAttestResultInfo(napi_env env, napi_callback_info i
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (argc > PARAM1) {
         HILOGE("[GetAttestResultInfo] Input at most 1 paramter");
-        DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, DEVATTEST_ERR_JS_PARAMETER_ERROR);
+        napi_throw(env, GenerateBusinessError(env, DEVATTEST_ERR_JS_PARAMETER_ERROR));
     }
 
     // 判断入参的类型是否正确
@@ -160,7 +159,7 @@ napi_value DevAttestNapi::GetAttestResultInfo(napi_env env, napi_callback_info i
         napi_typeof(env, argv[0], &type);
         if (type != napi_function) {
             HILOGE("[GetAttestResultInfo] the type of argv[0] is not function");
-            DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, DEVATTEST_ERR_JS_PARAMETER_ERROR);
+            napi_throw(env, GenerateBusinessError(env, DEVATTEST_ERR_JS_PARAMETER_ERROR));
         }
     }
 
@@ -198,7 +197,7 @@ napi_value DevAttestNapi::GetAttestResultInfoSync(napi_env env, napi_callback_in
     int32_t errCode = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
     if (errCode != DEVATTEST_SUCCESS) {
         HILOGE("[GetAttestResultInfoSync] GetAttestStatus failed errCode:%{public}d", errCode);
-        DEVICE_ATTEST_NAPI_RETURN_UNDEF(env, errCode);
+        napi_throw(env, GenerateBusinessError(env, errCode));
     }
 
     return GenerateDevAttestHandle(env, attestResultInfo.authResult_, attestResultInfo.softwareResult_,

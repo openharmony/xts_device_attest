@@ -26,7 +26,7 @@ int32_t GetObjectItemValueObject(const char* rootStr, const char* key, char** va
 
 int32_t GetObjectItemValueStr(const char* rootStr, const char* key, char** value);
 
-double GetObjectItemValueNumber(const char* rootStr, char* key);
+double GetObjectItemValueNumber(const char* rootStr, const char* key);
 
 #ifdef __cplusplus
 #if __cplusplus

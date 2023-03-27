@@ -74,7 +74,7 @@ int32_t GetObjectItemValueStr(const char* rootStr, const char* key, char** dest)
 }
 
 // 返回值需要使用isnan判断是否合法
-double GetObjectItemValueNumber(const char* rootStr, char* key)
+double GetObjectItemValueNumber(const char* rootStr, const char* key)
 {
     if (rootStr == NULL || key == NULL) {
         return (double)NAN;

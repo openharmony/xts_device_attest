@@ -58,7 +58,7 @@ int32_t GetFileSize(const char* path, const char* fileName, uint32_t* result)
     char* formatPath = realpath(filePath, NULL);
     ATTEST_MEM_FREE(filePath);
     if (formatPath == NULL) {
-        ATTEST_LOG_ERROR("[GetFileSize] Invalid path of %s", path);
+        ATTEST_LOG_ERROR("[GetFileSize] Invalid path of %s/%s", path, fileName);
         return ATTEST_ERR;
     }
 

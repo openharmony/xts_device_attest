@@ -22,9 +22,6 @@
 using namespace std;
 namespace OHOS {
 namespace DevAttest {
-namespace {
-const std::u16string DEVATTEST_PROXY_INTERFACE_TOKEN = u"ohos.devattest.accessToken";
-}
 int32_t DevAttestServiceProxy::GetAttestStatus(AttestResultInfo &attestResultInfo)
 {
     HILOGI("DevAttestServiceProxy GetAttestStatus begin");
@@ -32,7 +29,7 @@ int32_t DevAttestServiceProxy::GetAttestStatus(AttestResultInfo &attestResultInf
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInterfaceToken(DEVATTEST_PROXY_INTERFACE_TOKEN)) {
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
         HILOGE("GetAttestStatus write interface token failed");
         return DEVATTEST_FAIL;
     }

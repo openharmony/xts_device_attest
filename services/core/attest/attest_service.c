@@ -295,6 +295,12 @@ int32_t ProcAttest(void)
         ret = InitMemNodeList();
         ATTEST_LOG_INFO("[ProcAttest] Init mem node list, ret = %d.", ret);
     }
+    // init network server info
+    ret = InitNetworkServerInfo();
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[ProcAttest] InitNetworkServerInfo failed, ret = %d.", ret);
+    }
+    // 主流程
     ret = ProcAttestImpl();
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);
@@ -431,9 +437,6 @@ static int32_t QueryAttestStatusSwitch(int32_t** resultArray, int32_t arraySize,
         case (AUTH_SUCCESS):
             ret = SetAttestStatusSucc(resultArray, ticket, ticketLength);
             ATTEST_LOG_INFO("[QueryAttestStatusSwitch] authResultCode is 0, ret = %d", ret);
-            if (ret != ATTEST_OK) {
-                ret = SetAttestStatusDefault(resultArray, ticket, ticketLength);
-            }
             break;
         default:
             ATTEST_LOG_INFO("[QueryAttestStatusSwitch] authResultCode is invalid");

@@ -53,8 +53,6 @@ int32_t AnonymiseStr(char* str);
 
 int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outLen);
 
-int32_t CountSymbolNum(char *inputData, int32_t symbol);
-
 #ifdef __cplusplus
 #if __cplusplus
 }

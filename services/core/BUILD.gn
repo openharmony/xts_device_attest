@@ -60,14 +60,6 @@ config("devattest_core_config") {
   ]
 
   defines = [ "ATTEST_HILOG_LEVEL = 1" ]
-  if (enable_attest_network_host_debug) {
-    defines += [
-      "__ATTEST_DEBUG__",
-      "HTTPS_NETWORK_HOST = \"wisedevice-saas-mirrorcn.hwcloudtest.cn\"",
-    ]
-  } else {
-    defines += [ "HTTPS_NETWORK_HOST = \"wisedevice-drcn.openharmony.cn\"" ]
-  }
 
   if (enable_attest_test_mock_network) {
     defines += [ "__ATTEST_MOCK_NETWORK_STUB__" ]
@@ -83,6 +75,14 @@ config("devattest_core_config") {
   }
 
   defines += [ "MBEDTLS_ALLOW_PRIVATE_ACCESS" ]
+  defines += [ "OPENSSL_SUPPRESS_DEPRECATED" ]
+}
+
+ohos_prebuilt_etc("network_config.json") {
+  source = "network_config.json"
+  relative_install_dir = "device_attest"
+  subsystem_name = "xts"
+  part_name = "device_attest"
 }
 
 ohos_shared_library("devattest_core") {
@@ -97,6 +97,8 @@ ohos_shared_library("devattest_core") {
     "//third_party/openssl:libcrypto_shared",
     "//third_party/openssl:libssl_shared",
   ]
+
+  deps += [ ":network_config.json" ]
 
   external_deps = [
     "c_utils:utils",

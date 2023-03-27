@@ -19,11 +19,7 @@ group("devattest_etc") {
 }
 
 ohos_prebuilt_etc("devattest_service.cfg") {
-  if (use_musl) {
-    source = "devattest_service.cfg"
-  } else {
-    source = "devattest_service.rc"
-  }
+  source = "devattest_service.cfg"
   relative_install_dir = "init"
   subsystem_name = "xts"
   part_name = "device_attest"

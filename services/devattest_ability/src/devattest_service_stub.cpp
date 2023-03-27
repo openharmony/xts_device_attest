@@ -28,11 +28,6 @@
 
 namespace OHOS {
 namespace DevAttest {
-namespace {
-const std::u16string DEVATTEST_PROXY_INTERFACE_TOKEN = u"ohos.devattest.accessToken";
-}
-
-
 DevAttestServiceStub::DevAttestServiceStub()
 {
     requestFuncMap_[GET_AUTH_RESULT] = &DevAttestServiceStub::GetAttestStatusInner;
@@ -47,8 +42,7 @@ int DevAttestServiceStub::OnRemoteRequest(uint32_t code,
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     HILOGD("DevAttestServiceStub::OnRemoteRequest, cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (DEVATTEST_PROXY_INTERFACE_TOKEN != remoteDescriptor) {
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
         HILOGE("DevAttestServiceStub::OnRemoteRequest failed, descriptor is not matched!");
         return DEVATTEST_SERVICE_FAILED;
     }

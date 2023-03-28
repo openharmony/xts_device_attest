@@ -26,7 +26,7 @@ namespace DevAttest {
 class DevAttestInterface : public OHOS::IRemoteBroker {
 public:
     static const int SA_ID_DEVICE_ATTEST_SERVICE = DEVICE_ATTEST_PROFILE_SA_ID;
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.DevAttest.DevAttestInterface");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.devattest.accessToken");
 
     virtual int32_t GetAttestStatus(AttestResultInfo &attestResultInfo) = 0;
 

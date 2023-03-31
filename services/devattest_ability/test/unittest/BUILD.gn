@@ -1,0 +1,62 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//test/xts/device_attest/build/devattestconfig.gni")
+
+##############################test_devattestservice##########################################
+ohos_unittest("test_devattestservice") {
+  module_out_path = "devattest/devattest_ability"
+  include_dirs = [
+    "include",
+    "${devattest_path}/services/core",
+    "${devattest_path}/common",
+    "${devattest_path}/common/log",
+    "${devattest_path}/common/permission/include",
+    "${devattest_innerkit_path}/native_cpp/include",
+    "${devattest_path}/services/devattest_ability/include",
+    "${devattest_path}/services/core/include",
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "//third_party/googletest/include",
+  ]
+
+  sources = [
+    "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
+    "${devattest_path}/services/devattest_ability/src/devattest_network_callback.cpp",
+    "${devattest_path}/services/devattest_ability/src/devattest_service.cpp",
+    "${devattest_path}/services/devattest_ability/src/devattest_service_stub.cpp",
+    "${devattest_path}/services/devattest_ability/src/devattest_system_ability_listener.cpp",
+    "src/devattest_service_test.cpp",
+  ]
+
+  deps = [
+    "${devattest_path}/common/permission:devattest_permission",
+    "${devattest_path}/services/core:devattest_core",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_common",
+    "samgr:samgr_proxy",
+  ]
+
+  subsystem_name = "xts"
+  part_name = "device_attest"
+}

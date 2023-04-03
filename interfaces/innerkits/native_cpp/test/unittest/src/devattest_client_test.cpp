@@ -58,6 +58,5 @@ HWTEST_F(DevAttestClientTest, GetAttestStatusTest001, TestSize.Level0)
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     ASSERT_TRUE(AttestStatusValid(attestResultInfo));
 }
-
 } // namespace DevAttest
 } // namespace OHOS

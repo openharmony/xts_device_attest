@@ -26,10 +26,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-
-    // std::shared_ptr<DevAttestService> devAttestService_;
 };
-
 } // namespace DevAttest
 } // namespace OHOS
 #endif // DEVATTEST_SERVICE_TEST_H

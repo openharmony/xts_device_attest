@@ -30,7 +30,12 @@ public:
     void TearDown();
 };
 
-    int GetAttestStatus_Test_001(void);
+    int GetAttestStatusTest001(void);
+    int GetAttestStatusProxyTest001(void);
+    int GetAttestStatusProxyTest002(void);
+    int GetAttestStatusProxyTest003(void);
+    int GetAttestStatusProxyTest004(void);
+    int GetAttestStatusProxyTest005(void);
 } // namespace DevAttest
 } // namespace OHOS
 #endif // DEVATTEST_CLIENT_TEST_H

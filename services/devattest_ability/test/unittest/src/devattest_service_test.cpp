@@ -27,7 +27,7 @@ using namespace OHOS::DevAttest;
 
 namespace OHOS {
 namespace DevAttest {
-class DevAttestServiceMock{
+class DevAttestServiceMock {
 public:
     static int mockGetAttestStatus()
     {
@@ -67,6 +67,5 @@ HWTEST_F(DevAttestServiceTest, GetAttestStatusServiceTest001, TestSize.Level1)
     int32_t ret = DevAttestServiceMock::mockGetAttestStatus();
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
 }
-
 } // namespace DevAttest
 } // namespace OHOS

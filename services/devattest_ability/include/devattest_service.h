@@ -40,6 +40,7 @@ class DevAttestService : public SystemAbility, public DevAttestServiceStub {
     DECLARE_DELAYED_SINGLETON(DevAttestService);
 
 public:
+    DevAttestService(int32_t systemAbilityId, bool runOnCreate = true);
     void OnStart() override;
     void OnStop() override;
     ServiceRunningState QueryServiceState() const

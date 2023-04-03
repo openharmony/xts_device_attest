@@ -26,6 +26,11 @@ namespace OHOS {
 namespace DevAttest {
     ::testing::AssertionResult AttestStatusValid(AttestResultInfo attestResultInfo);
 
+    typedef enum {
+        ATTEST_TYPE_REPLY_RESULT = 0,
+        ATTEST_TYPE_RETURN_RESULT = 1,
+        ATTEST_TYPE_BUTT,
+    } ATTEST_MOCK_PROXY_RESULT_TYPE;
 } // namespace DevAttest
 } // namespace OHOS
 #endif // DEVATTEST_TEST_H

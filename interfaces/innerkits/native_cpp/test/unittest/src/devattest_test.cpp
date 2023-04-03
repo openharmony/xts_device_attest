@@ -19,6 +19,7 @@
 #include "attest_result_info.h"
 #include "devattest_client.h"
 
+using namespace std;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DevAttest;
@@ -36,60 +37,51 @@ static bool AttestStatusNumberValid(int32_t attestStatusNumber)
 ::testing::AssertionResult AttestStatusValid(AttestResultInfo attestResultInfo)
 {
     bool result = true;
-    std::string failString;
+    string failString;
     if (!AttestStatusNumberValid(attestResultInfo.authResult_)) {
-        failString += std::string(" authResult is ");
-        failString += std::to_string(attestResultInfo.authResult_);
+        failString += string(" authResult is ") + to_string(attestResultInfo.authResult_);
         result = false;
     }
     if (!AttestStatusNumberValid(attestResultInfo.softwareResult_)) {
-        failString += std::string(" softwareResult is ");
-        failString += std::to_string(attestResultInfo.softwareResult_);
+        failString += string(" softwareResult is ") + to_string(attestResultInfo.softwareResult_);
         result = false;
     }
-    if (!AttestStatusNumberValid(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_VERSIONID])) {
-        failString += std::string(" versionResult is ");
-        failString += std::to_string(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_VERSIONID]);
+    vector<int32_t> softwareResultArray = attestResultInfo.softwareResultDetail_;
+    if (!AttestStatusNumberValid(softwareResultArray[SOFTWARE_RESULT_VERSIONID])) {
+        failString += string(" versionResult is ") + to_string(softwareResultArray[SOFTWARE_RESULT_VERSIONID]);
         result = false;
     }
-    if (!AttestStatusNumberValid(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_PATCHLEVEL])) {
-        failString += std::string(" patchResult is ");
-        failString += std::to_string(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_PATCHLEVEL]);
+    if (!AttestStatusNumberValid(softwareResultArray[SOFTWARE_RESULT_PATCHLEVEL])) {
+        failString += string(" patchResult is ") + to_string(softwareResultArray[SOFTWARE_RESULT_PATCHLEVEL]);
         result = false;
     }
-    if (!AttestStatusNumberValid(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_ROOTHASH])) {
-        failString += std::string(" roothashResult is ");
-        failString += std::to_string(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_ROOTHASH]);
+    if (!AttestStatusNumberValid(softwareResultArray[SOFTWARE_RESULT_ROOTHASH])) {
+        failString += string(" roothashResult is ") + to_string(softwareResultArray[SOFTWARE_RESULT_ROOTHASH]);
         result = false;
     }
-    if (!AttestStatusNumberValid(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_PCID])) {
-        failString += std::string(" pcidResult is ");
-        failString += std::to_string(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_PCID]);
+    if (!AttestStatusNumberValid(softwareResultArray[SOFTWARE_RESULT_PCID])) {
+        failString += string(" pcidResult is ") + to_string(softwareResultArray[SOFTWARE_RESULT_PCID]);
         result = false;
     }
-    if (!AttestStatusNumberValid(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_RESERVE])) {
-        failString += std::string(" reserveResult is ");
-        failString += std::to_string(attestResultInfo.softwareResultDetail_[SOFTWARE_RESULT_RESERVE]);
+    if (!AttestStatusNumberValid(softwareResultArray[SOFTWARE_RESULT_RESERVE])) {
+        failString += string(" reserveResult is ") + to_string(softwareResultArray[SOFTWARE_RESULT_PCID]);
         result = false;
     }
     if (attestResultInfo.authResult_ == DEVATTEST_SUCCESS) {
         if (attestResultInfo.ticketLength_ <= 0) {
-            failString += std::string(" ticketLength is ");
-            failString += std::to_string(attestResultInfo.ticketLength_);
+            failString += string(" ticketLength is ") + to_string(attestResultInfo.ticketLength_);
             result = false;
         }
         if (attestResultInfo.ticket_.empty()) {
-            failString += std::string(" ticket is empty");
+            failString += string(" ticket is empty");
             result = false;
         }
     }
-
     if (result) {
         return ::testing::AssertionSuccess();
     } else {
         return ::testing::AssertionFailure() << failString.c_str();
     }
 }
-
 } // namespace DevAttest
 } // namespace OHOS

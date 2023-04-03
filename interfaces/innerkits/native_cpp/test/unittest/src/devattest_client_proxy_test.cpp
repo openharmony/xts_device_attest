@@ -29,11 +29,6 @@ constexpr int ATTEST_TEST_ZERO_NUM = 0;
 constexpr int ATTEST_TEST_FAILED_NUM1 = -3;
 constexpr int ATTEST_TEST_FAILED_NUM2 = 1;
 const std::string ATTEST_TEST_TICKET_STRING = "testTicket";
-enum {
-    ATTEST_TYPE_REPLY_RESULT = 0,
-    ATTEST_TYPE_RETURN_RESULT = 1,
-    ATTEST_TYPE_BUTT,
-};
 
 void ActionAttestResultInfo(int option, AttestResultInfo &attestResultInfo)
 {
@@ -290,6 +285,5 @@ HWTEST_F(DevAttestClientTest, GetAttestStatusProxyTest005, TestSize.Level1)
     EXPECT_EQ(ERR_OK, ret);
     ASSERT_FALSE(AttestStatusValid(attestResultInfo));
 }
-
 } // namespace DevAttest
 } // namespace OHOS

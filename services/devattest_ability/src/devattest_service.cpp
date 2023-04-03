@@ -38,8 +38,10 @@
 using namespace std;
 namespace OHOS {
 namespace DevAttest {
-DevAttestService::DevAttestService()
-    : SystemAbility(DEVICE_ATTEST_PROFILE_SA_ID, true)
+REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DEVICE_ATTEST_PROFILE_SA_ID, true)
+
+DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
+    : SystemAbility(systemAbilityId, runOnCreate)
 {
 }
 

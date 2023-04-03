@@ -19,42 +19,25 @@ ohos_unittest("test_devattestservice") {
   module_out_path = "devattest/devattest_ability"
   include_dirs = [
     "include",
-    "${devattest_path}/services/core",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
-    "${devattest_path}/common/permission/include",
     "${devattest_innerkit_path}/native_cpp/include",
     "${devattest_path}/services/devattest_ability/include",
-    "${devattest_path}/services/core/include",
-    "//utils/native/base/include",
-    "//utils/system/safwk/native/include",
     "//third_party/googletest/include",
   ]
 
-  sources = [
-    "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "${devattest_path}/services/devattest_ability/src/devattest_network_callback.cpp",
-    "${devattest_path}/services/devattest_ability/src/devattest_service.cpp",
-    "${devattest_path}/services/devattest_ability/src/devattest_service_stub.cpp",
-    "${devattest_path}/services/devattest_ability/src/devattest_system_ability_listener.cpp",
-    "src/devattest_service_test.cpp",
-  ]
+  sources = [ "src/devattest_service_test.cpp" ]
 
   deps = [
-    "${devattest_path}/common/permission:devattest_permission",
-    "${devattest_path}/services/core:devattest_core",
+    "${devattest_path}/services/devattest_ability:devattest_service",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "netmanager_base:net_conn_manager_if",
     "safwk:system_ability_fwk",
-    "samgr:samgr_common",
-    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "xts"

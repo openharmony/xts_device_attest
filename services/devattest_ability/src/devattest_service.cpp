@@ -45,6 +45,11 @@ DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
 {
 }
 
+DevAttestService::DevAttestService()
+    : SystemAbility(DEVICE_ATTEST_PROFILE_SA_ID, true)
+{
+}
+
 DevAttestService::~DevAttestService()
 {
 }

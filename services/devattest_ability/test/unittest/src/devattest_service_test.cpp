@@ -15,10 +15,7 @@
 
 #include "devattest_service_test.h"
 
-#include <ipc_skeleton.h>
-#define private public
-#include "devattest_service.h"
-#undef private
+#include "singleton.h"
 #include "devattest_errno.h"
 
 using namespace testing::ext;
@@ -27,15 +24,6 @@ using namespace OHOS::DevAttest;
 
 namespace OHOS {
 namespace DevAttest {
-class DevAttestServiceMock {
-public:
-    static int mockGetAttestStatus()
-    {
-        AttestResultInfo attestResultInfo;
-        return DelayedSingleton<DevAttestService>::GetInstance()->GetAttestStatus(attestResultInfo);
-    }
-};
-
 void DevAttestServiceTest::SetUpTestCase(void)
 {
     // input testsuit setup step，setup invoked before all testcases
@@ -64,7 +52,8 @@ void DevAttestServiceTest::TearDown(void)
  */
 HWTEST_F(DevAttestServiceTest, GetAttestStatusServiceTest001, TestSize.Level1)
 {
-    int32_t ret = DevAttestServiceMock::mockGetAttestStatus();
+    AttestResultInfo attestResultInfo;
+    int ret =  DelayedSingleton<DevAttestService>::GetInstance()->GetAttestStatus(attestResultInfo);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
 }
 } // namespace DevAttest

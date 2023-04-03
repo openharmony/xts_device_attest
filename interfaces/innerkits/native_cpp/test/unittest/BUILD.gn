@@ -22,7 +22,6 @@ ohos_unittest("test_devattestclient") {
     "${devattest_path}/common",
     "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
-    "//utils/native/base/include",
     "//third_party/googletest/include",
   ]
 
@@ -58,7 +57,6 @@ ohos_unittest("test_devattestclient_proxy") {
     "${devattest_path}/common",
     "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
-    "//utils/native/base/include",
     "//third_party/googletest/include",
   ]
 

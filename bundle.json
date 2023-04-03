@@ -53,6 +53,9 @@
         }
       ],
       "test": [
+        "//test/xts/device_attest/interfaces/innerkits/native_cpp/test/unittest:test_devattestclient",
+        "//test/xts/device_attest/interfaces/innerkits/native_cpp/test/unittest:test_devattestclient_proxy",
+        "//test/xts/device_attest/services/devattest_ability/test/unittest:test_devattestservice"
       ]
     }
   }

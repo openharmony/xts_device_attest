@@ -21,6 +21,8 @@
 #include "system_ability.h"
 #include "iremote_stub.h"
 #include "iremote_object.h"
+#include "singleton.h"
+
 #include "devattest_interface.h"
 #include "devattest_service_stub.h"
 #include "system_ability_status_change_stub.h"
@@ -35,9 +37,10 @@ enum class ServiceRunningState {
 
 class DevAttestService : public SystemAbility, public DevAttestServiceStub {
     DECLARE_SYSTEM_ABILITY(DevAttestService);
+    DECLARE_DELAYED_SINGLETON(DevAttestService);
+
 public:
-    DevAttestService(int32_t systemAbilityId, bool runOnCreate = true):SystemAbility(systemAbilityId, runOnCreate) {};
-    ~DevAttestService() = default;
+    DevAttestService(int32_t systemAbilityId, bool runOnCreate = true);
     void OnStart() override;
     void OnStop() override;
     ServiceRunningState QueryServiceState() const

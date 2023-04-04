@@ -40,6 +40,20 @@ namespace OHOS {
 namespace DevAttest {
 REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DEVICE_ATTEST_PROFILE_SA_ID, true)
 
+DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
+    : SystemAbility(systemAbilityId, runOnCreate)
+{
+}
+
+DevAttestService::DevAttestService()
+    : SystemAbility(DEVICE_ATTEST_PROFILE_SA_ID, true)
+{
+}
+
+DevAttestService::~DevAttestService()
+{
+}
+
 void DevAttestService::OnStart()
 {
     HILOGI("DevAttestService OnStart");
@@ -117,7 +131,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
 
         attestResultInfo.ticketLength_ = ticketLength;
         attestResultInfo.ticket_ = ticketStr;
-        ret = CopyAttestResult(resultArray,  attestResultInfo);
+        ret = CopyAttestResult(resultArray, attestResultInfo);
         if (ret != DEVATTEST_SUCCESS) {
             HILOGE("copy attest result failed");
             break;

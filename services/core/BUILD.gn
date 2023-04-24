@@ -13,30 +13,10 @@
 
 import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
+import("attestsource.gni")
 
-sources_common = [
-  "attest_entry.c",
-  "adapter/attest_adapter.c",
-  "adapter/attest_adapter_os.c",
-  "adapter/attest_adapter_oem.c",
-  "adapter/attest_adapter_mock.c",
-  "attest/attest_service.c",
-  "attest/attest_service_auth.c",
-  "attest/attest_service_active.c",
-  "attest/attest_service_challenge.c",
-  "attest/attest_service_reset.c",
-  "attest/attest_service_device.c",
-  "network/attest_network.c",
-  "security/attest_security.c",
-  "security/attest_security_token.c",
-  "security/attest_security_ticket.c",
-  "utils/attest_utils_file.c",
-  "utils/attest_utils_json.c",
-  "utils/attest_utils_log.c",
-  "utils/attest_utils_timer.c",
-  "utils/attest_utils_list.c",
-  "utils/attest_utils.c",
-]
+sources_common = sources_notmock
+sources_common += sources_mock
 
 if (enable_attest_debug_memory_leak) {
   sources_common += [ "utils/attest_utils_memleak.c" ]
@@ -49,15 +29,7 @@ if (enable_attest_debug_dfx) {
 config("devattest_core_config") {
   visibility = [ ":*" ]
   cflags = [ "-Wall" ]
-  include_dirs = [
-    "include",
-    "${devattest_path}/services/core/include/adapter",
-    "${devattest_path}/services/core/include/attest",
-    "${devattest_path}/services/core/include/dfx",
-    "${devattest_path}/services/core/include/security",
-    "${devattest_path}/services/core/include/network",
-    "${devattest_path}/services/core/include/utils",
-  ]
+  include_dirs = include_core_dirs
 
   defines = [ "ATTEST_HILOG_LEVEL = 1" ]
 
@@ -90,22 +62,11 @@ ohos_shared_library("devattest_core") {
 
   configs = [ ":devattest_core_config" ]
 
-  deps = [
-    "${devattest_path}/services/oem_adapter:device_attest_oem_adapter",
-    "//third_party/cJSON:cjson",
-    "//third_party/mbedtls:mbedtls_shared",
-    "//third_party/openssl:libcrypto_shared",
-    "//third_party/openssl:libssl_shared",
-  ]
+  deps = core_deps
 
   deps += [ ":network_config.json" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "syscap_codec:syscap_interface_shared",
-  ]
+  external_deps = core_external_deps
 
   subsystem_name = "xts"
   part_name = "device_attest"

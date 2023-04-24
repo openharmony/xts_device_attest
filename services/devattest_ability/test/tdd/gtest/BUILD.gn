@@ -40,3 +40,4 @@ ohos_unittest("device_attest_tdd") {
   deps = core_deps
   external_deps = core_external_deps
 }
+

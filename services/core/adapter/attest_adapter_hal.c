@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include <securec.h>
-#include "hal_token.h"
+#include "device_attest_oem_adapter.h"
 #include "attest_utils_log.h"
 #include "attest_adapter_mock.h"
 #include "attest_type.h"
@@ -25,7 +25,7 @@ int32_t AttestGetManufacturekey(uint8_t manufacturekey[], uint32_t len)
     if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
         return OsGetAcKeyStub((char*)manufacturekey, len);
     }
-    return HalGetAcKey((char*)manufacturekey, len);
+    return OEMGetManufacturekey((char*)manufacturekey, len);
 }
 
 // 读取ProductId
@@ -34,7 +34,7 @@ int32_t AttestGetProductId(uint8_t productId[], uint32_t len)
     if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
         return OsGetProdIdStub((char*)productId, len);
     }
-    return HalGetProdId((char*)productId, len);
+    return OEMGetProductId((char*)productId, len);
 }
 
 // 读取ProductKey
@@ -43,7 +43,7 @@ int32_t AttestGetProductKey(uint8_t productKey[], uint32_t len)
     if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
         return OsGetProdKeyStub((char*)productKey, len);
     }
-    return HalGetProdKey((char*)productKey, len);
+    return OEMGetProductKey((char*)productKey, len);
 }
 
 // 写入Token
@@ -78,7 +78,7 @@ int32_t AttestWriteToken(TokenInfo* tokenInfo)
     if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
         ret =  OsWriteTokenStub(token, sizeof(token));
     } else {
-        ret = HalWriteToken(token, sizeof(token));
+        ret = OEMWriteToken(token, sizeof(token));
     }
 
     if (ret != ATTEST_OK) {
@@ -99,7 +99,7 @@ int32_t AttestReadToken(TokenInfo* tokenInfo)
     if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
         ret =  OsReadTokenStub(token, sizeof(token));
     } else {
-        ret = HalReadToken(token, sizeof(token));
+        ret = OEMReadToken(token, sizeof(token));
     }
 
     if (ret != ATTEST_OK) {

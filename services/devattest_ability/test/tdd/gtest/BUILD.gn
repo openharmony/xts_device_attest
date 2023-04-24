@@ -39,4 +39,7 @@ ohos_unittest("device_attest_tdd") {
   sources += sources_notmock
   deps = core_deps
   external_deps = core_external_deps
+  
+  subsystem_name = "xts"
+  part_name = "device_attest"
 }

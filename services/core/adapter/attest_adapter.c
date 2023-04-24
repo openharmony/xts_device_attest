@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "device_attest_oem_adapter.h"
-
 #include "attest_type.h"
 #include "attest_utils_log.h"
 #include "attest_adapter_oem.h"

@@ -43,26 +43,27 @@ sources_mock = [
 ]
 
 include_core_dirs = [
-    "${attest_core_path}/include",
-    "${attest_core_path}/include/adapter",
-    "${attest_core_path}/include/attest",
-    "${attest_core_path}/include/dfx",
-    "${attest_core_path}/include/security",
-    "${attest_core_path}/include/network",
-    "${attest_core_path}/include/utils",
+  "${attest_core_path}/include",
+  "${attest_core_path}/include/adapter",
+  "${attest_core_path}/include/attest",
+  "${attest_core_path}/include/dfx",
+  "${attest_core_path}/include/security",
+  "${attest_core_path}/include/network",
+  "${attest_core_path}/include/utils",
 ]
 
 core_deps = [
-    "${devattest_path}/services/oem_adapter:device_attest_oem_adapter",
-    "//third_party/cJSON:cjson",
-    "//third_party/mbedtls:mbedtls_shared",
-    "//third_party/openssl:libcrypto_shared",
-    "//third_party/openssl:libssl_shared",
+  "${devattest_path}/services/oem_adapter:device_attest_oem_adapter",
+  "//third_party/cJSON:cjson",
+  "//third_party/mbedtls:mbedtls_shared",
+  "//third_party/openssl:libcrypto_shared",
+  "//third_party/openssl:libssl_shared",
 ]
 
 core_external_deps = [
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "syscap_codec:syscap_interface_shared",
+  "c_utils:utils",
+  "hiviewdfx_hilog_native:libhilog",
+  "init:libbegetutil",
+  "syscap_codec:syscap_interface_shared",
 ]
+

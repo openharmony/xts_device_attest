@@ -66,4 +66,3 @@ core_external_deps = [
   "init:libbegetutil",
   "syscap_codec:syscap_interface_shared",
 ]
-

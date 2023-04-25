@@ -1,0 +1,68 @@
+# Copyright (C) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//test/xts/device_attest/build/devattestconfig.gni")
+attest_core_path = "${devattest_path}/services/core"
+sources_notmock = [
+  "${attest_core_path}/attest_entry.c",
+  "${attest_core_path}/adapter/attest_adapter.c",
+  "${attest_core_path}/adapter/attest_adapter_os.c",
+  "${attest_core_path}/adapter/attest_adapter_oem.c",
+  "${attest_core_path}/adapter/attest_adapter_mock.c",
+  "${attest_core_path}/attest/attest_service.c",
+  "${attest_core_path}/attest/attest_service_auth.c",
+  "${attest_core_path}/attest/attest_service_active.c",
+  "${attest_core_path}/attest/attest_service_challenge.c",
+  "${attest_core_path}/attest/attest_service_reset.c",
+  "${attest_core_path}/attest/attest_service_device.c",
+  "${attest_core_path}/network/attest_network.c",
+  "${attest_core_path}/security/attest_security.c",
+  "${attest_core_path}/security/attest_security_token.c",
+  "${attest_core_path}/security/attest_security_ticket.c",
+  "${attest_core_path}/utils/attest_utils_file.c",
+  "${attest_core_path}/utils/attest_utils_json.c",
+  "${attest_core_path}/utils/attest_utils_log.c",
+  "${attest_core_path}/utils/attest_utils_timer.c",
+  "${attest_core_path}/utils/attest_utils_list.c",
+  "${attest_core_path}/utils/attest_utils.c",
+]
+
+sources_mock = [
+  "${attest_core_path}/adapter/attest_adapter_hal.c",
+  "${attest_core_path}/adapter/attest_adapter_property.c",
+]
+
+include_core_dirs = [
+  "${attest_core_path}/include",
+  "${attest_core_path}/include/adapter",
+  "${attest_core_path}/include/attest",
+  "${attest_core_path}/include/dfx",
+  "${attest_core_path}/include/security",
+  "${attest_core_path}/include/network",
+  "${attest_core_path}/include/utils",
+]
+
+core_deps = [
+  "${devattest_path}/services/oem_adapter:device_attest_oem_adapter",
+  "//third_party/cJSON:cjson",
+  "//third_party/mbedtls:mbedtls_shared",
+  "//third_party/openssl:libcrypto_shared",
+  "//third_party/openssl:libssl_shared",
+]
+
+core_external_deps = [
+  "c_utils:utils",
+  "hiviewdfx_hilog_native:libhilog",
+  "init:libbegetutil",
+  "syscap_codec:syscap_interface_shared",
+]

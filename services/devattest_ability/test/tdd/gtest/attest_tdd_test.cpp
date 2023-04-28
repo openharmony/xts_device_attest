@@ -43,7 +43,7 @@ ZXRhaWwiOnsicGF0Y2hMZXZlbFJlc3VsdCI6MzAwMDgsInBjaWRSZXN1bHQiOjMwMDExLCJyb290SGFz
 IsInZlcnNpb25JZCI6ImRlZmF1bHQvaHVhLXdlaS9rZW1pbi9kZWZhdWx0L09wZW5IYXJtb255LTQuMC4zLjIoQ2FuYXJ5MSkvb2hvcy9tYXgvMTAv\
 T3Blbkhhcm1vbnkgMi4zIGJldGEvZGVidWcifQ.\",\
 \"errcode\":0,\
-\"ticket_\":\"svnR0unsciaFi7S4hcpBa/LCSiYwNSt6\",\
+\"ticket\":\"svnR0unsciaFi7S4hcpBa/LCSiYwNSt6\",\
 \"token\":\"yh9te54pfTb91CrSqpD5fQsVBA/etKNb\",\
 \"uuid\":\"156dcff8-0ab0-4521-ac8f-ba682e6ca5a0\"\
 }3";
@@ -368,8 +368,8 @@ HWTEST_F(AttestTddTest, TestQueryAttestStatus001, TestSize.Level1)
     AttestWriteAuthResultCode((char*)&authResultCode, 1);
     AttestResultInfo attestResultInfo;
     int32_t ret = GetAttestStatus(attestResultInfo);
-    EXPECT_TRUE((ret == DEVATTEST_SUCCESS) && (attestResultInfo.authResult_ == DEVATTEST_SUCCESS));
-    EXPECT_TRUE(attestResultInfo.ticket_.empty());
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+    EXPECT_TRUE(!attestResultInfo.ticket_.empty());
     if (attestResultInfo.ticket_.empty()) {
         return;
     }

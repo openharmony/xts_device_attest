@@ -76,9 +76,9 @@ int32_t AttestWriteToken(TokenInfo* tokenInfo)
     }
     int32_t ret = 0;
     if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
-        ret =  OsWriteTokenStub(token, sizeof(token));
+        ret = OsWriteTokenStub(token, TOKEN_ENCRYPT_LEN);
     } else {
-        ret = OEMWriteToken(token, sizeof(token));
+        ret = OEMWriteToken((const char *)token, TOKEN_ENCRYPT_LEN);
     }
 
     if (ret != ATTEST_OK) {
@@ -97,9 +97,9 @@ int32_t AttestReadToken(TokenInfo* tokenInfo)
     char token[TOKEN_ENCRYPT_LEN + 1] = {0};
     int32_t ret = 0;
     if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
-        ret =  OsReadTokenStub(token, sizeof(token));
+        ret = OsReadTokenStub(token, TOKEN_ENCRYPT_LEN);
     } else {
-        ret = OEMReadToken(token, sizeof(token));
+        ret = OEMReadToken(token, TOKEN_ENCRYPT_LEN);
     }
 
     if (ret != ATTEST_OK) {

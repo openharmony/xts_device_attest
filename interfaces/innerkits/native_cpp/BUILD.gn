@@ -28,6 +28,7 @@ config("devattest_sdk_config") {
 }
 
 ohos_shared_library("devattest_sdk") {
+  version_script = "libdevattest_sdk.map"
   sources = [
     "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
     "src/devattest_client.cpp",

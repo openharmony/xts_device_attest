@@ -58,6 +58,8 @@ ohos_prebuilt_etc("network_config.json") {
 }
 
 ohos_shared_library("devattest_core") {
+  version_script = "libdevattest_core.map"
+
   sources = sources_common
 
   configs = [ ":devattest_core_config" ]

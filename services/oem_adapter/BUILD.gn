@@ -17,15 +17,11 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 config("device_attest_oem_adapter_config") {
   visibility = [ ":*" ]
   cflags = [ "-Wall" ]
-  include_dirs = [
-    "include",
-    "${devattest_path}/services/core/include",
-    "${devattest_path}/services/core/include/utils",
-    "${devattest_path}/services/oem_adapter/include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 ohos_shared_library("device_attest_oem_adapter") {
+  version_script = "libdevattest_oem.map"
   sources = [
     "src/device_attest_oem_adapter.c",
     "src/device_attest_oem_file.c",
@@ -33,12 +29,7 @@ ohos_shared_library("device_attest_oem_adapter") {
 
   public_configs = [ ":device_attest_oem_adapter_config" ]
 
-  deps = [ "//third_party/cJSON:cjson" ]
-
-  external_deps = [
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-  ]
+  external_deps = [ "c_utils:utils" ]
 
   subsystem_name = "xts"
   part_name = "device_attest"

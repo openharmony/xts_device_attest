@@ -24,7 +24,9 @@ namespace DevAttest {
 using namespace NetManagerStandard;
 
 class DevAttestNetworkCallback : public NetConnCallbackStub {
+private:
     int32_t NetCapabilitiesChange(sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap) override;
+    int32_t netId_ = 0;
 };
 } // DevAttest
 } // OHOS

@@ -16,6 +16,7 @@
     *DevAttestClient*;
     *GetAttestStatus*;
     *AttestResultInfo*;
+    *DevAttestServiceProxy*;
   local:
     *;
 };

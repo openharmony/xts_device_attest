@@ -18,7 +18,7 @@
     "features": [],
     "adapted_system_type": [ "standard" ],
     "rom": "512KB",
-    "ram": "~1950KB",
+    "ram": "~2335KB",
     "deps": {
       "components": [
         "safwk",

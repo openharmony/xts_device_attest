@@ -28,6 +28,7 @@ int32_t AttestTask(void);
 
 int32_t QueryAttest(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength);
 
+int32_t QueryAttestDisplayResult(int32_t* displayResult);
 #ifdef __cplusplus
 #if __cplusplus
 }

@@ -455,3 +455,30 @@ int32_t QueryAttestStatus(int32_t** resultArray, int32_t arraySize, char** ticke
     pthread_mutex_unlock(&g_mtxAttest);
     return ret;
 }
+
+int32_t QueryAttestDisplayResultImpl(int32_t* displayResult)
+{
+    pthread_mutex_lock(&g_mtxAttest);
+    char* authStatusBase64 = NULL;
+    AuthStatus* authStatus = CreateAuthStatus();
+    int32_t ret = ATTEST_OK;
+    do {
+        if (GetAuthStatus(&authStatusBase64) != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[QueryAttestDisplayResultImpl] Load Auth Status failed, auth file not exist");
+            ret = ATTEST_ERR;
+            break;
+        }
+        if (DecodeAuthStatus((const char*)authStatusBase64, authStatus) != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[QueryAttestDisplayResultImpl] Decode Auth Status failed");
+            ret = ATTEST_ERR;
+            break;
+        }
+        if (authStatus->hardwareResult == ATTEST_OK && authStatus->softwareResult == ATTEST_OK) {
+            *displayResult = ATTEST_OK;
+        } else {
+            *displayResult = ATTEST_ERR;
+        }
+    } while (0);
+    pthread_mutex_unlock(&g_mtxAttest);
+    return ret;
+}

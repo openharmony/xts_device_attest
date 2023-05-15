@@ -15,6 +15,7 @@
   global:
     AttestTask;
     QueryAttest;
+    QueryAttestDisplayResult;
   local:
     *;
 };

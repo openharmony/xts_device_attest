@@ -46,13 +46,20 @@ ohos_shared_library("devattest_service") {
   deps = [ "${devattest_path}/services/core:devattest_core" ]
 
   external_deps = [
+    "ability_base:base",
+    "ability_base:zuri",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "distributed_notification_service:ans_innerkits",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
+    "relational_store:native_rdb",
+    "resource_management:global_resmgr",
     "safwk:system_ability_fwk",
     "samgr:samgr_common",
     "samgr:samgr_proxy",

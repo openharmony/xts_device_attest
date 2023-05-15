@@ -41,3 +41,8 @@ int32_t QueryAttest(int32_t** resultArray, int32_t arraySize, char** ticket, int
 {
     return QueryAttestStatus(resultArray, arraySize, ticket, ticketLength);
 }
+
+int32_t QueryAttestDisplayResult(int32_t* displayResult)
+{
+    return QueryAttestDisplayResultImpl(displayResult);
+}

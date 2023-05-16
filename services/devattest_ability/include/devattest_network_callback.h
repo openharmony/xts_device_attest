@@ -27,6 +27,7 @@ class DevAttestNetworkCallback : public NetConnCallbackStub {
 private:
     int32_t NetCapabilitiesChange(sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap) override;
     int32_t GetDevattestBundleUid(int32_t *uid);
+    int32_t GetDevattestContent(std::string &title, std::string &text);
     int32_t PublishNotificationImpl(void);
     void PublishNotification(void);
     bool isFirstPublish_ = true;

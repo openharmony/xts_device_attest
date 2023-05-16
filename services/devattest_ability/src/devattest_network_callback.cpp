@@ -40,6 +40,7 @@ constexpr std::int32_t DEVATTEST_PUBLISH_NOTIFICATION_ID = 0;
 const char* DEVATTEST_PUBLISH_BUNDLE = "com.ohos.settingsdata";
 const char* DEVATTEST_CONTENT_TITLE = "ohos_desc_device_attest_publish_title";
 const char* DEVATTEST_CONTENT_TEXT = "ohos_desc_device_attest_publish_text";
+const char* SYSTEM_RESOURCE_PATH = "/system/app/ohos.global.systemres/SystemResources.hap";
 
 int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
     sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap)
@@ -113,27 +114,15 @@ void DevAttestNetworkCallback::PublishNotification(void)
 int32_t DevAttestNetworkCallback::PublishNotificationImpl(void)
 {
     int32_t uid = 0;
+    std::string contentTitle;
+    std::string contentText;
     if (GetDevattestBundleUid(&uid) != DEVATTEST_SUCCESS) {
         HILOGE("[PublishNotificationImpl] failed to get uid");
         return DEVATTEST_FAIL;
     }
 
-    Global::Resource::ResourceManager *resourceManager = Global::Resource::CreateResourceManager();
-    if (resourceManager == nullptr) {
-        HILOGE("[PublishNotificationImpl] get resourceManager failed");
-        return DEVATTEST_FAIL;
-    }
-    std::string contentTitle;
-    std::string contentText;
-    Global::Resource::RState state = resourceManager->GetStringByName(DEVATTEST_CONTENT_TITLE, contentTitle);
-    if (state != Global::Resource::RState::SUCCESS) {
-        HILOGE("[PublishNotificationImpl] failed to get title form resource");
-        return DEVATTEST_FAIL;
-    }
-
-    state = resourceManager->GetStringByName(DEVATTEST_CONTENT_TEXT, contentText);
-    if (state != Global::Resource::RState::SUCCESS) {
-        HILOGE("[PublishNotificationImpl] failed to get text form resource");
+    if (GetDevattestContent(contentTitle, contentText) != DEVATTEST_SUCCESS) {
+        HILOGE("[PublishNotificationImpl] failed to get Content");
         return DEVATTEST_FAIL;
     }
 
@@ -167,20 +156,49 @@ int32_t DevAttestNetworkCallback::GetDevattestBundleUid(int32_t* uid)
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
+        HILOGE("[GetDevattestBundleUid] get systemAbilityManager failed");
         return DEVATTEST_FAIL;
     }
 
     sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (remoteObject == nullptr) {
+        HILOGE("[GetDevattestBundleUid] get remoteObject failed");
         return DEVATTEST_FAIL;
     }
 
     sptr<AppExecFwk::IBundleMgr> bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     if (bundleMgr == nullptr) {
+        HILOGE("[GetDevattestBundleUid] bundleMgr remoteObject failed");
         return DEVATTEST_FAIL;
     }
     *uid = bundleMgr->GetUidByBundleName(std::string(DEVATTEST_PUBLISH_BUNDLE), DEVATTEST_PUBLISH_USERID);
-    HILOGI("[GetDevattestBundleUid]uid:%{public}d", *uid);
+    return DEVATTEST_SUCCESS;
+}
+
+int32_t DevAttestNetworkCallback::GetDevattestContent(std::string &title, std::string &text)
+{
+    std::shared_ptr<Global::Resource::ResourceManager> pResMgr(Global::Resource::CreateResourceManager());
+    if (pResMgr == nullptr) {
+        HILOGE("[GetDevattestContent] get resourceManager failed");
+        return DEVATTEST_FAIL;
+    }
+
+    if (!pResMgr->AddResource(SYSTEM_RESOURCE_PATH)) {
+        HILOGE("[GetDevattestContent] failed to AddResource");
+        return DEVATTEST_FAIL;
+    }
+
+    Global::Resource::RState state = pResMgr->GetStringByName(DEVATTEST_CONTENT_TITLE, title);
+    if (state != Global::Resource::RState::SUCCESS) {
+        HILOGE("[GetDevattestContent] failed to get title form resource");
+        return DEVATTEST_FAIL;
+    }
+
+    state = pResMgr->GetStringByName(DEVATTEST_CONTENT_TEXT, text);
+    if (state != Global::Resource::RState::SUCCESS) {
+        HILOGE("[GetDevattestContent] failed to get text form resource");
+        return DEVATTEST_FAIL;
+    }
     return DEVATTEST_SUCCESS;
 }
 } // DevAttest

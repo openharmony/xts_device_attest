@@ -479,7 +479,7 @@ int32_t QueryAttestPublishableImpl(int32_t* publishable)
     pthread_mutex_lock(&g_mtxAttest);
     *publishable = ATTEST_ERR;
     int32_t ret = ATTEST_OK;
-    while (0) {
+    do {
         if (AttestIsPublishFlagExist()) {
             ATTEST_LOG_WARN("[QueryAttestPublishableImpl] already publish");
             break;
@@ -490,7 +490,7 @@ int32_t QueryAttestPublishableImpl(int32_t* publishable)
             ATTEST_LOG_ERROR("[QueryAttestPublishableImpl] failed to query DisplayResult");
             break;
         }
-    }
+    } while (0);
     pthread_mutex_unlock(&g_mtxAttest);
     return ret;
 }

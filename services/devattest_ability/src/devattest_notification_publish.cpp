@@ -31,8 +31,6 @@
 #include "devattest_errno.h"
 #include "attest_entry.h"
 
-#define LETTER_PATTERN "[a-zA-Z]"
-
 namespace OHOS {
 namespace DevAttest {
 using namespace OHOS;
@@ -67,7 +65,7 @@ void DevAttestNotificationPublish::PublishNotification(void)
         HILOGE("[PublishNotification] QueryAttestPublishable fail");
         return;
     }
-    if (publishable == DEVATTEST_SUCCESS) {
+    if (publishable != DEVATTEST_SUCCESS) {
         HILOGE("[PublishNotification] No need to publish notifications");
         return;
     }
@@ -160,7 +158,7 @@ std::shared_ptr<Global::Resource::ResConfig> DevAttestNotificationPublish::GetDe
         return nullptr;
     }
 
-    ret = sscanf_s(locale, "%" LETTER_PATTERN "-%" LETTER_PATTERN "-%" LETTER_PATTERN,
+    ret = sscanf_s(locale, "%[a-zA-Z]-%[a-zA-Z]-%[a-zA-Z]",
         language, LOCALE_ITEM_SIZE,
         script, LOCALE_ITEM_SIZE,
         region, LOCALE_ITEM_SIZE);

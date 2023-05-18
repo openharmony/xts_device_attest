@@ -15,7 +15,6 @@
 
 #include "devattest_network_callback.h"
 
-#include <cstdint>
 #include <securec.h>
 #include "net_conn_client.h"
 #include "net_conn_constants.h"

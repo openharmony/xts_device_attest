@@ -1,6 +1,6 @@
 {
-  "name": "@ohos/devattest_service",
-  "version": "3.1",
+  "name": "@ohos/device_attest",
+  "version": "4.0",
   "description": "",
   "license": "Apache License 2.0",
   "domain": "os",

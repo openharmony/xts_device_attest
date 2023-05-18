@@ -22,14 +22,15 @@
 // 是否存在重置标记
 bool AttestIsResetFlagExist(void)
 {
-    return OEMIsResetFlagExist();
+    return OEMIsFlagExist(OEM_FLAG_RESET);
 }
-// 创建重置标记
 
+// 创建重置标记
 int32_t AttestCreateResetFlag(void)
 {
-    return OEMCreateResetFlag();
+    return OEMCreateFlag(OEM_FLAG_RESET);
 }
+
 // 写入认证结果
 int32_t AttestWriteAuthStatus(const char* data, uint32_t len)
 {
@@ -83,4 +84,16 @@ int32_t AttestWriteAuthResultCode(const char* data, uint32_t len)
 int32_t AttestReadAuthResultCode(char* buffer, uint32_t bufferLen)
 {
     return OEMReadAuthResultCode(buffer, bufferLen);
+}
+
+// 是否存在已发布标记
+bool AttestIsPublishFlagExist(void)
+{
+    return OEMIsFlagExist(OEM_FLAG_PUBLISH);
+}
+
+// 创建已发布标记
+int32_t AttestCreatePublishFlag(void)
+{
+    return OEMCreateFlag(OEM_FLAG_PUBLISH);
 }

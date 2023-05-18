@@ -52,6 +52,7 @@ extern "C" {
 #define STARTSUP_PARA_ATTEST_KEY "persist.xts.devattest.authresult"
 #define STARTSUP_PARA_ATTEST_OK "attest_ok"
 #define STARTSUP_PARA_ATTEST_ERROR "attest_error"
+#define STARTSUP_PARA_ATTEST_SIZE 16
 
 // token相关
 #define TOKEN_ID_LEN 36

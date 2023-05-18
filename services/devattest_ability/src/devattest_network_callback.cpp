@@ -15,17 +15,12 @@
 
 #include "devattest_network_callback.h"
 
-#include "cstdint"
+#include <cstdint>
+#include <securec.h>
 #include "net_conn_client.h"
 #include "net_conn_constants.h"
-#include "notification_helper.h"
-#include "notification_content.h"
-#include "notification_normal_content.h"
-#include "notification_request.h"
-#include "system_ability_definition.h"
-#include "system_ability_status_change_stub.h"
-#include "iservice_registry.h"
-#include "resource_manager.h"
+#include "singleton.h"
+#include "devattest_notification_publish.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
 #include "attest_entry.h"
@@ -33,15 +28,6 @@
 namespace OHOS {
 namespace DevAttest {
 using namespace OHOS;
-using namespace OHOS::EventFwk;
-
-constexpr std::int32_t DEVATTEST_PUBLISH_USERID = 0;
-constexpr std::int32_t DEVATTEST_PUBLISH_NOTIFICATION_ID = 0;
-const char* DEVATTEST_PUBLISH_BUNDLE = "com.ohos.settingsdata";
-const char* DEVATTEST_CONTENT_TITLE = "ohos_desc_device_attest_publish_title";
-const char* DEVATTEST_CONTENT_TEXT = "ohos_desc_device_attest_publish_text";
-const char* SYSTEM_RESOURCE_PATH = "/system/app/ohos.global.systemres/SystemResources.hap";
-
 int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
     sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap)
 {
@@ -68,7 +54,7 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_INTERNET start");
                 ret = AttestTask();
                 HILOGI("DevAttestService test success, ret = %{public}d", ret);
-                PublishNotification();
+                DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;
             case NET_CAPABILITY_NOT_VPN:
                 HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_NOT_VPN start");
@@ -83,121 +69,6 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 HILOGI("[NetCapabilitiesChange] default start");
                 break;
         }
-    }
-    return DEVATTEST_SUCCESS;
-}
-
-void DevAttestNetworkCallback::PublishNotification(void)
-{
-    if (!isFirstPublish_) {
-        HILOGE("[PublishNotification] Already publishNotification");
-        return;
-    }
-    int32_t displayResult = DEVATTEST_INIT;
-    int32_t ret = QueryAttestDisplayResult(&displayResult);
-    if (ret == DEVATTEST_SUCCESS && displayResult == DEVATTEST_SUCCESS) {
-        HILOGE("[PublishNotification] auth success");
-        return;
-    }
-
-    ret = PublishNotificationImpl();
-    if (ret != DEVATTEST_SUCCESS) {
-        HILOGE("[PublishNotification] public notification fail");
-        return;
-    }
-
-    isFirstPublish_ = false;
-    HILOGI("[PublishNotification]publish notification success");
-    return;
-}
-
-int32_t DevAttestNetworkCallback::PublishNotificationImpl(void)
-{
-    int32_t uid = 0;
-    std::string contentTitle;
-    std::string contentText;
-    if (GetDevattestBundleUid(&uid) != DEVATTEST_SUCCESS) {
-        HILOGE("[PublishNotificationImpl] failed to get uid");
-        return DEVATTEST_FAIL;
-    }
-
-    if (GetDevattestContent(contentTitle, contentText) != DEVATTEST_SUCCESS) {
-        HILOGE("[PublishNotificationImpl] failed to get Content");
-        return DEVATTEST_FAIL;
-    }
-
-    auto normalContent = std::make_shared<Notification::NotificationNormalContent>();
-    if (normalContent == nullptr) {
-        HILOGE("[PublishNotificationImpl] normalContent is null");
-        return DEVATTEST_FAIL;
-    }
-    normalContent->SetTitle(contentTitle);
-    normalContent->SetText(contentText);
-    auto content = std::make_shared<Notification::NotificationContent>(normalContent);
-    if (content == nullptr) {
-        HILOGE("[PublishNotificationImpl] content is null");
-        return DEVATTEST_FAIL;
-    }
-    Notification::NotificationRequest request;
-    request.SetNotificationId(DEVATTEST_PUBLISH_NOTIFICATION_ID);
-    request.SetCreatorUid(uid);
-    request.SetContent(content);
-    request.SetSlotType(Notification::NotificationConstant::OTHER);
-    int32_t result = Notification::NotificationHelper::PublishNotification(request);
-    if (result != DEVATTEST_SUCCESS) {
-        HILOGE("[PublishNotificationImpl]publish result:%{public}d", result);
-        return result;
-    }
-    return DEVATTEST_SUCCESS;
-}
-
-int32_t DevAttestNetworkCallback::GetDevattestBundleUid(int32_t* uid)
-{
-    sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        HILOGE("[GetDevattestBundleUid] get systemAbilityManager failed");
-        return DEVATTEST_FAIL;
-    }
-
-    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (remoteObject == nullptr) {
-        HILOGE("[GetDevattestBundleUid] get remoteObject failed");
-        return DEVATTEST_FAIL;
-    }
-
-    sptr<AppExecFwk::IBundleMgr> bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
-    if (bundleMgr == nullptr) {
-        HILOGE("[GetDevattestBundleUid] bundleMgr remoteObject failed");
-        return DEVATTEST_FAIL;
-    }
-    *uid = bundleMgr->GetUidByBundleName(std::string(DEVATTEST_PUBLISH_BUNDLE), DEVATTEST_PUBLISH_USERID);
-    return DEVATTEST_SUCCESS;
-}
-
-int32_t DevAttestNetworkCallback::GetDevattestContent(std::string &title, std::string &text)
-{
-    std::shared_ptr<Global::Resource::ResourceManager> pResMgr(Global::Resource::CreateResourceManager());
-    if (pResMgr == nullptr) {
-        HILOGE("[GetDevattestContent] get resourceManager failed");
-        return DEVATTEST_FAIL;
-    }
-
-    if (!pResMgr->AddResource(SYSTEM_RESOURCE_PATH)) {
-        HILOGE("[GetDevattestContent] failed to AddResource");
-        return DEVATTEST_FAIL;
-    }
-
-    Global::Resource::RState state = pResMgr->GetStringByName(DEVATTEST_CONTENT_TITLE, title);
-    if (state != Global::Resource::RState::SUCCESS) {
-        HILOGE("[GetDevattestContent] failed to get title form resource");
-        return DEVATTEST_FAIL;
-    }
-
-    state = pResMgr->GetStringByName(DEVATTEST_CONTENT_TEXT, text);
-    if (state != Global::Resource::RState::SUCCESS) {
-        HILOGE("[GetDevattestContent] failed to get text form resource");
-        return DEVATTEST_FAIL;
     }
     return DEVATTEST_SUCCESS;
 }

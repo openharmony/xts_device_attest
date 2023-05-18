@@ -15,7 +15,8 @@
   global:
     AttestTask;
     QueryAttest;
-    QueryAttestDisplayResult;
+    QueryAttestPublishable;
+    AttestPublishComplete;
   local:
     *;
 };

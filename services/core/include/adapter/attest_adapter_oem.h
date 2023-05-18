@@ -22,11 +22,17 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
+typedef enum {
+    OEM_FLAG_RESET = 0,
+    OEM_FLAG_PUBLISH,
+} OEM_FLAG_TYPE;
+
 #define AUTH_RESULT_PATH "/data/device_attest" // 具体读写路径待和浩哥讨论
 #define AUTH_STATUS_FILE_NAME "auth_status"
 #define AUTH_RESULT_CODE_FILE_NAME "auth_result_code"
 #define TICKET_FILE_NAME "ticket"
 #define RESET_FLAG_FILE_NAME "reset_flag"
+#define PUBLISH_FLAG_FILE_NAME "publish_flag"
 #define NETWORK_CONFIG_FILE_NAME "network_config.json"
 
 int32_t OEMWriteTicket(const TicketInfo* ticketInfo);
@@ -39,9 +45,9 @@ int32_t OEMReadAuthStatus(char* buffer, uint32_t bufferLen);
 
 int32_t OEMGetAuthStatusFileSize(uint32_t* len);
 
-int32_t OEMCreateResetFlag(void);
+int32_t OEMCreateFlag(OEM_FLAG_TYPE type);
 
-bool OEMIsResetFlagExist(void);
+bool OEMIsFlagExist(OEM_FLAG_TYPE type);
 
 int32_t OEMReadNetworkConfig(char* buffer, uint32_t bufferLen);
 

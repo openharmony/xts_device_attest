@@ -17,16 +17,38 @@
 #include "attest_utils_file.h"
 #include "attest_adapter_oem.h"
 
-// 是否存在重置标记
-bool OEMIsResetFlagExist(void)
+// 是否存在标记
+bool OEMIsFlagExist(OEM_FLAG_TYPE type)
 {
-    return IsFileExist(AUTH_RESULT_PATH, RESET_FLAG_FILE_NAME);
+    bool result = false;
+    switch (type) {
+        case OEM_FLAG_RESET:
+            result = IsFileExist(AUTH_RESULT_PATH, RESET_FLAG_FILE_NAME);
+            break;
+        case OEM_FLAG_PUBLISH:
+            result = IsFileExist(AUTH_RESULT_PATH, PUBLISH_FLAG_FILE_NAME);
+            break;
+        default:
+            break;
+    }
+    return result;
 }
 
-// 创建重置标记
-int32_t OEMCreateResetFlag(void)
+// 创建标记
+int32_t OEMCreateFlag(OEM_FLAG_TYPE type)
 {
-    return CreateFile(AUTH_RESULT_PATH, RESET_FLAG_FILE_NAME);
+    int32_t result = ATTEST_ERR;
+    switch (type) {
+        case OEM_FLAG_RESET:
+            result = CreateFile(AUTH_RESULT_PATH, RESET_FLAG_FILE_NAME);
+            break;
+        case OEM_FLAG_PUBLISH:
+            result = CreateFile(AUTH_RESULT_PATH, PUBLISH_FLAG_FILE_NAME);
+            break;
+        default:
+            break;
+    }
+    return result;
 }
 
 // 写入认证结果

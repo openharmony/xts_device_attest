@@ -1032,6 +1032,32 @@ static int32_t ParseNetworkInfosConfig(char *inputData, List *list)
     return ret;
 }
 
+static int32_t NetworkInfoFileCreate(void)
+{
+    char *buffer = (char *)ATTEST_MEM_MALLOC(NETWORK_CONFIG_SIZE + 1);
+    if (buffer == NULL) {
+        ATTEST_LOG_ERROR("[NetworkInfoFileCreate] buffer malloc failed.");
+        return ATTEST_ERR;
+    }
+    int32_t ret = ATTEST_ERR;
+    do {
+        ret = AttestReadDefaultNetworkConfig(buffer, NETWORK_CONFIG_SIZE);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[NetworkInfoFileCreate] read NetworkConfig failed.");
+            break;
+        }
+
+        ret = AttestWriteNetworkConfig(buffer, strlen(buffer));
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[NetworkInfoFileCreate] write NetworkConfig failed.");
+            break;
+        }
+        ret = ATTEST_OK;
+    } while (0);
+    ATTEST_MEM_FREE(buffer);
+    return ret;
+}
+
 static int32_t NetworkInfoConfig(List* list)
 {
     if (list == NULL) {
@@ -1084,6 +1110,14 @@ int32_t InitNetworkServerInfo(void)
         ATTEST_LOG_WARN("[InitNetworkServerInfo] already init g_attestNetworkList");
         return ATTEST_OK;
     }
+
+    if (!AttestNetworkConfigExist()) {
+        ATTEST_LOG_INFO("[InitNetworkServerInfo] NetworkConfig doesn't exist");
+        if (NetworkInfoFileCreate() != ATTEST_OK) {
+            return ATTEST_ERR;
+        }
+    }
+
     int32_t ret = NetworkInfoConfig(&g_attestNetworkList);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_INFO("[InitNetworkServerInfo] init g_attestNetworkList failed");

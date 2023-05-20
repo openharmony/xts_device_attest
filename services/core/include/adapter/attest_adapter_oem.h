@@ -23,6 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define AUTH_RESULT_PATH "/data/device_attest" // 具体读写路径待和浩哥讨论
+#define ETC_DEVICE_ATTEST_PATH "/etc/device_attest"
 #define AUTH_STATUS_FILE_NAME "auth_status"
 #define AUTH_RESULT_CODE_FILE_NAME "auth_result_code"
 #define TICKET_FILE_NAME "ticket"
@@ -43,7 +44,13 @@ int32_t OEMCreateResetFlag(void);
 
 bool OEMIsResetFlagExist(void);
 
+bool OEMIsNetworkConfigExist(void);
+
+int32_t OEMWriteNetworkConfig(char* buffer, uint32_t bufferLen);
+
 int32_t OEMReadNetworkConfig(char* buffer, uint32_t bufferLen);
+
+int32_t OEMReadDefaultNetworkConfig(char* buffer, uint32_t bufferLen);
 
 int32_t OEMWriteAuthResultCode(const char* data, uint32_t len);
 

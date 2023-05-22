@@ -16,7 +16,7 @@ on post-fs-data
     chown device_attest device_attest /data/device_attest
     start devattest_service
 
-service devattest_service /system/bin/sa_main /system/profile/devattest_service.xml
+service devattest_service /system/bin/sa_main /system/profile/devattest_service.json
     class z_core
     user device_attest
     group device_attest system shell

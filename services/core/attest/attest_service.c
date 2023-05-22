@@ -484,11 +484,14 @@ int32_t QueryAttestPublishableImpl(int32_t* publishable)
             ATTEST_LOG_WARN("[QueryAttestPublishableImpl] already publish");
             break;
         }
-
-        int32_t ret = QueryAttestDisplayResultImpl(publishable);
+        int32_t displayResult = DEVICE_ATTEST_INIT;
+        int32_t ret = QueryAttestDisplayResultImpl(&displayResult);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[QueryAttestPublishableImpl] failed to query DisplayResult");
             break;
+        }
+        if (displayResult != DEVICE_ATTEST_PASS) {
+            *publishable = ATTEST_OK;
         }
     } while (0);
     pthread_mutex_unlock(&g_mtxAttest);

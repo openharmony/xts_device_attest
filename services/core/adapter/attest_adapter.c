@@ -71,9 +71,24 @@ int32_t AttestGetParameter(const char *key, const char *def, char *value, uint32
     return OsGetParameter(key, def, value, len);
 }
 
+bool AttestNetworkConfigExist(void)
+{
+    return OEMIsNetworkConfigExist();
+}
+
+int32_t AttestWriteNetworkConfig(char* buffer, uint32_t bufferLen)
+{
+    return OEMWriteNetworkConfig(buffer, bufferLen);
+}
+
 int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen)
 {
     return OEMReadNetworkConfig(buffer, bufferLen);
+}
+
+int32_t AttestReadDefaultNetworkConfig(char* buffer, uint32_t bufferLen)
+{
+    return OEMReadDefaultNetworkConfig(buffer, bufferLen);
 }
 
 int32_t AttestWriteAuthResultCode(const char* data, uint32_t len)

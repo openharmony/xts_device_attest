@@ -27,6 +27,8 @@
 #include "iservice_registry.h"
 #include "parameter.h"
 #include "bundle_mgr_interface.h"
+#include "os_account_manager.h"
+#include "locale_config.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
 #include "attest_entry.h"
@@ -38,12 +40,8 @@ using namespace OHOS::EventFwk;
 using namespace std;
 
 constexpr std::int32_t LOCALE_ITEM_SIZE = 5;
-constexpr std::int32_t LOCALE_SIZE = 17;
 constexpr std::int32_t PARAM_THREE = 3;
-constexpr std::int32_t DEVATTEST_PUBLISH_USERID = 0;
 constexpr std::int32_t DEVATTEST_PUBLISH_NOTIFICATION_ID = 0;
-const char* PERSIST_GLOBAL_LOCALE_LABEL = "persist.global.locale";
-const char* DEFAULT_LOCALE_LABEL = "zh-Hans-CN";
 const char* DEVATTEST_PUBLISH_BUNDLE = "com.ohos.settingsdata";
 const char* DEVATTEST_CONTENT_TITLE = "OpenHarmony_Compatibility_Assessment";
 const char* DEVATTEST_CONTENT_TEXT = "assessmentPassFailedText";
@@ -122,6 +120,13 @@ int32_t DevAttestNotificationPublish::PublishNotificationImpl(void)
 
 int32_t DevAttestNotificationPublish::GetDevattestBundleUid(int32_t* uid)
 {
+    int32_t userId = -1;
+    int32_t ret = OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromProcess(userId);
+    if (ret != DEVATTEST_SUCCESS) {
+        HILOGE("[GetDevattestBundleUid] GetOsAccountLocalIdFromProcess failed, ret:%{public}d", ret);
+        return DEVATTEST_FAIL;
+    }
+
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
@@ -140,7 +145,7 @@ int32_t DevAttestNotificationPublish::GetDevattestBundleUid(int32_t* uid)
         HILOGE("[GetDevattestBundleUid] bundleMgr remoteObject failed");
         return DEVATTEST_FAIL;
     }
-    *uid = bundleMgr->GetUidByBundleName(std::string(DEVATTEST_PUBLISH_BUNDLE), DEVATTEST_PUBLISH_USERID);
+    *uid = bundleMgr->GetUidByBundleName(std::string(DEVATTEST_PUBLISH_BUNDLE), userId);
     return DEVATTEST_SUCCESS;
 }
 
@@ -148,22 +153,22 @@ std::shared_ptr<Global::Resource::ResConfig> DevAttestNotificationPublish::GetDe
 {
     std::shared_ptr<Global::Resource::ResConfig> pResConfig(Global::Resource::CreateResConfig());
 
-    char locale[LOCALE_SIZE] = {0};
-    char language[LOCALE_ITEM_SIZE] = {0};
-    char script[LOCALE_ITEM_SIZE] = {0};
-    char region[LOCALE_ITEM_SIZE] = {0};
-    int32_t ret = GetParameter(PERSIST_GLOBAL_LOCALE_LABEL, DEFAULT_LOCALE_LABEL, locale, LOCALE_SIZE);
-    if (ret < DEVATTEST_SUCCESS) {
-        HILOGE("[GetDevattestResConfig] failed to get parameter. ret:%{public}d", ret);
+    string localeStr = Global::I18n::LocaleConfig::GetSystemLocale();
+    if (localeStr.empty()) {
+        HILOGE("[GetDevattestResConfig] failed to GetSystemLocale");
         return nullptr;
     }
 
-    ret = sscanf_s(locale, "%[a-zA-Z]-%[a-zA-Z]-%[a-zA-Z]",
+    char language[LOCALE_ITEM_SIZE] = {0};
+    char script[LOCALE_ITEM_SIZE] = {0};
+    char region[LOCALE_ITEM_SIZE] = {0};
+    // zh-Hans-CN
+    int32_t ret = sscanf_s(localeStr.c_str(), "%[a-zA-Z]-%[a-zA-Z]-%[a-zA-Z]",
         language, LOCALE_ITEM_SIZE,
         script, LOCALE_ITEM_SIZE,
         region, LOCALE_ITEM_SIZE);
     if (ret != PARAM_THREE) {
-        HILOGE("[GetDevattestResConfig] failed to split locale locale:%{public}s", locale);
+        HILOGE("[GetDevattestResConfig] failed to split locale locale:%{public}s", localeStr.c_str());
         return nullptr;
     }
 

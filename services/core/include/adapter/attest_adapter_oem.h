@@ -27,7 +27,7 @@ typedef enum {
     OEM_FLAG_PUBLISH,
 } OEM_FLAG_TYPE;
 
-#define AUTH_RESULT_PATH "/data/device_attest" // 具体读写路径待和浩哥讨论
+#define AUTH_RESULT_PATH "/data/device_attest"
 #define AUTH_STATUS_FILE_NAME "auth_status"
 #define AUTH_RESULT_CODE_FILE_NAME "auth_result_code"
 #define TICKET_FILE_NAME "ticket"

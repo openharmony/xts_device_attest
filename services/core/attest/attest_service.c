@@ -455,3 +455,50 @@ int32_t QueryAttestStatus(int32_t** resultArray, int32_t arraySize, char** ticke
     pthread_mutex_unlock(&g_mtxAttest);
     return ret;
 }
+
+static int32_t QueryAttestDisplayResultImpl(int32_t* displayResult)
+{
+    *displayResult = DEVICE_ATTEST_INIT;
+    char attestResult[STARTSUP_PARA_ATTEST_SIZE] = {0};
+    int32_t ret = AttestGetParameter(STARTSUP_PARA_ATTEST_KEY,
+        STARTSUP_PARA_ATTEST_ERROR, attestResult, STARTSUP_PARA_ATTEST_SIZE);
+    if (ret < ATTEST_OK) {
+        ATTEST_LOG_ERROR("[QueryAttestDisplayResultImpl] failed to get parameter. ret:%d", ret);
+        return ATTEST_ERR;
+    }
+    if (strcmp(STARTSUP_PARA_ATTEST_OK, attestResult) == 0) {
+        *displayResult = DEVICE_ATTEST_PASS;
+    } else {
+        *displayResult = DEVICE_ATTEST_FAIL;
+    }
+    return ATTEST_OK;
+}
+
+int32_t QueryAttestPublishableImpl(int32_t* publishable)
+{
+    pthread_mutex_lock(&g_mtxAttest);
+    *publishable = ATTEST_ERR;
+    int32_t ret = ATTEST_OK;
+    do {
+        if (AttestIsPublishFlagExist()) {
+            ATTEST_LOG_WARN("[QueryAttestPublishableImpl] already publish");
+            break;
+        }
+        int32_t displayResult = DEVICE_ATTEST_INIT;
+        int32_t ret = QueryAttestDisplayResultImpl(&displayResult);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[QueryAttestPublishableImpl] failed to query DisplayResult");
+            break;
+        }
+        if (displayResult != DEVICE_ATTEST_PASS) {
+            *publishable = ATTEST_OK;
+        }
+    } while (0);
+    pthread_mutex_unlock(&g_mtxAttest);
+    return ret;
+}
+
+int32_t AttestPublishCompleteImpl(void)
+{
+    return AttestCreatePublishFlag();
+}

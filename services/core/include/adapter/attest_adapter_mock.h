@@ -42,7 +42,6 @@ extern "C" {
 #define ATTEST_MOCK_TOKEN_FILE_NAME "token"
 #define ATTEST_MOCK_STUB_MAX_LEN 512
 
-// 定义打桩数据Json的节点名称
 #define ATTEST_MOCK_L1_AUTH_STATUS_CHANGE "authStatusChange"
 #define ATTEST_MOCK_L1_RESET_DEVICE "resetDevice"
 #define ATTEST_MOCK_L1_AUTH_DEVICE "authDevice"

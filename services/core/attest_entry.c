@@ -41,3 +41,13 @@ int32_t QueryAttest(int32_t** resultArray, int32_t arraySize, char** ticket, int
 {
     return QueryAttestStatus(resultArray, arraySize, ticket, ticketLength);
 }
+
+int32_t QueryAttestPublishable(int32_t* publishable)
+{
+    return QueryAttestPublishableImpl(publishable);
+}
+
+int32_t AttestPublishComplete(void)
+{
+    return AttestPublishCompleteImpl();
+}

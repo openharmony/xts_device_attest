@@ -16,7 +16,6 @@
 #ifndef DEVATTEST_NETWORK_CALLBACK_H
 #define DEVATTEST_NETWORK_CALLBACK_H
 
-
 #include "net_conn_callback_stub.h"
 
 namespace OHOS {

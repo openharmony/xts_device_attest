@@ -15,17 +15,18 @@
 
 #include "devattest_network_callback.h"
 
-#include "cstdint"
-
+#include <securec.h>
 #include "net_conn_client.h"
 #include "net_conn_constants.h"
-
+#include "singleton.h"
+#include "devattest_notification_publish.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
 #include "attest_entry.h"
 
 namespace OHOS {
 namespace DevAttest {
+using namespace OHOS;
 int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
     sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap)
 {
@@ -52,6 +53,7 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_INTERNET start");
                 ret = AttestTask();
                 HILOGI("DevAttestService test success, ret = %{public}d", ret);
+                DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;
             case NET_CAPABILITY_NOT_VPN:
                 HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_NOT_VPN start");

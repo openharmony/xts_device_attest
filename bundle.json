@@ -53,10 +53,8 @@
         }
       ],
       "test": [
-        "//test/xts/device_attest/interfaces/innerkits/native_cpp/test/unittest:test_devattestclient",
-        "//test/xts/device_attest/interfaces/innerkits/native_cpp/test/unittest:test_devattestclient_proxy",
-        "//test/xts/device_attest/services/devattest_ability/test/unittest:test_devattestservice",
-        "//test/xts/device_attest/services/devattest_ability/test/tdd/gtest:device_attest_tdd"
+        "//test/xts/device_attest/test/fuzztest:fuzztest",
+        "//test/xts/device_attest/test/unittest:unittest"
       ]
     }
   }

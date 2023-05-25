@@ -32,7 +32,7 @@ namespace OHOS {
         if ((memcpy_s(testResult, sizeof(testResult), data, SIZE)) != EOK) {
             return;
         }
-        std::string testTicket(reinterpret_cast<const char*>(data), size);
+        std::string testTicket(static_cast<const char*>(data), size);
 
         for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
             attestResultInfo.softwareResultDetail_[i] = testResult[0];

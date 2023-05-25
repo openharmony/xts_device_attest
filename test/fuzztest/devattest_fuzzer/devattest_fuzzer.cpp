@@ -32,7 +32,6 @@ namespace OHOS {
         if ((memcpy_s(testResult, sizeof(testResult), data, SIZE)) != EOK) {
             return;
         }
-        std::string testTicket(static_cast<const char*>(data), size);
 
         for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
             attestResultInfo.softwareResultDetail_[i] = testResult[0];
@@ -40,7 +39,7 @@ namespace OHOS {
         attestResultInfo.authResult_ = testResult[0];
         attestResultInfo.softwareResult_ = testResult[0];
         attestResultInfo.ticketLength_ = testResult[0];
-        attestResultInfo.ticket_ = testTicket;
+        attestResultInfo.ticket_ = std::string(data, data + size);
         DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
     }
 

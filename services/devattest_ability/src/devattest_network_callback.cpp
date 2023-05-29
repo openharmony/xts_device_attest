@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace DevAttest {
+using namespace OHOS;
 int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
     sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap)
 {
@@ -34,6 +35,12 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
         return DEVATTEST_SUCCESS;
     }
     int32_t ret = DEVATTEST_SUCCESS;
+    int32_t netHandleId = netHandle->GetNetId();
+    if (netId_ == netHandleId) {
+        HILOGI("[NetCapabilitiesChange] Skip the same operation");
+        return DEVATTEST_SUCCESS;
+    }
+    netId_ = netHandleId;
     for (auto netCap : netAllCap->netCaps_) {
         switch (netCap) {
             case NET_CAPABILITY_MMS:

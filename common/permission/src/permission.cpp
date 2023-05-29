@@ -119,14 +119,13 @@ bool Permission::IsSystemHap()
     bool result = false;
     switch (type) {
         case ATokenTypeEnum::TOKEN_HAP:
-        {
             if (sptrBundleMgr_ == nullptr) {
                 HILOGE("[IsSystemHap] sptrBundleMgr_ is null");
-                return false;
+                result = false;
+                break;
             }
             result = sptrBundleMgr_->CheckIsSystemAppByUid(uid);
             break;
-        }
         case ATokenTypeEnum::TOKEN_NATIVE:
         case ATokenTypeEnum::TOKEN_SHELL:
             result = true;

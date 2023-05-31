@@ -14,8 +14,12 @@
  */
 
 #include <stdbool.h>
-#include "securec.h"
-#include "attest_error.h"
+#include <securec.h>
+#include "mbedtls/base64.h"
+#include "mbedtls/cipher.h"
+#include "mbedtls/aes.h"
+#include "mbedtls/hkdf.h"
+#include "mbedtls/md.h"
 #include "attest_adapter.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"
@@ -60,7 +64,6 @@ int32_t Base64Encode(const uint8_t* srcData, size_t srcDataLen, uint8_t* base64E
     }
     return ATTEST_OK;
 }
-
 
 void GetSalt(uint8_t* salt, uint32_t saltLen)
 {

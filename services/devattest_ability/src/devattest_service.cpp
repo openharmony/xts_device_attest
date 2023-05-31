@@ -15,30 +15,19 @@
 
 #include "devattest_service.h"
 
-#include <map>
 #include <string>
 #include <iostream>
-
-#include "cstdint"
-#include "securec.h"
-
-#include "system_ability_definition.h"
-#include "system_ability_status_change_stub.h"
-#include "iservice_registry.h"
-
-#include "net_conn_client.h"
-#include "net_conn_constants.h"
-
+#include <cstdint>
+#include <securec.h>
 #include "devattest_errno.h"
 #include "devattest_log.h"
 #include "devattest_system_ability_listener.h"
-#include "attest_result_info.h"
 #include "attest_entry.h"
 
 using namespace std;
 namespace OHOS {
 namespace DevAttest {
-REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DEVICE_ATTEST_PROFILE_SA_ID, true)
+REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE, true)
 
 DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
     : SystemAbility(systemAbilityId, runOnCreate)
@@ -46,7 +35,7 @@ DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
 }
 
 DevAttestService::DevAttestService()
-    : SystemAbility(DEVICE_ATTEST_PROFILE_SA_ID, true)
+    : SystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE, true)
 {
 }
 

@@ -17,10 +17,6 @@
 #define DEVICE_ATTEST_OEM_ADAPTER_H
 
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #ifdef __cplusplus
 #if __cplusplus

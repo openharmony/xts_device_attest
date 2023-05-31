@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <stdio.h>
 #include "attest_utils.h"
 #include "attest_adapter_os.h"
 

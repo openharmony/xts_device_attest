@@ -16,7 +16,7 @@
 #ifndef __ATTEST_SECURITY_TOKEN_H__
 #define __ATTEST_SECURITY_TOKEN_H__
 
-#include "attest_security.h"
+#include "attest_type.h"
 
 #ifdef __cplusplus
 #if __cplusplus

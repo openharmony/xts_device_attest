@@ -13,18 +13,8 @@
  * limitations under the License.
  */
 
-#include "devattest_client.h"
-
-#include <string>
-#include <cstdio>
-
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
-#include "system_ability.h"
-#include "singleton.h"
-
 #include "devattest_errno.h"
-#include "attest_result_info.h"
+#include "devattest_client.h"
 
 using namespace OHOS;
 using namespace OHOS::DevAttest;

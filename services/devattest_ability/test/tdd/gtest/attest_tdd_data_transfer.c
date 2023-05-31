@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "securec.h"
+
+#include <securec.h>
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_tdd_data_transfer.h"
+
 static size_t AttestGetMallocLen(const char* input)
 {
     size_t totalFlag = 0;

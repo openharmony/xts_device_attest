@@ -16,7 +16,6 @@
 #ifndef DEVATTEST_INTERFACE_H
 #define DEVATTEST_INTERFACE_H
 
-#include <string>
 #include "iremote_broker.h"
 #include "attest_result_info.h"
 #include "system_ability_definition.h"

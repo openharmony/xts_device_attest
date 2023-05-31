@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <securec.h>
+#include <signal.h>
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_utils_timer.h"

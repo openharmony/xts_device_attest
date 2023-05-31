@@ -16,8 +16,6 @@
 #include "devattest_network_callback.h"
 
 #include <securec.h>
-#include "net_conn_client.h"
-#include "net_conn_constants.h"
 #include "singleton.h"
 #include "devattest_notification_publish.h"
 #include "devattest_log.h"

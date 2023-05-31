@@ -16,13 +16,7 @@
 #ifndef __ATTEST_SECURITY_H__
 #define __ATTEST_SECURITY_H__
 
-#include "base64.h"
-#include "cipher.h"
-#include "ctr_drbg.h"
-#include "hkdf.h"
-#include "md.h"
-#include "sha256.h"
-#include "entropy.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 #if __cplusplus

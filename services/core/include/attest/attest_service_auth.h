@@ -16,7 +16,7 @@
 #ifndef __ATTEST_SERVICE_AUTH_H__
 #define __ATTEST_SERVICE_AUTH_H__
 
-#include "mbedtls/base64.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 #if __cplusplus

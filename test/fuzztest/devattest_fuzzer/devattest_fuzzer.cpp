@@ -17,7 +17,6 @@
 
 #include <string>
 #include <securec.h>
-#include <vector>
 #include "devattest_client.h"
 
 using namespace std;

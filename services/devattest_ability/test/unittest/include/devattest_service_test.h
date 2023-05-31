@@ -17,7 +17,6 @@
 #define DEVATTEST_SERVICE_TEST_H
 
 #include <gtest/gtest.h>
-#include "devattest_service.h"
 
 namespace OHOS {
 namespace DevAttest {

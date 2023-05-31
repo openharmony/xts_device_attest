@@ -16,8 +16,6 @@
 #ifndef DEVATTEST_CLIENT_H
 #define DEVATTEST_CLIENT_H
 
-#include <string>
-#include "iremote_object.h"
 #include "devattest_interface.h"
 #include "singleton.h"
 

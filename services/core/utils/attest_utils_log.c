@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <inttypes.h>
-#include "securec.h"
+#include <securec.h>
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 

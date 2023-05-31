@@ -16,7 +16,6 @@
 #ifndef DEVATTEST_SERVICE_PROXY_H
 #define DEVATTEST_SERVICE_PROXY_H
 
-#include <string>
 #include "iremote_proxy.h"
 #include "devattest_interface.h"
 

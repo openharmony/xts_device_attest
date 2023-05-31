@@ -15,6 +15,8 @@
 
 #include "devattest_client_test.h"
 
+#include <string.h>
+#include "devattest_errno.h"
 #include "devattest_client.h"
 #include "devattest_service_proxy.h"
 
@@ -28,7 +30,7 @@ constexpr int ATTEST_GET_OPTION = 1;
 constexpr int ATTEST_TEST_ZERO_NUM = 0;
 constexpr int ATTEST_TEST_FAILED_NUM1 = -3;
 constexpr int ATTEST_TEST_FAILED_NUM2 = 1;
-const std::string ATTEST_TEST_TICKET_STRING = "testTicket";
+const char* ATTEST_TEST_TICKET_STRING = "testTicket";
 
 void ActionAttestResultInfo(int option, AttestResultInfo &attestResultInfo)
 {
@@ -225,7 +227,7 @@ HWTEST_F(DevAttestClientTest, GetAttestStatusProxyTest003, TestSize.Level1)
 {
     AttestResultInfo attestResultInfotemp;
     SetAllAttestResultInfo(attestResultInfotemp, DEVATTEST_SUCCESS);
-    attestResultInfotemp.ticketLength_ = ATTEST_TEST_TICKET_STRING.length();
+    attestResultInfotemp.ticketLength_ = strlen(ATTEST_TEST_TICKET_STRING);
     ActionAttestResultInfo(ATTEST_SET_OPTION, attestResultInfotemp);
 
     sptr<IRemoteObject> object = new MockIRemoteObject();
@@ -272,7 +274,7 @@ HWTEST_F(DevAttestClientTest, GetAttestStatusProxyTest005, TestSize.Level1)
     SetAllAttestResultInfo(attestResultInfotemp, DEVATTEST_SUCCESS);
     attestResultInfotemp.authResult_ = ATTEST_TEST_FAILED_NUM1;
     attestResultInfotemp.softwareResult_ = ATTEST_TEST_FAILED_NUM2;
-    attestResultInfotemp.ticketLength_ = ATTEST_TEST_TICKET_STRING.length();
+    attestResultInfotemp.ticketLength_ = strlen(ATTEST_TEST_TICKET_STRING);
     attestResultInfotemp.ticket_ = ATTEST_TEST_TICKET_STRING;
 
     ActionAttestResultInfo(ATTEST_SET_OPTION, attestResultInfotemp);

@@ -17,16 +17,6 @@
 #define ATTEST_TYPE
 
 #include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include "cJSON.h"
-#include "limits.h"
-#include "securec.h"
 #include "attest_error.h"
 
 #ifdef __cplusplus

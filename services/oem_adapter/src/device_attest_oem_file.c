@@ -13,11 +13,7 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <limits.h>
 #include <securec.h>
 #include "device_attest_oem_file.h"

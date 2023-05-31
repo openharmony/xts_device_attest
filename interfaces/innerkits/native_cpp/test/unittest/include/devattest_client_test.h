@@ -16,7 +16,6 @@
 #ifndef DEVATTEST_CLIENT_TEST_H
 #define DEVATTEST_CLIENT_TEST_H
 
-
 #include <ipc_skeleton.h>
 #include "devattest_test.h"
 

@@ -17,7 +17,6 @@
 #define ATTEST_ADAPTER_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include "attest_type.h"
 
 #ifdef __cplusplus

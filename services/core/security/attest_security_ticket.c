@@ -14,8 +14,8 @@
  */
 
 #include <stdbool.h>
-#include "securec.h"
-#include "attest_error.h"
+#include <securec.h>
+
 #include "attest_adapter.h"
 #include "attest_utils_log.h"
 #include "attest_security.h"

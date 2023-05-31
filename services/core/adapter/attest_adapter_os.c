@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <securec.h>
 #include "parameter.h"
 #include "attest_type.h"
 #include "attest_utils.h"

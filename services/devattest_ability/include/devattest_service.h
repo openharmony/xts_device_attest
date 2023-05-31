@@ -17,16 +17,9 @@
 #define DEVATTEST_SERVICE_H
 
 #include <string>
-#include <map>
 #include "system_ability.h"
-#include "iremote_stub.h"
-#include "iremote_object.h"
 #include "singleton.h"
-
-#include "devattest_interface.h"
 #include "devattest_service_stub.h"
-#include "system_ability_status_change_stub.h"
-#include "attest_result_info.h"
 
 namespace OHOS {
 namespace DevAttest {

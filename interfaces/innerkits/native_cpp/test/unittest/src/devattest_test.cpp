@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-#include "devattest_client_test.h"
+#include "devattest_test.h"
 
+#include <string.h>
 #include "devattest_errno.h"
-#include "attest_result_info.h"
-#include "devattest_client.h"
 
 using namespace std;
 using namespace testing::ext;
 using namespace OHOS;
-using namespace OHOS::DevAttest;
 
 namespace OHOS {
 namespace DevAttest {

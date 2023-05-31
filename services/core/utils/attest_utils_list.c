@@ -15,7 +15,7 @@
 
 #include <securec.h>
 #include <stdlib.h>
-#include "string.h"
+#include <string.h>
 #include "attest_error.h"
 #include "attest_utils.h"
 #include "attest_utils_list.h"

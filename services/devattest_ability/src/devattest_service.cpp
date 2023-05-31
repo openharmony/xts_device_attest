@@ -19,14 +19,19 @@
 #include <iostream>
 #include <cstdint>
 #include <securec.h>
+#include "iservice_registry.h"
 #include "devattest_errno.h"
 #include "devattest_log.h"
 #include "devattest_system_ability_listener.h"
+#include "devattest_task.h"
 #include "attest_entry.h"
 
-using namespace std;
 namespace OHOS {
 namespace DevAttest {
+using namespace std;
+constexpr int32_t UNLOAD_IMMEDIATELY = 0;
+constexpr int32_t DELAY_TIME = 300000;
+const char* ATTEST_UNLOAD_TASK_ID = "attest_unload_task";
 REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE, true)
 
 DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
@@ -35,7 +40,7 @@ DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
 }
 
 DevAttestService::DevAttestService()
-    : SystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE, true)
+    : SystemAbility(SA_ID_DEVICE_ATTEST_SERVICE, true)
 {
 }
 
@@ -43,11 +48,10 @@ DevAttestService::~DevAttestService()
 {
 }
 
-void DevAttestService::OnStart()
+void DevAttestService::OnStart(const SystemAbilityOnDemandReason& startReason)
 {
-    HILOGI("DevAttestService OnStart");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
-        HILOGI("DevAttest Service has already started.");
+        HILOGE("DevAttest Service has already started.");
         return;
     }
     if (!Init()) {
@@ -56,15 +60,23 @@ void DevAttestService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     HILOGI("DevAttestService start success");
-    sptr<DevAttestSystemAbilityListener> devAttestSystemAbilityListener =
-        (std::make_unique<DevAttestSystemAbilityListener>()).release();
-    if (!devAttestSystemAbilityListener->AddDevAttestSystemAbilityListener(NETMANAGER_SAMGR_ID)) {
-        HILOGE("AddDevAttestSystemAbilityListener failed.");
+    if (startReason.GetId() != OHOS::OnDemandReasonId::INTERFACE_CALL) {
+        DevAttestTask devAttestTask;
+        if (!devAttestTask.CreateThread()) {
+            HILOGE("Failed to CreateThread");
+        }
+    } else {
+        sptr<DevAttestSystemAbilityListener> pListener =
+            (std::make_unique<DevAttestSystemAbilityListener>()).release();
+        if (!pListener->AddDevAttestSystemAbilityListener(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID)) {
+            HILOGE("AddDevAttestSystemAbilityListener failed.");
+        }
     }
+    return;
 }
+
 bool DevAttestService::Init()
 {
-    HILOGI("DevAttestService Init begin");
     if (!registerToSa_) {
         bool ret = Publish(this);
         if (!ret) {
@@ -73,14 +85,50 @@ bool DevAttestService::Init()
         }
         registerToSa_ = true;
     }
-    HILOGI("DevAttestService Init Success");
+
+    // 用于延时卸载
+    shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(ATTEST_UNLOAD_TASK_ID);
+    if (unloadHandler_ == nullptr) {
+        unloadHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    }
+    if (unloadHandler_ == nullptr) {
+        return false;
+    }
     return true;
 }
+
 void DevAttestService::OnStop()
 {
-    HILOGI("DevAttestService OnStop Begin");
+    HILOGI("DevAttestService OnStop");
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToSa_ = false;
+}
+
+int32_t DevAttestService::OnIdle(const SystemAbilityOnDemandReason& idleReason)
+{
+    HILOGI("[DEVATTEST] OnIdle reason %{public}d", idleReason.GetId());
+    AttestWaitTaskOver();
+    return UNLOAD_IMMEDIATELY;
+}
+
+void DevAttestService::DelayUnloadTask(void)
+{
+    auto task = []() {
+        sptr<ISystemAbilityManager> samgrProxy =
+            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            HILOGE("samgrProxy is null");
+            return;
+        }
+        int32_t ret = samgrProxy->UnloadSystemAbility(DEVICE_ATTEST_PROFILE_SA_ID);
+        if (ret != DEVATTEST_SUCCESS) {
+            HILOGE("unload system ability failed");
+            return;
+        }
+    };
+
+    unloadHandler_->RemoveTask(std::string(ATTEST_UNLOAD_TASK_ID));
+    unloadHandler_->PostTask(task, std::string(ATTEST_UNLOAD_TASK_ID), DELAY_TIME);
 }
 
 int32_t DevAttestService::CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo)
@@ -100,7 +148,6 @@ int32_t DevAttestService::CopyAttestResult(int32_t *resultArray, AttestResultInf
 
 int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
 {
-    HILOGI("GetAttestStatus start");
     int32_t resultArraySize = MAX_ATTEST_RESULT_SIZE * sizeof(int32_t);
     int32_t *resultArray = (int32_t *)malloc(resultArraySize);
     if (resultArray == NULL) {
@@ -134,17 +181,6 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
     resultArray = NULL;
     HILOGI("GetAttestStatus end success");
     return ret;
-}
-
-// 根据入参判断接口权限，当前没有入参，后续确认不需要后再删除
-bool DevAttestService::CheckPermission(const std::string &packageName)
-{
-    HILOGI("DevAttestService CheckPermission packageName %{public}s", packageName.c_str());
-    if (packageName.empty()) {
-        HILOGE("CheckPermission param is null");
-        return false;
-    }
-    return true;
 }
 } // end of DevAttest
 } // end of OHOS

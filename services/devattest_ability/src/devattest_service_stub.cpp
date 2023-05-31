@@ -39,6 +39,7 @@ int DevAttestServiceStub::OnRemoteRequest(uint32_t code,
         HILOGE("DevAttestServiceStub::OnRemoteRequest failed, descriptor is not matched!");
         return DEVATTEST_SERVICE_FAILED;
     }
+    DelayUnloadTask();
     auto itFunc = requestFuncMap_.find(code);
     if (itFunc != requestFuncMap_.end()) {
         auto requestFunc = itFunc->second;

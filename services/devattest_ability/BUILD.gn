@@ -38,6 +38,7 @@ ohos_shared_library("devattest_service") {
     "src/devattest_service.cpp",
     "src/devattest_service_stub.cpp",
     "src/devattest_system_ability_listener.cpp",
+    "src/devattest_task.cpp",
   ]
 
   configs = [ ":devattest_service_config" ]
@@ -51,6 +52,7 @@ ohos_shared_library("devattest_service") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "distributed_notification_service:ans_innerkits",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "i18n:intl_util",
     "ipc:ipc_core",

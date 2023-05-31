@@ -29,6 +29,7 @@ ohos_shared_library("devattest_sdk") {
   sources = [
     "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
     "src/devattest_client.cpp",
+    "src/devattest_profile_load_callback.cpp",
     "src/devattest_service_proxy.cpp",
   ]
 

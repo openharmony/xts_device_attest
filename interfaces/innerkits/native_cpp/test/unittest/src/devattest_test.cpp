@@ -15,7 +15,7 @@
 
 #include "devattest_test.h"
 
-#include <string.h>
+#include <string>
 #include "devattest_errno.h"
 
 using namespace std;

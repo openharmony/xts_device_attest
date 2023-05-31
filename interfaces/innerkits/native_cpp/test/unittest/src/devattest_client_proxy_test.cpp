@@ -15,7 +15,7 @@
 
 #include "devattest_client_test.h"
 
-#include <string.h>
+#include <string>
 #include "devattest_errno.h"
 #include "devattest_client.h"
 #include "devattest_service_proxy.h"

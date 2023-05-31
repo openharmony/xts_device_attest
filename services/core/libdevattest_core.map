@@ -17,6 +17,7 @@
     QueryAttest;
     QueryAttestPublishable;
     AttestPublishComplete;
+    AttestWaitTaskOver;
   local:
     *;
 };

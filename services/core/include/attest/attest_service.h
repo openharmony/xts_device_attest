@@ -33,6 +33,8 @@ int32_t QueryAttestStatus(int32_t** resultArray, int32_t arraySize, char** ticke
 int32_t QueryAttestPublishableImpl(int32_t* publishable);
 
 int32_t AttestPublishCompleteImpl(void);
+
+int32_t AttestWaitTaskOverImpl(void);
 #ifdef __cplusplus
 #if __cplusplus
 }

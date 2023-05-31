@@ -16,21 +16,6 @@
 #ifndef DEVATTEST_TASK_H
 #define DEVATTEST_TASK_H
 
-// #include <string>
-// #include <map>
-// #include "iremote_stub.h"
-// #include "iremote_object.h"
-// #include "system_ability.h"
-// #include "system_ability_ondemand_reason.h"
-// #include "system_ability_status_change_stub.h"
-// #include "devattest_interface.h"
-// #include "devattest_service_stub.h"
-// #include "attest_result_info.h"
-
-// #include <pthread.h>
-// #include <functional>
-// #include "resource_manager.h"
-
 namespace OHOS {
 namespace DevAttest {
 class DevAttestTask {

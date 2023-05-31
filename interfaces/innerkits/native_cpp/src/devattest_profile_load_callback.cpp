@@ -25,13 +25,12 @@ void DevAttestProfileLoadCallback::OnLoadSystemAbilitySuccess(
     int32_t systemAbilityId, const sptr<OHOS::IRemoteObject> &remoteObject)
 {
     DelayedSingleton<DevAttestClient>::GetInstance()->LoadSystemAbilitySuccess(remoteObject);
-    HILOGI("on load system ability success!");
 }
 
 void DevAttestProfileLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
     DelayedSingleton<DevAttestClient>::GetInstance()->LoadSystemAbilityFail();
-    HILOGI("on load system ability failed!");
+    HILOGE("[OnLoadSystemAbilityFail] failed!");
 }
 }
 }

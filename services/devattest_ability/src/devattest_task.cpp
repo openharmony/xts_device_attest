@@ -60,7 +60,7 @@ void* DevAttestTask::Run(void* arg)
 {
     prctl(PR_SET_NAME, ATTEST_RUN_TASK_ID);  // 设置线程名
 
-    (void)AttestTask();
+    (void)AttestTask(false);
     DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
     UnloadTask();
     HILOGI("Thread exited...");

@@ -54,7 +54,7 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 break;
             case NET_CAPABILITY_VALIDATED:
                 HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
-                (void)AttestTask();
+                (void)AttestTask(true);
                 DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;
             case NET_CAPABILITY_CAPTIVE_PORTAL:

@@ -32,7 +32,7 @@ using namespace std;
 constexpr int32_t UNLOAD_IMMEDIATELY = 0;
 constexpr int32_t DELAY_TIME = 300000;
 const char* ATTEST_UNLOAD_TASK_ID = "attest_unload_task";
-REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE, true)
+REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE, false)
 
 DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
     : SystemAbility(systemAbilityId, runOnCreate)
@@ -40,7 +40,7 @@ DevAttestService::DevAttestService(int32_t systemAbilityId, bool runOnCreate)
 }
 
 DevAttestService::DevAttestService()
-    : SystemAbility(SA_ID_DEVICE_ATTEST_SERVICE, true)
+    : SystemAbility(SA_ID_DEVICE_ATTEST_SERVICE, false)
 {
 }
 
@@ -120,7 +120,7 @@ void DevAttestService::DelayUnloadTask(void)
             HILOGE("samgrProxy is null");
             return;
         }
-        int32_t ret = samgrProxy->UnloadSystemAbility(DEVICE_ATTEST_PROFILE_SA_ID);
+        int32_t ret = samgrProxy->UnloadSystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE);
         if (ret != DEVATTEST_SUCCESS) {
             HILOGE("unload system ability failed");
             return;

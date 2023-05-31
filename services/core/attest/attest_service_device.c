@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
+#include <securec.h>
 #include "syscap_interface.h"
-#include "attest_type.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_adapter.h"

@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <string.h>
+#include <securec.h>
 #include "attest_type.h"
 #include "attest_utils.h"
 #include "attest_utils_file.h"

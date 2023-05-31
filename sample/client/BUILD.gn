@@ -19,20 +19,12 @@ ohos_executable("attesttestclient") {
 
   include_dirs = [
     "${devattest_path}/common",
-    "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
-    "${devattest_path}/services/devattest_ability/include",
-    "//utils/native/base/include",
   ]
 
   deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-  ]
+  external_deps = [ "c_utils:utils" ]
 
   subsystem_name = "xts"
   part_name = "device_attest"

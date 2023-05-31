@@ -17,8 +17,6 @@
 #define DEVICE_ATTEST_OEM_FILE_H
 
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 #if __cplusplus

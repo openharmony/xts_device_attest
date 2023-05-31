@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <math.h>
+#include <stdio.h>
+#include <signal.h>
 #include "attest_type.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"

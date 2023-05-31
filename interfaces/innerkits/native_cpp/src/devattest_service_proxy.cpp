@@ -17,7 +17,6 @@
 
 #include "devattest_log.h"
 #include "devattest_errno.h"
-#include "attest_result_info.h"
 
 using namespace std;
 namespace OHOS {

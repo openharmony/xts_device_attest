@@ -16,7 +16,6 @@
 #ifndef DEVATTEST_SERVICE_STUB_H
 #define DEVATTEST_SERVICE_STUB_H
 
-#include <string>
 #include <map>
 #include "iremote_stub.h"
 #include "iremote_object.h"

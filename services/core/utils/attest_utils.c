@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "string.h"
-#include "securec.h"
-#include "time.h"
+#include <ctype.h>
+#include <string.h>
+#include <securec.h>
+#include <time.h>
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/sha256.h"

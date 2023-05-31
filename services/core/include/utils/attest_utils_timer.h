@@ -16,9 +16,8 @@
 #ifndef __ATTEST_UTILS_TIMER_H__
 #define __ATTEST_UTILS_TIMER_H__
 
-#include <signal.h>
 #include <time.h>
-#include "stdint.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 #if __cplusplus

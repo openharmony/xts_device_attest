@@ -16,16 +16,11 @@
 
 #include <cstdint>
 #include <securec.h>
-#include "net_conn_client.h"
-#include "net_conn_constants.h"
 #include "notification_helper.h"
 #include "notification_content.h"
-#include "notification_normal_content.h"
 #include "notification_request.h"
 #include "system_ability_definition.h"
-#include "system_ability_status_change_stub.h"
 #include "iservice_registry.h"
-#include "parameter.h"
 #include "bundle_mgr_interface.h"
 #include "os_account_manager.h"
 #include "locale_config.h"
@@ -93,14 +88,16 @@ int32_t DevAttestNotificationPublish::PublishNotificationImpl(void)
         return DEVATTEST_FAIL;
     }
 
-    auto normalContent = std::make_shared<Notification::NotificationNormalContent>();
+    shared_ptr<Notification::NotificationNormalContent> normalContent =
+        std::make_shared<Notification::NotificationNormalContent>();
     if (normalContent == nullptr) {
         HILOGE("[PublishNotificationImpl] normalContent is null");
         return DEVATTEST_FAIL;
     }
     normalContent->SetTitle(contentTitle);
     normalContent->SetText(contentText);
-    auto content = std::make_shared<Notification::NotificationContent>(normalContent);
+    shared_ptr<Notification::NotificationContent> content =
+        std::make_shared<Notification::NotificationContent>(normalContent);
     if (content == nullptr) {
         HILOGE("[PublishNotificationImpl] content is null");
         return DEVATTEST_FAIL;

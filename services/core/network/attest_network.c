@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
+#include <ctype.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>

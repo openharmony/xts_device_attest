@@ -14,8 +14,8 @@
  */
 
 #include <stdbool.h>
-#include "securec.h"
-#include "attest_error.h"
+#include <securec.h>
+#include "mbedtls/md.h"
 #include "attest_adapter.h"
 #include "attest_dfx.h"
 #include "attest_utils.h"

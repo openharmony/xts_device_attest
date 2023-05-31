@@ -17,9 +17,6 @@
 #define DEVATTEST_TEST_H
 
 #include <gtest/gtest.h>
-
-#include "devattest_log.h"
-#include "devattest_errno.h"
 #include "attest_result_info.h"
 
 namespace OHOS {

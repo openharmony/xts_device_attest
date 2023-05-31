@@ -12,11 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <string>
+
 #include "devattest_log.h"
 #include "devattest_errno.h"
 #include "devattest_client.h"
-#include "attest_result_info.h"
 #include "devattest_napi.h"
 
 using namespace std;

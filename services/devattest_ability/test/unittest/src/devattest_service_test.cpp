@@ -17,6 +17,7 @@
 
 #include "singleton.h"
 #include "devattest_errno.h"
+#include "devattest_service.h"
 
 using namespace testing::ext;
 using namespace OHOS;

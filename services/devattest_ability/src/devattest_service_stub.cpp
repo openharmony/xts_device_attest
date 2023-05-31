@@ -15,14 +15,9 @@
 
 #include "devattest_service_stub.h"
 
-#include "system_ability_definition.h"
-#include "iremote_object.h"
-#include "iremote_stub.h"
-#include "iservice_registry.h"
 #include "permission.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
-#include "attest_result_info.h"
 
 namespace OHOS {
 namespace DevAttest {

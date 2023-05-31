@@ -16,7 +16,6 @@
 #define ATTEST_RESULT_INFO_H
 
 #include <string>
-#include <list>
 #include "parcel.h"
 
 #define SOFTWARE_RESULT_DETAIL_SIZE 5

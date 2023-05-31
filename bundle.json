@@ -24,14 +24,25 @@
         "safwk",
         "samgr",
         "ipc",
-        "kal_timer",
         "hiviewdfx_hilog_native",
         "c_utils",
-        "napi"
+        "napi",
+        "resource_management",
+        "bundle_framework",
+        "os_account",
+        "netmanager_base",
+        "access_token",
+        "distributed_notification_service",
+        "ability_base",
+        "syscap_codec",
+        "i18n",
+        "relational_store",
+        "init"
       ],
       "third_party": [
-        "bounds_checking_function",
-        "cjson"
+        "cjson",
+        "openssl",
+        "mbedtls"
       ]
     },
     "build": {

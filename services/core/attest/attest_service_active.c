@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <string.h>
+#include <math.h>
 #include "attest_type.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"

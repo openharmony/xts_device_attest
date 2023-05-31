@@ -16,15 +16,10 @@
 #include "devattest_system_ability_listener.h"
 
 #include <thread>
-#include "cstdint"
-
+#include <cstdint>
 #include "net_conn_client.h"
-#include "net_conn_constants.h"
-
 #include "system_ability_definition.h"
-#include "system_ability_status_change_stub.h"
 #include "iservice_registry.h"
-
 #include "devattest_log.h"
 #include "devattest_network_callback.h"
 
@@ -77,7 +72,7 @@ bool DevAttestSystemAbilityListener::AddDevAttestSystemAbilityListener(int32_t s
         HILOGI("systemAbilityId invalid %{public}d", systemAbilityId);
         return false;
     }
-    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         HILOGI("failed to get samgrProxy");
         return false;
@@ -97,7 +92,7 @@ bool DevAttestSystemAbilityListener::RemoveDevAttestSystemAbilityListener(int32_
         HILOGI("systemAbilityId invalid %{public}d", systemAbilityId);
         return false;
     }
-    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         HILOGI("failed to get samgrProxy");
         return false;

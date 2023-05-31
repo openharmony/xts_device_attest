@@ -15,13 +15,9 @@
 
 #include "devattest_client.h"
 
-#include "system_ability_definition.h"
-
 #include "iservice_registry.h"
-
 #include "devattest_log.h"
 #include "devattest_errno.h"
-#include "attest_result_info.h"
 
 using namespace std;
 using namespace OHOS;
@@ -45,13 +41,13 @@ int DevAttestClient::InitClientService()
         return DEVATTEST_SUCCESS;
     }
 
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
         HILOGE("Failed to get system ability mgr.");
         return DEVATTEST_SA_NO_INIT;
     }
 
-    auto object = samgr->CheckSystemAbility(DEVICE_ATTEST_PROFILE_SA_ID);
+    sptr<IRemoteObject> object = samgr->CheckSystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE);
     if (!object) {
         HILOGE("Failed to get Device Attest.");
         return DEVATTEST_SA_NO_INIT;

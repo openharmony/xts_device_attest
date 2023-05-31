@@ -17,8 +17,6 @@
 #define DEVATTEST_PROFILE_LOAD_CALLBACK_H
 
 #include <cstdint>
-#include <string>
-
 #include "system_ability_load_callback_stub.h"
 
 namespace OHOS {

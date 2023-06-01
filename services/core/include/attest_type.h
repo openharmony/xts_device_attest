@@ -99,10 +99,16 @@ typedef struct {
     uint64_t expireTime;  // 项目新增字段，参考接口文档
 } AuthStatus;
 
+typedef struct {
+    char *activeSite;
+    char *standbySite;
+} CloudServerInfo;
+
 // 获取挑战值返回结果
 typedef struct {
     char *challenge;
     uint64_t currentTime;
+    CloudServerInfo cloudServerInfo;
 } ChallengeResult;
 
 // 重置返回结果

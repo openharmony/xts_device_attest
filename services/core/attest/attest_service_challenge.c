@@ -133,7 +133,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
             ATTEST_MEM_FREE(challenge->cloudServerInfo.standbySite);
             break;
         }
-    } while(0);
+    } while (0);
     ATTEST_MEM_FREE(serverInfo);
     return ret;
 }

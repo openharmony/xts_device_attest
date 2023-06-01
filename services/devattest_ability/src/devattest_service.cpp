@@ -51,25 +51,25 @@ DevAttestService::~DevAttestService()
 void DevAttestService::OnStart(const SystemAbilityOnDemandReason& startReason)
 {
     if (state_ == ServiceRunningState::STATE_RUNNING) {
-        HILOGE("DevAttest Service has already started.");
+        HILOGE("[OnStart] DevAttest Service has already started.");
         return;
     }
     if (!Init()) {
-        HILOGE("Failed to init DevAttestService.");
+        HILOGE("[OnStart] Failed to init DevAttestService.");
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
-    HILOGI("DevAttestService start success");
+    HILOGI("[OnStart] DevAttestService start success");
     if (startReason.GetId() != OHOS::OnDemandReasonId::INTERFACE_CALL) {
         DevAttestTask devAttestTask;
         if (!devAttestTask.CreateThread()) {
-            HILOGE("Failed to CreateThread");
+            HILOGE("[OnStart] Failed to CreateThread");
         }
     } else {
         sptr<DevAttestSystemAbilityListener> pListener =
             (std::make_unique<DevAttestSystemAbilityListener>()).release();
         if (!pListener->AddDevAttestSystemAbilityListener(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID)) {
-            HILOGE("AddDevAttestSystemAbilityListener failed.");
+            HILOGE("[OnStart] AddDevAttestSystemAbilityListener failed.");
         }
     }
     return;
@@ -80,7 +80,7 @@ bool DevAttestService::Init()
     if (!registerToSa_) {
         bool ret = Publish(this);
         if (!ret) {
-            HILOGE("DevAttestService Init Publish failed");
+            HILOGE("[OnStart] DevAttestService Init Publish failed");
             return false;
         }
         registerToSa_ = true;
@@ -99,14 +99,14 @@ bool DevAttestService::Init()
 
 void DevAttestService::OnStop()
 {
-    HILOGI("DevAttestService OnStop");
+    HILOGI("[OnStop] DevAttestService OnStop");
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToSa_ = false;
 }
 
 int32_t DevAttestService::OnIdle(const SystemAbilityOnDemandReason& idleReason)
 {
-    HILOGI("[DEVATTEST] OnIdle reason %{public}d", idleReason.GetId());
+    HILOGI("[OnIdle] reason %{public}d", idleReason.GetId());
     AttestWaitTaskOver();
     return UNLOAD_IMMEDIATELY;
 }
@@ -117,12 +117,12 @@ void DevAttestService::DelayUnloadTask(void)
         sptr<ISystemAbilityManager> samgrProxy =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy == nullptr) {
-            HILOGE("samgrProxy is null");
+            HILOGE("[unload] samgrProxy is null");
             return;
         }
         int32_t ret = samgrProxy->UnloadSystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE);
         if (ret != DEVATTEST_SUCCESS) {
-            HILOGE("unload system ability failed");
+            HILOGE("[unload] system ability failed");
             return;
         }
     };
@@ -151,7 +151,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
     int32_t resultArraySize = MAX_ATTEST_RESULT_SIZE * sizeof(int32_t);
     int32_t *resultArray = (int32_t *)malloc(resultArraySize);
     if (resultArray == NULL) {
-        HILOGE("malloc resultArray failed");
+        HILOGE("[GetAttestStatus] malloc resultArray failed");
         return DEVATTEST_FAIL;
     }
     (void)memset_s(resultArray, resultArraySize, 0, resultArraySize);
@@ -161,7 +161,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
     do {
         ret = QueryAttest(&resultArray, MAX_ATTEST_RESULT_SIZE, &ticketStr, &ticketLength);
         if (ret != DEVATTEST_SUCCESS) {
-            HILOGE("QueryAttest failed");
+            HILOGE("[GetAttestStatus] QueryAttest failed");
             break;
         }
 
@@ -169,7 +169,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
         attestResultInfo.ticket_ = ticketStr;
         ret = CopyAttestResult(resultArray, attestResultInfo);
         if (ret != DEVATTEST_SUCCESS) {
-            HILOGE("copy attest result failed");
+            HILOGE("[GetAttestStatus] copy attest result failed");
             break;
         }
     } while (0);
@@ -179,7 +179,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
     }
     free(resultArray);
     resultArray = NULL;
-    HILOGI("GetAttestStatus end success");
+    HILOGI("[GetAttestStatus] GetAttestStatus end success");
     return ret;
 }
 } // end of DevAttest

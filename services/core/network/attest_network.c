@@ -573,7 +573,7 @@ static int32_t BuildHttpsChallServerInfo(cJSON **serverInfo)
         return ATTEST_ERR;
     }
     int32_t ret = ATTEST_ERR;
-    do {  
+    do {
         if (cJSON_AddStringToObject(serverInfoData, "issueRegion", "CN") == NULL) {
             ATTEST_LOG_ERROR("[BuildHttpsChallServerInfo] build issueRegion fail");
             break;
@@ -587,7 +587,7 @@ static int32_t BuildHttpsChallServerInfo(cJSON **serverInfo)
             break;
         }
         ret = ATTEST_OK;
-    } while(0);
+    } while (0);
     if (ret != ATTEST_OK) {
         cJSON_Delete(serverInfoData);
         ATTEST_LOG_ERROR("[BuildHttpsChallServerInfo] generate serverInfoData fail");
@@ -631,7 +631,7 @@ char* BuildHttpsChallBody(DevicePacket *postValue)
         cJSON_Delete(postData);
         ATTEST_LOG_DEBUG("[BuildHttpsChallBody] End.");
         return bodyData;
-    } while(0);
+    } while (0);
     cJSON_Delete(postData);
     cJSON_Delete(serverInfo);
     ATTEST_LOG_ERROR("[BuildHttpsChallBody] build https challenge body fail");
@@ -1253,7 +1253,7 @@ int32_t CheckDomain(char* inputData, char** outData)
             ATTEST_LOG_ERROR("[CheckDomain] connect to new domain failed");
             break;
         }
-    } while(0);
+    } while (0);
     if (ret != ATTEST_OK) {
         ReleaseList(&g_attestNetworkList);
         ret = SplitNetworkInfoSymbol(curDomain, &g_attestNetworkList);

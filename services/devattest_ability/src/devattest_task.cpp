@@ -28,7 +28,6 @@
 namespace OHOS {
 namespace DevAttest {
 using namespace OHOS;
-constexpr std::int32_t RUN_TASK_THREAD_STACK_SIZE = 8192;
 const char* ATTEST_RUN_TASK_ID = "attest_run_task";
 DevAttestTask::DevAttestTask()
 {
@@ -47,7 +46,9 @@ bool DevAttestTask::CreateThread()
     int priority = 0;
     struct sched_param sched = {static_cast<int>(priority)};
     pthread_attr_setschedparam(&attr, &sched);
-    pthread_attr_setstacksize(&attr, RUN_TASK_THREAD_STACK_SIZE);
+#if defined(THREAD_STACK_SIZE) and THREAD_STACK_SIZE > 0
+    pthread_attr_setstacksize(&attr, THREAD_STACK_SIZE);
+#endif
     int ret = pthread_create(&tid, &attr, DevAttestTask::Run, NULL);
     if (ret != DEVATTEST_SUCCESS) {
         HILOGE("thread create failed, ret: %{public}d", ret);

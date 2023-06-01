@@ -115,7 +115,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         return ATTEST_ERR;
     }
     char* serverInfo = NULL;
-    do{
+    do {
         ret = GetObjectItemValueObject(jsonStr, "serverInfo", &serverInfo);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem serverInfo failed.");
@@ -133,7 +133,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
             ATTEST_MEM_FREE(challenge->cloudServerInfo.standbySite);
             break;
         }
-    }while(0);
+    } while(0);
     ATTEST_MEM_FREE(serverInfo);
     return ret;
 }
@@ -218,11 +218,11 @@ int32_t GetChallenge(ChallengeResult** challResult, ATTEST_ACTION_TYPE actionTyp
     char* standbySite = challengeResult->cloudServerInfo.standbySite;
     ret = UpdateNetConfig(activeSite, standbySite, &updateFlag);
     if (ret != ATTEST_OK) {
-        if (updateFlag == 1){
+        if (updateFlag == 1) {
             ATTEST_LOG_ERROR("[GetChallenge] update netconfig failed");
             return ATTEST_ERR;
         }
-    }else{
+    } else {
         FREE_CHALLENGE_RESULT(challengeResult);
         challengeResult = GetChallengeImpl(actionType);
         if (challengeResult == NULL) {

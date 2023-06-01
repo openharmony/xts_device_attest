@@ -43,8 +43,9 @@ extern "C" {
 #define NETWORK_CONFIG_SERVER_INFO_NAME "serverInfo"
 #define HOST_PATTERN "[a-zA-Z0-9-_.]"
 #define PORT_PATTERN "[0-9]"
-#define PARAM_TWO 2
+#define CAT_LEN 2
 #define PARAM_ONE 1
+#define PARAM_TWO 2
 #define ISSUE_REGION_KEY "issueRegion"
 #define ISSUE_REGION_VAL "CN"
 #define ACTIVE_SITE_KEY "activeSiteKey"

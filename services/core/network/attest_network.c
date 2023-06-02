@@ -1268,10 +1268,9 @@ int32_t UpdateNetConfig(char* activeSite, char* standbySite, int32_t* updateFlag
         ATTEST_LOG_ERROR("[UpdateNetConfig] Invalid parameter");
         return ATTEST_ERR;
     }
-    int32_t ret;
     char* newDomain = NULL;
     *updateFlag = UPDATE_NO;
-    ret = CheckDomain(activeSite, &newDomain);
+    int32_t ret = CheckDomain(activeSite, &newDomain);
     if (ret != ATTEST_OK && strcmp(activeSite, standbySite) != 0) {
         ret = CheckDomain(standbySite, &newDomain);
     }

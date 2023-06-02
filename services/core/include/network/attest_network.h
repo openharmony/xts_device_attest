@@ -43,7 +43,17 @@ extern "C" {
 #define NETWORK_CONFIG_SERVER_INFO_NAME "serverInfo"
 #define HOST_PATTERN "[a-zA-Z0-9-_.]"
 #define PORT_PATTERN "[0-9]"
+#define PARAM_ONE 1
 #define PARAM_TWO 2
+#define ISSUE_REGION_KEY "issueRegion"
+#define ISSUE_REGION_VAL "CN"
+#define ACTIVE_SITE_KEY "activeSiteKey"
+#define ACTIVE_SITE_VAL_HTTP "HTTP_ActiveSiteKey"
+#define STANDBY_SITE_KEY "standbySiteKey"
+#define STANDBY_SITE_VAL_HTTP "HTTP_StandbySiteKey"
+#define CONNECTOR ":"
+#define UPDATE_NO 0
+#define UPDATE_OK 1
 
 typedef struct HttpPacketStruct {
     char *reqPort;
@@ -103,6 +113,8 @@ char* BuildHttpsAuthBody(DevicePacket *devPacket);
 char* BuildHttpsActiveBody(DevicePacket *devPacket);
 
 int32_t InitNetworkServerInfo(void);
+
+int32_t UpdateNetConfig(char* activeSite, char* standbySite, int32_t* updateFlag);
 
 #ifdef __cplusplus
 #if __cplusplus

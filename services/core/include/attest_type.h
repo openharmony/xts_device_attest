@@ -106,8 +106,8 @@ typedef struct {
 
 // 获取挑战值返回结果
 typedef struct {
-    char *challenge;
     uint64_t currentTime;
+    char *challenge;
     CloudServerInfo cloudServerInfo;
 } ChallengeResult;
 

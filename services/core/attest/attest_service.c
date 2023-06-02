@@ -502,5 +502,16 @@ int32_t QueryAttestPublishableImpl(int32_t* publishable)
 
 int32_t AttestPublishCompleteImpl(void)
 {
-    return AttestCreatePublishFlag();
+    pthread_mutex_lock(&g_mtxAttest);
+    int32_t ret = AttestCreatePublishFlag();
+    pthread_mutex_unlock(&g_mtxAttest);
+    return ret;
+}
+
+int32_t AttestWaitTaskOverImpl(void)
+{
+    pthread_mutex_lock(&g_mtxAttest);
+    int32_t ret = ATTEST_OK;
+    pthread_mutex_unlock(&g_mtxAttest);
+    return ret;
 }

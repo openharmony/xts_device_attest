@@ -16,6 +16,9 @@
 #ifndef DEVATTEST_CLIENT_H
 #define DEVATTEST_CLIENT_H
 
+#include <condition_variable>
+#include <shared_mutex>
+#include "iremote_object.h"
 #include "devattest_interface.h"
 #include "singleton.h"
 
@@ -27,12 +30,19 @@ class DevAttestClient {
 public:
     int GetAttestStatus(AttestResultInfo &attestResultInfo);
 
+public:
+    void LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject);
+    void LoadSystemAbilityFail();
+
 private:
     DevAttestClient(const DevAttestClient&);
     DevAttestClient& operator=(const DevAttestClient&);
-    int InitClientService();
+    sptr<DevAttestInterface> GetDeviceProfileService();
+    bool LoadDevAttestProfile();
 
     sptr<DevAttestInterface> attestClientInterface_;
+    std::mutex clientLock_;
+    std::condition_variable proxyConVar_;
 };
 } // end of DevAttest
 } // end of OHOS

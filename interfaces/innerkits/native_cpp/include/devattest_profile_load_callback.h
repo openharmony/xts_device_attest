@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,32 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef ATTEST_ENTRY_H
-#define ATTEST_ENTRY_H
+#ifndef DEVATTEST_PROFILE_LOAD_CALLBACK_H
+#define DEVATTEST_PROFILE_LOAD_CALLBACK_H
 
-#include <stdint.h>
+#include <cstdint>
+#include "system_ability_load_callback_stub.h"
 
-#ifdef __cplusplus
-#if __cplusplus
-extern "C" {
+namespace OHOS {
+namespace DevAttest {
+class DevAttestProfileLoadCallback : public SystemAbilityLoadCallbackStub {
+public:
+    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
+        const sptr<OHOS::IRemoteObject> &remoteObject) override;
+    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+};
+} // DevAttest
+} // OHOS
 #endif
-#endif /* __cplusplus */
-
-int32_t AttestTask(int32_t isCreateTimer);
-
-int32_t QueryAttest(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength);
-
-int32_t QueryAttestPublishable(int32_t* publishable);
-
-int32_t AttestPublishComplete(void);
-
-int32_t AttestWaitTaskOver(void);
-
-#ifdef __cplusplus
-#if __cplusplus
-}
-#endif
-#endif /* __cplusplus */
-
-#endif
-

@@ -29,10 +29,9 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
     sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap)
 {
     if (netHandle == nullptr || netAllCap == nullptr) {
-        HILOGI("[NetCapabilitiesChange] invalid parameter");
+        HILOGE("[NetCapabilitiesChange] invalid parameter");
         return DEVATTEST_SUCCESS;
     }
-    int32_t ret = DEVATTEST_SUCCESS;
     int32_t netHandleId = netHandle->GetNetId();
     if (netId_ == netHandleId) {
         HILOGI("[NetCapabilitiesChange] Skip the same operation");
@@ -42,28 +41,27 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
     for (auto netCap : netAllCap->netCaps_) {
         switch (netCap) {
             case NET_CAPABILITY_MMS:
-                HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_MMS start");
+                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_MMS start");
                 break;
             case NET_CAPABILITY_NOT_METERED:
-                HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_NOT_METERED start");
+                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_NOT_METERED start");
                 break;
             case NET_CAPABILITY_INTERNET:
-                HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_INTERNET start");
-                ret = AttestTask();
-                HILOGI("DevAttestService test success, ret = %{public}d", ret);
-                DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
+                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_INTERNET start");
                 break;
             case NET_CAPABILITY_NOT_VPN:
-                HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_NOT_VPN start");
+                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_NOT_VPN start");
                 break;
             case NET_CAPABILITY_VALIDATED:
-                HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
+                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
+                (void)AttestTask(true);
+                DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;
             case NET_CAPABILITY_CAPTIVE_PORTAL:
-                HILOGI("[NetCapabilitiesChange] NET_CAPABILITY_CAPTIVE_PORTAL start");
+                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_CAPTIVE_PORTAL start");
                 break;
             default:
-                HILOGI("[NetCapabilitiesChange] default start");
+                HILOGD("[NetCapabilitiesChange] default start");
                 break;
         }
     }

@@ -19,7 +19,7 @@
 #include "attest_service.h"
 #include "attest_entry.h"
 
-int32_t AttestTask(void)
+int32_t AttestTask(int32_t isCreateTimer)
 {
     ATTEST_LOG_INFO("[AttestTask] Begin.");
     // 执行主流程代码
@@ -29,9 +29,11 @@ int32_t AttestTask(void)
     }
 
     // 创建主流程定时器
-    ret = CreateTimerTask(EXPIRED_INTERVAL, &ProcAttest, ATTEST_TIMER_TYPE_PERIOD);
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[AttestTask] Create Periodic TimerTask return ret = %d.", ret);
+    if (isCreateTimer) {
+        ret = CreateTimerTask(EXPIRED_INTERVAL, &ProcAttest, ATTEST_TIMER_TYPE_PERIOD);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[AttestTask] Create Periodic TimerTask return ret = %d.", ret);
+        }
     }
     ATTEST_LOG_INFO("[AttestTask] End.");
     return ret;
@@ -50,4 +52,9 @@ int32_t QueryAttestPublishable(int32_t* publishable)
 int32_t AttestPublishComplete(void)
 {
     return AttestPublishCompleteImpl();
+}
+
+int32_t AttestWaitTaskOver(void)
+{
+    return AttestWaitTaskOverImpl();
 }

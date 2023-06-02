@@ -28,7 +28,11 @@ public:
     DevAttestServiceStub();
     ~DevAttestServiceStub();
     int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
-
+    virtual void DelayUnloadTask()
+    {
+        printf("[DevAttestServiceStub] DelayUnloadTask");
+        return;
+    }
 private:
     int GetAttestStatusInner(MessageParcel& data, MessageParcel& reply);
     using RequestFuncType = int (DevAttestServiceStub::*)(MessageParcel& data, MessageParcel& reply);

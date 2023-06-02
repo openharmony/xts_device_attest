@@ -23,39 +23,38 @@ namespace OHOS {
 namespace DevAttest {
 int32_t DevAttestServiceProxy::GetAttestStatus(AttestResultInfo &attestResultInfo)
 {
-    HILOGI("DevAttestServiceProxy GetAttestStatus begin");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
 
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        HILOGE("GetAttestStatus write interface token failed");
+        HILOGE("[DevAttestServiceProxy] write interface token failed");
         return DEVATTEST_FAIL;
     }
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        HILOGE("remote service null");
+        HILOGE("[DevAttestServiceProxy] remote service null");
         return DEVATTEST_FAIL;
     }
     int ret = remote->SendRequest(GET_AUTH_RESULT, data, reply, option);
     if (ret != DEVATTEST_SUCCESS) {
-        HILOGE("GetAttestStatus: call SendRequest failed %{public}d", ret);
+        HILOGE("[DevAttestServiceProxy] call SendRequest failed %{public}d", ret);
         return DEVATTEST_FAIL;
     }
     int32_t authRet;
     if (!reply.ReadInt32(authRet)) {
-        HILOGE("GetAttestStatus: authRet failed %{public}d", authRet);
+        HILOGE("[DevAttestServiceProxy] authRet failed %{public}d", authRet);
         return DEVATTEST_FAIL;
     }
     if (authRet != DEVATTEST_SUCCESS) {
-        HILOGE("GetAttestStatus: authRet failed code %{public}d", authRet);
+        HILOGE("[DevAttestServiceProxy] authRet failed code %{public}d", authRet);
         return authRet;
     }
 
     sptr<AttestResultInfo> attestResultInfoPtr = AttestResultInfo::Unmarshalling(reply);
     if (attestResultInfoPtr == nullptr) {
-        HILOGE("GetAttestStatus: attestResultInfoPtr is nullptr");
+        HILOGE("[DevAttestServiceProxy] attestResultInfoPtr is nullptr");
         return DEVATTEST_FAIL;
     }
     attestResultInfo = *attestResultInfoPtr;

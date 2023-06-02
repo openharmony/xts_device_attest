@@ -21,6 +21,7 @@
 #include "system_ability_definition.h"
 #include "iservice_registry.h"
 #include "devattest_log.h"
+#include "devattest_errno.h"
 #include "devattest_network_callback.h"
 
 namespace OHOS {
@@ -31,33 +32,34 @@ constexpr std::int32_t RETRY_REGISTER_NET_CALLBACK_TIME = 5;
 
 void DevAttestSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    HILOGI("SA:%{public}d added", systemAbilityId);
-
-    std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
-    if (netManager == nullptr) {
-        HILOGE("Failed to init NetConnClient.");
-        return;
-    }
-
-    sptr<DevAttestNetworkCallback> callback = (std::make_unique<DevAttestNetworkCallback>()).release();
-    int32_t ret = 0;
-    for (size_t i = 0; i < RETRY_REGISTER_NET_CALLBACK_TIME; i++) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_FOR_KVSTORE));
-        ret = netManager->RegisterNetConnCallback(callback);
-        if (ret == NETMANAGER_SUCCESS) {
-            break;
+    if (systemAbilityId == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
+        std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
+        if (netManager == nullptr) {
+            HILOGE("Failed to init NetConnClient.");
+            return;
         }
-    }
 
-    if (ret == NETMANAGER_SUCCESS) {
-        HILOGE("RegisterNetConnCallback success.");
+        sptr<DevAttestNetworkCallback> callback = (std::make_unique<DevAttestNetworkCallback>()).release();
+        int32_t ret = 0;
+        for (size_t i = 0; i < RETRY_REGISTER_NET_CALLBACK_TIME; i++) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_FOR_KVSTORE));
+            ret = netManager->RegisterNetConnCallback(callback);
+            if (ret == NETMANAGER_SUCCESS) {
+                break;
+            }
+        }
+
+        if (ret != NETMANAGER_SUCCESS) {
+            HILOGE("RegisterNetConnCallback failed.");
+        }
     } else {
-        HILOGE("RegisterNetConnCallback failed.");
+        HILOGW("Do Nothing");
     }
 
     if (RemoveDevAttestSystemAbilityListener(systemAbilityId)) {
-        HILOGE("RemoveSystemAbilityListener success.");
+        HILOGI("RemoveSystemAbilityListener success.");
     }
+    return;
 }
 
 void DevAttestSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -67,20 +69,19 @@ void DevAttestSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbility
 
 bool DevAttestSystemAbilityListener::AddDevAttestSystemAbilityListener(int32_t systemAbilityId)
 {
-    HILOGI("AddDevAttestSystemAbilityListener start");
+    HILOGD("AddDevAttestSystemAbilityListener start");
     if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGI("systemAbilityId invalid %{public}d", systemAbilityId);
+        HILOGE("systemAbilityId invalid %{public}d", systemAbilityId);
         return false;
     }
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
-        HILOGI("failed to get samgrProxy");
+        HILOGE("failed to get samgrProxy");
         return false;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(systemAbilityId, this);
-    HILOGI("SubscribeSystemAbility ret: %{public}d", ret);
-    if (ret) {
-        HILOGI("failed to subscribe sa: %{public}d", systemAbilityId);
+    if (ret != DEVATTEST_SUCCESS) {
+        HILOGE("failed to subscribe sa: %{public}d", systemAbilityId);
         return false;
     }
     return true;
@@ -89,18 +90,17 @@ bool DevAttestSystemAbilityListener::AddDevAttestSystemAbilityListener(int32_t s
 bool DevAttestSystemAbilityListener::RemoveDevAttestSystemAbilityListener(int32_t systemAbilityId)
 {
     if (!CheckInputSysAbilityId(systemAbilityId)) {
-        HILOGI("systemAbilityId invalid %{public}d", systemAbilityId);
+        HILOGE("systemAbilityId invalid %{public}d", systemAbilityId);
         return false;
     }
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
-        HILOGI("failed to get samgrProxy");
+        HILOGE("failed to get samgrProxy");
         return false;
     }
     int32_t ret = samgrProxy->UnSubscribeSystemAbility(systemAbilityId, this);
-    HILOGI("UnSubscribeSystemAbility ret: %{public}d", ret);
-    if (ret) {
-        HILOGI("failed to unsubscribe sa: %{public}d", systemAbilityId);
+    if (ret != DEVATTEST_SUCCESS) {
+        HILOGE("failed to unsubscribe sa: %{public}d", systemAbilityId);
         return false;
     }
     return true;

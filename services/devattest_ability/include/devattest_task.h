@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,32 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef ATTEST_ENTRY_H
-#define ATTEST_ENTRY_H
+#ifndef DEVATTEST_TASK_H
+#define DEVATTEST_TASK_H
 
-#include <stdint.h>
+namespace OHOS {
+namespace DevAttest {
+class DevAttestTask {
+public:
+    DevAttestTask();
+    ~DevAttestTask();
+    bool CreateThread();
 
-#ifdef __cplusplus
-#if __cplusplus
-extern "C" {
+private:
+    static void* Run(void* arg);
+    static void UnloadTask(void);
+};
+} // end of DevAttest
+} // end of OHOS
 #endif
-#endif /* __cplusplus */
-
-int32_t AttestTask(int32_t isCreateTimer);
-
-int32_t QueryAttest(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength);
-
-int32_t QueryAttestPublishable(int32_t* publishable);
-
-int32_t AttestPublishComplete(void);
-
-int32_t AttestWaitTaskOver(void);
-
-#ifdef __cplusplus
-#if __cplusplus
-}
-#endif
-#endif /* __cplusplus */
-
-#endif
-

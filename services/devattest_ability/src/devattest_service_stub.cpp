@@ -34,11 +34,12 @@ DevAttestServiceStub::~DevAttestServiceStub()
 int DevAttestServiceStub::OnRemoteRequest(uint32_t code,
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    HILOGD("DevAttestServiceStub::OnRemoteRequest, cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
+    HILOGD("[OnRemoteRequest] cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        HILOGE("DevAttestServiceStub::OnRemoteRequest failed, descriptor is not matched!");
+        HILOGE("[OnRemoteRequest] failed, descriptor is not matched!");
         return DEVATTEST_SERVICE_FAILED;
     }
+    DelayUnloadTask();
     auto itFunc = requestFuncMap_.find(code);
     if (itFunc != requestFuncMap_.end()) {
         auto requestFunc = itFunc->second;
@@ -46,17 +47,16 @@ int DevAttestServiceStub::OnRemoteRequest(uint32_t code,
             return (this->*requestFunc)(data, reply);
         }
     }
-    HILOGE("DevAttestServiceStub::OnRemoteRequest, default case");
+    HILOGE("[OnRemoteRequest] default case");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int DevAttestServiceStub::GetAttestStatusInner(MessageParcel& data, MessageParcel& reply)
 {
-    HILOGD("DevAttestServiceStub::GetAttestStatusInner");
     if (!DelayedSingleton<Permission>::GetInstance()->IsSystem()) {
-        HILOGE("GetAttestStatusInner: not a system");
+        HILOGE("[GetAttestStatusInner] not a system");
         if (!reply.WriteInt32(DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP)) {
-            HILOGE("GetAttestStatusInner: write DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP fail");
+            HILOGE("[GetAttestStatusInner] write DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP fail");
             return DEVATTEST_FAIL;
         }
         return DEVATTEST_SUCCESS;
@@ -65,17 +65,17 @@ int DevAttestServiceStub::GetAttestStatusInner(MessageParcel& data, MessageParce
     AttestResultInfo attestResultInfo;
     int ret = GetAttestStatus(attestResultInfo);
     if (!reply.WriteInt32(ret)) {
-        HILOGE("GetAttestStatusInner: write result fail, %{public}d", ret);
+        HILOGE("[GetAttestStatusInner] write result fail, %{public}d", ret);
         return DEVATTEST_FAIL;
     }
     if (ret == DEVATTEST_SUCCESS) {
         sptr<AttestResultInfo> attestResultInfoPtr = (std::make_unique<AttestResultInfo>(attestResultInfo)).release();
         if (!attestResultInfoPtr->Marshalling(reply)) {
-            HILOGE("GetAttestStatusInner stub Marshalling failed");
+            HILOGE("[GetAttestStatusInner] stub Marshalling failed");
             return DEVATTEST_FAIL;
         }
     } else {
-        HILOGE("GetAttestStatusInner: GetAttestStatus fail, %{public}d", ret);
+        HILOGE("[GetAttestStatusInner] GetAttestStatus fail, %{public}d", ret);
         return DEVATTEST_FAIL;
     }
     return DEVATTEST_SUCCESS;

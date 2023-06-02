@@ -37,7 +37,8 @@
         "syscap_codec",
         "i18n",
         "relational_store",
-        "init"
+        "init",
+        "eventhandler"
       ],
       "third_party": [
         "cjson",

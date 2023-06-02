@@ -19,6 +19,9 @@
 #include <string>
 #include "system_ability.h"
 #include "singleton.h"
+#include "system_ability_ondemand_reason.h"
+#include "event_handler.h"
+#include "event_runner.h"
 #include "devattest_service_stub.h"
 
 namespace OHOS {
@@ -34,8 +37,10 @@ class DevAttestService : public SystemAbility, public DevAttestServiceStub {
 
 public:
     DevAttestService(int32_t systemAbilityId, bool runOnCreate = true);
-    void OnStart() override;
+    void OnStart(const SystemAbilityOnDemandReason& startReason) override;
     void OnStop() override;
+    int32_t OnIdle(const SystemAbilityOnDemandReason& idleReason) override;
+    void DelayUnloadTask(void) override;
     ServiceRunningState QueryServiceState() const
     {
         return state_;
@@ -46,9 +51,8 @@ private:
     bool Init();
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     bool registerToSa_ = false;
-    bool CheckPermission(const std::string &packageName);
-    const int32_t NETMANAGER_SAMGR_ID = 1151;
     int32_t CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo);
+    std::shared_ptr<AppExecFwk::EventHandler> unloadHandler_;
 };
 } // end of DevAttest
 } // end of OHOS

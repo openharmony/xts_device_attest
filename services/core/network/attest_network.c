@@ -1195,7 +1195,7 @@ static int32_t MergeDomain(char* hostName, char* port, char** resultDomain)
             break;
         }
         if (strcat_s(newDomain, newDomainSize, hostName) != 0 ||
-            strcat_s(newDomain, newDomainSize, CONNECTOR) !=0 || 
+            strcat_s(newDomain, newDomainSize, CONNECTOR) != 0 || 
             strcat_s(newDomain, newDomainSize, port) != 0) {
             ATTEST_MEM_FREE(newDomain);
             ret = ATTEST_ERR;

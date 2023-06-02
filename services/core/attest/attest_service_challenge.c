@@ -86,7 +86,6 @@ static int32_t SendChallMsg(DevicePacket* devicePacket, char** respMsg, ATTEST_A
 
 static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challenge)
 {
-    int32_t ret;
     if (jsonStr == NULL || challenge == NULL) {
         ATTEST_LOG_ERROR("[ParseChallengeResult] Invalid parameter");
         return ATTEST_ERR;
@@ -108,10 +107,9 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem currentTime failed.");
         return ATTEST_ERR;
     }
-    ret = GetObjectItemValueStr(jsonStr, "challenge", &(challenge->challenge));
+    int32_t ret = GetObjectItemValueStr(jsonStr, "challenge", &(challenge->challenge));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem challenge failed.");
-        ATTEST_MEM_FREE(challenge->challenge);
         return ATTEST_ERR;
     }
     char* serverInfo = NULL;
@@ -124,13 +122,11 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         ret = GetObjectItemValueStr(serverInfo, "activeSite", &(challenge->cloudServerInfo.activeSite));
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem challenge failed.");
-            ATTEST_MEM_FREE(challenge->cloudServerInfo.activeSite);
             break;
         }
         ret = GetObjectItemValueStr(serverInfo, "standbySite", &(challenge->cloudServerInfo.standbySite));
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem challenge failed.");
-            ATTEST_MEM_FREE(challenge->cloudServerInfo.standbySite);
             break;
         }
     } while (0);
@@ -202,7 +198,6 @@ static ChallengeResult* GetChallengeImpl(ATTEST_ACTION_TYPE actionType)
 
 int32_t GetChallenge(ChallengeResult** challResult, ATTEST_ACTION_TYPE actionType)
 {
-    int32_t ret;
     ATTEST_LOG_DEBUG("[GetChallenge] Begin.");
     if (challResult == NULL) {
         ATTEST_LOG_ERROR("[GetChallenge] Invalid parameter");
@@ -213,17 +208,16 @@ int32_t GetChallenge(ChallengeResult** challResult, ATTEST_ACTION_TYPE actionTyp
         ATTEST_LOG_ERROR("[GetChallenge] GetChallengeImpl fail");
         return ATTEST_ERR;
     }
-    int32_t updateFlag = 0;
+    int32_t updateFlag = UPDATE_NO;
     char* activeSite = challengeResult->cloudServerInfo.activeSite;
     char* standbySite = challengeResult->cloudServerInfo.standbySite;
-    ret = UpdateNetConfig(activeSite, standbySite, &updateFlag);
-    if (ret != ATTEST_OK) {
-        if (updateFlag == 1) {
+    int32_t ret = UpdateNetConfig(activeSite, standbySite, &updateFlag);
+    if (updateFlag == UPDATE_OK) {
+        FREE_CHALLENGE_RESULT(challengeResult);
+        if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[GetChallenge] update netconfig failed");
             return ATTEST_ERR;
         }
-    } else {
-        FREE_CHALLENGE_RESULT(challengeResult);
         challengeResult = GetChallengeImpl(actionType);
         if (challengeResult == NULL) {
             ATTEST_LOG_ERROR("[GetChallenge] GetChallengeImpl fail");

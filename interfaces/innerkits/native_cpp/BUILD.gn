@@ -43,5 +43,6 @@ ohos_shared_library("devattest_sdk") {
   ]
 
   subsystem_name = "xts"
+  innerapi_tags = [ "platformsdk" ]
   part_name = "device_attest"
 }

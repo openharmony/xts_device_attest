@@ -37,10 +37,6 @@ static bool IsTokenAplMatch(ATokenAplEnum apl)
     ATokenTypeEnum type = AccessTokenKit::GetTokenTypeFlag(tokenId);
     HILOGD("[IsTokenAplMatch] checking apl, apl=%{public}d, type=%{public}d, pid=%{public}d, uid=%{public}d",
         static_cast<int32_t>(apl), static_cast<int32_t>(type), pid, uid);
-    if (type == ATokenTypeEnum::TOKEN_HAP) {
-        HILOGE("[IsTokenAplMatch] type is hap");
-        return false;
-    }
     NativeTokenInfo info;
     AccessTokenKit::GetNativeTokenInfo(tokenId, info);
     if (info.apl == apl) {
@@ -84,7 +80,7 @@ bool Permission::IsSystemApl()
 
 void Permission::InitPermissionInterface()
 {
-    HILOGI("[InitPermissionInterface] begin");
+    HILOGD("[InitPermissionInterface] begin");
     if (sptrBundleMgr_ != nullptr) {
         HILOGE("[InitPermissionInterface] already init");
         return;
@@ -100,13 +96,13 @@ sptr<IBundleMgr> Permission::GetBundleMgr()
     auto bundleObj =
         DelayedSingleton<AppExecFwk::SysMrgClient>::GetInstance()->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (bundleObj == nullptr) {
-        HILOGE("[GetBundleMgr][kemin] GetSystemAbility is null");
+        HILOGE("[GetBundleMgr] GetSystemAbility is null");
         return nullptr;
     }
 
     sptr<AppExecFwk::IBundleMgr> bmgr = iface_cast<AppExecFwk::IBundleMgr>(bundleObj);
     if (bmgr == nullptr) {
-        HILOGE("[GetBundleMgr][kemin] iface_cast get null");
+        HILOGE("[GetBundleMgr] iface_cast get null");
     }
     return bmgr;
 }
@@ -120,15 +116,31 @@ bool Permission::IsSystemHap()
     ATokenTypeEnum type = AccessTokenKit::GetTokenTypeFlag(tokenId);
     HILOGD("[IsSystemHap] checking system hap, type=%{public}d, pid=%{public}d, uid=%{public}d",
         static_cast<int32_t>(type), pid, uid);
-    if (type != ATokenTypeEnum::TOKEN_HAP) {
-        HILOGE("[IsSystemHap] type is not hap");
+    bool result = false;
+    switch (type) {
+        case ATokenTypeEnum::TOKEN_HAP:
+            if (sptrBundleMgr_ == nullptr) {
+                HILOGE("[IsSystemHap] sptrBundleMgr_ is null");
+                result = false;
+                break;
+            }
+            result = sptrBundleMgr_->CheckIsSystemAppByUid(uid);
+            break;
+        case ATokenTypeEnum::TOKEN_NATIVE:
+        case ATokenTypeEnum::TOKEN_SHELL:
+            result = true;
+            break;
+        case ATokenTypeEnum::TOKEN_INVALID:
+        case ATokenTypeEnum::TOKEN_TYPE_BUTT:
+            break;
+        default:
+            break;
+    }
+    if (!result) {
+        HILOGE("[IsSystemHap] system denied");
         return false;
     }
-    if (sptrBundleMgr_ == nullptr) {
-        HILOGE("[IsSystemHap] sptrBundleMgr_ is null");
-        return false;
-    }
-    return sptrBundleMgr_->CheckIsSystemAppByUid(uid);
+    return true;
 }
 
 bool Permission::IsSystem()

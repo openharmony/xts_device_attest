@@ -16,7 +16,6 @@
 #ifndef DEVATTEST_NETWORK_CALLBACK_H
 #define DEVATTEST_NETWORK_CALLBACK_H
 
-
 #include "net_conn_callback_stub.h"
 
 namespace OHOS {
@@ -24,7 +23,9 @@ namespace DevAttest {
 using namespace NetManagerStandard;
 
 class DevAttestNetworkCallback : public NetConnCallbackStub {
+private:
     int32_t NetCapabilitiesChange(sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap) override;
+    int32_t netId_ = 0;
 };
 } // DevAttest
 } // OHOS

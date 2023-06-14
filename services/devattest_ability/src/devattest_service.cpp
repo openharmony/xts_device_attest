@@ -116,12 +116,6 @@ int32_t DevAttestService::OnIdle(const SystemAbilityOnDemandReason& idleReason)
 void DevAttestService::DelayUnloadTask(void)
 {
     HILOGI("delay unload task begin");
-    if (unloadHandler_ == nullptr) {
-        HILOGE("can not carry out the delayed unload task");
-        shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(ATTEST_UNLOAD_TASK_ID);
-        unloadHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-        return;
-    }
     auto task = []() {
         sptr<ISystemAbilityManager> samgrProxy =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -136,8 +130,8 @@ void DevAttestService::DelayUnloadTask(void)
         }
     };
 
-    unloadHandler_->RemoveTask(std::string(ATTEST_UNLOAD_TASK_ID));
-    unloadHandler_->PostTask(task, std::string(ATTEST_UNLOAD_TASK_ID), DELAY_TIME);
+    unloadHandler_->RemoveTask(ATTEST_UNLOAD_TASK_ID);
+    unloadHandler_->PostTask(task, ATTEST_UNLOAD_TASK_ID, DELAY_TIME);
 }
 
 int32_t DevAttestService::CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo)

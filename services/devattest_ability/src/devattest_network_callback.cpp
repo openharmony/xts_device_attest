@@ -63,7 +63,7 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 break;
             case NET_CAPABILITY_VALIDATED:
                 HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
-                (void)AttestTask(true);
+                (void)AttestTask();
                 (void)AttestCreateTimerTask();
                 DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;

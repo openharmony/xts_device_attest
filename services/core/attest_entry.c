@@ -21,10 +21,9 @@
 
 static ATTEST_TIMER_ID g_ProcAttestTimerId = NULL;
 
-int32_t AttestTask(int32_t isCreateTimer)
+int32_t AttestTask(void)
 {
     ATTEST_LOG_INFO("[AttestTask] Begin.");
-    (void)isCreateTimer;
     // 执行主流程代码
     int32_t ret = ProcAttest();
     if (ret != ATTEST_OK) {

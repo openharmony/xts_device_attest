@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,13 @@
  * limitations under the License.
  */
 
-// #include "devattest_system_ability_listener.h"
+#include "devattest_network_manager.h"
 
 #include <thread>
 #include <cstdint>
 #include "net_conn_client.h"
-// #include "iservice_registry.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
-#include "devattest_network_manager.h"
 
 namespace OHOS {
 namespace DevAttest {
@@ -35,7 +33,6 @@ DevAttestNetworkManager::~DevAttestNetworkManager()
 
 void DevAttestNetworkManager::RegisterNetConnCallback(void)
 {
-    HILOGI("[RegisterNetConnCallback] start.");
     if (netCallback_ == NULL) {
         netCallback_ = (std::make_unique<DevAttestNetworkCallback>()).release();
     }
@@ -54,7 +51,6 @@ void DevAttestNetworkManager::RegisterNetConnCallback(void)
 
 void DevAttestNetworkManager::UnregisterNetConnCallback(void)
 {
-    HILOGI("[UnregisterNetConnCallback] start.");
     if (netCallback_ == NULL) {
         return;
     }

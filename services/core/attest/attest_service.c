@@ -441,7 +441,7 @@ static int32_t QueryAttestStatusSwitch(int32_t** resultArray, int32_t arraySize,
             ATTEST_LOG_INFO("[QueryAttestStatusSwitch] authResultCode is 0, ret = %d", ret);
             break;
         default:
-            ATTEST_LOG_INFO("[QueryAttestStatusSwitch] authResultCode is invalid");
+            ATTEST_LOG_WARN("[QueryAttestStatusSwitch] authResultCode is invalid");
             break;
     }
     return ret;

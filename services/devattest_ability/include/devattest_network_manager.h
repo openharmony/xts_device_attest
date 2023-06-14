@@ -13,36 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef ATTEST_ENTRY_H
-#define ATTEST_ENTRY_H
+#ifndef DEVATTEST_NETWORK_MANAGER_H
+#define DEVATTEST_NETWORK_MANAGER_H
 
-#include <stdint.h>
 
-#ifdef __cplusplus
-#if __cplusplus
-extern "C" {
-#endif
-#endif /* __cplusplus */
+#include "singleton.h"
+#include "devattest_network_callback.h"
 
-int32_t AttestTask(int32_t isCreateTimer);
-
-int32_t QueryAttest(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength);
-
-int32_t QueryAttestPublishable(int32_t* publishable);
-
-int32_t AttestPublishComplete(void);
-
-int32_t AttestWaitTaskOver(void);
-
-int32_t AttestCreateTimerTask(void);
-
-int32_t AttestDestroyTimerTask(void);
-
-#ifdef __cplusplus
-#if __cplusplus
-}
-#endif
-#endif /* __cplusplus */
-
-#endif
-
+namespace OHOS {
+namespace DevAttest {
+class DevAttestNetworkManager {
+    DECLARE_DELAYED_SINGLETON(DevAttestNetworkManager)
+public:
+    void RegisterNetConnCallback(void);
+    void UnregisterNetConnCallback(void);
+private:
+    sptr<DevAttestNetworkCallback> netCallback_;
+};
+} // DevAttest
+} // OHOS
+#endif // DEVATTEST_NETWORK_MANAGER_H

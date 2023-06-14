@@ -222,7 +222,7 @@ static void PrintMemNode(MemNode *data)
         ATTEST_LOG_ERROR("[PrintMemNode] data is null.");
         return;
     }
-    ATTEST_LOG_INFO("Addr = %p, Func = %s, File = %s, Line = %d.",
+    ATTEST_LOG_WARN("Addr = %p, Func = %s, File = %s, Line = %d.",
         data->addr, data->func, data->file, data->line);
 }
 
@@ -236,9 +236,9 @@ void PrintMemNodeList(void)
     }
     ListNode* head = list->head;
     if (head == NULL) {
-        ATTEST_LOG_ERROR("[PrintMemNodeList] No memory leak.");
+        ATTEST_LOG_INFO("[PrintMemNodeList] No memory leak.");
     } else {
-        ATTEST_LOG_INFO("[PrintMemNodeList] Memory leak info:");
+        ATTEST_LOG_WARN("[PrintMemNodeList] Memory leak info:");
     }
     while (head != NULL) {
         PrintMemNode((MemNode *)(head->data));

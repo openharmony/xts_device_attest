@@ -23,9 +23,14 @@ namespace DevAttest {
 using namespace NetManagerStandard;
 
 class DevAttestNetworkCallback : public NetConnCallbackStub {
-private:
+public:
     int32_t NetCapabilitiesChange(sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap) override;
+    int32_t NetAvailable(sptr<NetHandle> &netHandle) override;
+    int32_t NetUnavailable() override;
+private:
     int32_t netId_ = 0;
+    // Default:0 fisrtUnavailable:1 fisrtAvailable:2 second:Other
+    int32_t netStatus_ = 0;
 };
 } // DevAttest
 } // OHOS

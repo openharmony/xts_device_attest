@@ -15,82 +15,130 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <securec.h>
 #include <signal.h>
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_utils_timer.h"
 
-static timer_t g_timerId = 0;
-
-static void TimerFunction(union sigval sigv)
+static void AttestFunction(union sigval attestTimer)
 {
-    TimerInfo *timerInfo = (TimerInfo *)(sigv.sival_ptr);
-    timerInfo->func();
+    AttestTimerInfo *tmpTimerInfo = (AttestTimerInfo *)attestTimer.sival_ptr;
+    if (tmpTimerInfo->type == ATTEST_TIMER_TYPE_ONCE) {
+        tmpTimerInfo->status = ATTEST_TIMER_STATUS_STOP;
+    }
+    tmpTimerInfo->func(tmpTimerInfo->arg);
 }
 
-static void Ms2TimeSpec(struct timespec *tp, uint32_t ms)
+static void AttestMs2TimeSpec(struct timespec *tp, uint32_t ms)
 {
-    tp->tv_sec = ms / LOSCFG_BASE_CORE_MS_PRE_SECOND;
-    ms -= tp->tv_sec * LOSCFG_BASE_CORE_MS_PRE_SECOND;
-    tp->tv_nsec = (long)(((unsigned long long)ms * OS_SYS_NS_PER_SECOND) / LOSCFG_BASE_CORE_MS_PRE_SECOND);
+    if (tp == NULL) {
+        ATTEST_LOG_ERROR("[AttestMs2TimeSpec] tp is null");
+        return;
+    }
+    tp->tv_sec = (time_t)(ms / LOSCFG_BASE_CORE_MS_PER_SECOND);
+    ms -= (uint32_t)(tp->tv_sec * LOSCFG_BASE_CORE_MS_PER_SECOND);
+    tp->tv_nsec = (long)(((unsigned long long)ms * OS_SYS_NS_PER_SECOND) / LOSCFG_BASE_CORE_MS_PER_SECOND);
 }
 
-static int32_t TimerCreate(TimerCallbackFunc userCallBack, TimerInfo* timerInfo)
+static ATTEST_TIMER_ID AttestTimerCreate(TimerCallbackFunc func, AttestTimerType type,
+    void *arg, uint32_t milliseconds)
 {
-    struct sigevent evp = {0};
+    if ((func == NULL) || (type != ATTEST_TIMER_TYPE_ONCE && type != ATTEST_TIMER_TYPE_PERIOD)) {
+        ATTEST_LOG_ERROR("[AttestTimerCreate] something is wrong");
+        return NULL;
+    }
+    AttestTimerInfo *timerInfo = (AttestTimerInfo *)ATTEST_MEM_MALLOC(sizeof(AttestTimerInfo));
+    if (timerInfo == NULL) {
+        ATTEST_LOG_ERROR("[AttestTimerCreate] TimerInfo malloc fail");
+        return NULL;
+    }
+
+    timerInfo->type = type;
+    timerInfo->milliseconds = milliseconds;
+    timerInfo->func = func;
+    timerInfo->arg = arg;
+    timerInfo->status = ATTEST_TIMER_STATUS_STOP;
+
     timer_t timerId;
-    timerInfo->func = userCallBack;
-    evp.sigev_value.sival_ptr = timerInfo;
-    evp.sigev_notify = SIGEV_THREAD;
-    evp.sigev_notify_function = TimerFunction;
-    int32_t ret = timer_create(CLOCK_REALTIME, &evp, &timerId);
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[TimerCreate] TimerCreate failed");
-        return ATTEST_ERR;
+    struct sigevent sigEvp = { 0 };
+    sigEvp.sigev_notify = SIGEV_THREAD;
+    sigEvp.sigev_notify_function = AttestFunction;
+    sigEvp.sigev_value.sival_ptr = timerInfo;
+    int32_t ret = timer_create(CLOCK_REALTIME, &sigEvp, &timerId);
+    if (ret != 0) {
+        ATTEST_MEM_FREE(timerInfo);
+        ATTEST_LOG_ERROR("[AttestTimerCreate] TimerCreate fail");
+        return NULL;
     }
     timerInfo->timerId = timerId;
-    return ret;
+    return (ATTEST_TIMER_ID)timerInfo;
 }
 
-static int32_t TimerStart(TimerInfo* timerInfo, AttestTimerType type, uint32_t milliseconds)
+static int32_t AttestTimerStart(ATTEST_TIMER_ID attestTimerId)
 {
-    struct itimerspec ts;
-    (void)memset_s(&ts, sizeof(ts), 0, sizeof(ts));
-    Ms2TimeSpec(&ts.it_value, milliseconds);
-    if (type == ATTEST_TIMER_TYPE_PERIOD) {
-        Ms2TimeSpec(&ts.it_interval, milliseconds);
+    if (attestTimerId == NULL) {
+        ATTEST_LOG_ERROR("[AttestTimerStart] attestTimerId is null");
+        return ATTEST_ERR;
     }
-    return timer_settime(timerInfo->timerId, 0, &ts, NULL);
+    struct itimerspec timerSpec = { 0 };
+    AttestTimerInfo *tmpTimerInfo = (AttestTimerInfo *)attestTimerId;
+
+    AttestMs2TimeSpec(&timerSpec.it_value, tmpTimerInfo->milliseconds);
+    if (tmpTimerInfo->type == ATTEST_TIMER_TYPE_PERIOD) {
+        AttestMs2TimeSpec(&timerSpec.it_interval, tmpTimerInfo->milliseconds);
+    }
+    int32_t ret = timer_settime(tmpTimerInfo->timerId, 0, &timerSpec, NULL);
+    if (ret != 0) {
+        ATTEST_LOG_ERROR("[AttestTimerStart] failed to settime");
+        return ATTEST_ERR;
+    }
+    if (tmpTimerInfo->milliseconds != 0) {
+        tmpTimerInfo->status = ATTEST_TIMER_STATUS_RUNNING;
+    }
+    return ATTEST_OK;
 }
 
-int32_t CreateTimerTask(uint32_t milliseconds, void* userCallBack, AttestTimerType type)
+int32_t AttestStopTimerTask(const ATTEST_TIMER_ID attestTimerId)
 {
-    if (g_timerId != 0) {
-        ATTEST_LOG_ERROR("[CreateTimerTask] TimerTask exists");
+    if (attestTimerId == NULL) {
         return ATTEST_ERR;
     }
-    TimerInfo* timerInfo = (TimerInfo *)ATTEST_MEM_MALLOC(sizeof(TimerInfo));
-    if (timerInfo == NULL) {
+    AttestTimerInfo *tmpTimerInfo = (AttestTimerInfo *)attestTimerId;
+    int32_t ret = timer_delete(tmpTimerInfo->timerId);
+    ATTEST_MEM_FREE(tmpTimerInfo);
+    return (ret != 0) ? ATTEST_ERR : ATTEST_OK;
+}
+
+int32_t AttestStartTimerTask(AttestTimerType isOnce, uint32_t milliseconds,
+                              void *func, void *arg, ATTEST_TIMER_ID *timerHandle)
+{
+    if (func == NULL || timerHandle == NULL) {
+        ATTEST_LOG_ERROR("[AttestStartTimerTask] callBackFunc or timerHandle is null");
         return ATTEST_ERR;
     }
-    int32_t ret = TimerCreate((TimerCallbackFunc)userCallBack, timerInfo);
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[CreateTimerTask] TimerCreate failed");
-        ATTEST_MEM_FREE(timerInfo);
+    if (*timerHandle != NULL) {
+        AttestTimerInfo *tmpTimerInfo = (AttestTimerInfo *)timerHandle;
+        if (tmpTimerInfo->timerId != 0) {
+            ATTEST_LOG_ERROR("[AttestStartTimerTask] timerId[%d] already exists", tmpTimerInfo->timerId);
+            return ATTEST_ERR;
+        }
+    }
+
+    AttestTimerType type = (isOnce == ATTEST_TIMER_TYPE_ONCE) ? ATTEST_TIMER_TYPE_ONCE : ATTEST_TIMER_TYPE_PERIOD;
+    ATTEST_TIMER_ID attestTimerId = AttestTimerCreate((TimerCallbackFunc)func, type, arg, milliseconds);
+    if (attestTimerId == NULL) {
+        ATTEST_LOG_ERROR("[AttestStartTimerTask] failed to create timerHandle");
         return ATTEST_ERR;
     }
 
-    ret = TimerStart(timerInfo, type, milliseconds);
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[CreateTimerTask] TimerStart failed");
-        timer_delete(timerInfo->timerId);
-        ATTEST_MEM_FREE(timerInfo);
+    if (AttestTimerStart(attestTimerId) != ATTEST_OK) {
+        if (AttestStopTimerTask(attestTimerId) == ATTEST_OK) {
+            attestTimerId = NULL;
+        }
+        ATTEST_LOG_ERROR("[AttestStartTimerTask] failed to start timerHandle");
         return ATTEST_ERR;
-    } else {
-        g_timerId = timerInfo->timerId;
-        ATTEST_LOG_INFO("[CreateTimerTask] TimerStart success");
     }
+    *timerHandle = attestTimerId;
     return ATTEST_OK;
 }

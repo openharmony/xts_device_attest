@@ -63,7 +63,6 @@ static napi_value GenerateBusinessError(napi_env env, int32_t code)
 {
     napi_value result;
     int32_t jsErrCode = ConvertToJsErrCode(code);
-    HILOGI("[GenerateBusinessError] jsErrCode:%{public}d", jsErrCode);
     if (jsErrCode == DEVATTEST_SUCCESS) {
         napi_get_undefined(env, &result);
     } else {
@@ -96,7 +95,7 @@ static napi_value GenerateReturnValue(napi_env env, DevAttestAsyncContext* callb
 static void Execute(napi_env env, void* data)
 {
     if (data == nullptr) {
-        HILOGI("[Execute] Invalid parameter");
+        HILOGE("[Execute] Invalid parameter");
         return;
     }
     DevAttestAsyncContext *asyncContext = static_cast<DevAttestAsyncContext*>(data);

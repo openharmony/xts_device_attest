@@ -92,8 +92,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
     }
     double errorCode = GetObjectItemValueNumber(jsonStr, "errcode");
     if (isnan(errorCode)) {
-        ATTEST_LOG_WARN("[ParseChallengeResult] errorCode is nan.");
-        ATTEST_LOG_ERROR("[ParseChallengeResult] Parse msg failed.");
+        ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem errcode failed.");
         return ATTEST_ERR;
     }
     if ((int32_t)errorCode != ATTEST_OK) {
@@ -103,7 +102,6 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
 
     challenge->currentTime = GetObjectItemValueNumber(jsonStr, "currentTime");
     if (isnan((double)challenge->currentTime)) {
-        ATTEST_LOG_WARN("[ParseChallengeResult] currentTime is nan.");
         ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem currentTime failed.");
         return ATTEST_ERR;
     }

@@ -187,7 +187,7 @@ static int32_t SetSocketTracekId(char *clientId, char* randomUuid, char **outTra
         return ATTEST_ERR;
     }
     
-    int32_t traceIdLen = strlen(randomUuid) + clientIdLastLen + 2; // traceid拼写规则:randomUuid+'_'+clientId后10位+'\0'(2字符)
+    int32_t traceIdLen = strlen(randomUuid) + clientIdLastLen + 2; // traceid拼写规则:clientId后10位+'_'+randomUuid+'\0'(2字符)
     char *tracekId = (char *)ATTEST_MEM_MALLOC(traceIdLen);
     if (tracekId == NULL) {
         ATTEST_LOG_ERROR("[SetSocketTracekId] tracekId ATTEST MEM MALLOC failed");
@@ -1229,7 +1229,7 @@ static int32_t CheckDomain(char* inputData, char** outData)
         return ATTEST_ERR;
     }
     if (strcmp(serverInfo->hostName, newHost) == 0) {
-        ATTEST_LOG_ERROR("[CheckDomain] same domain,curHost[%s],newHost[%s]", serverInfo->hostName, newHost);
+        ATTEST_LOG_ERROR("[CheckDomain] same domain");
         return ATTEST_ERR;
     }
     char* newDomain = NULL;
@@ -1282,11 +1282,11 @@ int32_t UpdateNetConfig(char* activeSite, char* standbySite, int32_t* updateFlag
     *updateFlag = UPDATE_OK;
     cJSON* newConfig = cJSON_CreateObject();
     cJSON_AddStringToObject(newConfig, NETWORK_CONFIG_SERVER_INFO_NAME, newDomain);
-    char *json_data = cJSON_Print(newConfig);
+    char *jsonData = cJSON_Print(newConfig);
     cJSON_Delete(newConfig);
-    uint32_t len = strlen(json_data) * sizeof(char);
-    ret = AttestWriteNetworkConfig(json_data, len);
-    ATTEST_MEM_FREE(json_data);
+    uint32_t len = strlen(jsonData) * sizeof(char);
+    ret = AttestWriteNetworkConfig(jsonData, len);
+    ATTEST_MEM_FREE(jsonData);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[UpdateNetConfig] write networkconfig failed.");
         return ATTEST_ERR;

@@ -25,22 +25,35 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-typedef int32_t (*TimerCallbackFunc)(void);
-#define LOSCFG_BASE_CORE_MS_PRE_SECOND 1000
+typedef void *ATTEST_TIMER_ID;
+typedef void (*TimerCallbackFunc)(void*);
+#define LOSCFG_BASE_CORE_MS_PER_SECOND 1000
 #define OS_SYS_NS_PER_SECOND 1000000000
 #define EXPIRED_INTERVAL 86400000
+
+typedef enum {
+    ATTEST_TIMER_STATUS_STOP = 0,
+    ATTEST_TIMER_STATUS_RUNNING,
+} AttestTimerStatus;
 
 typedef enum {
     ATTEST_TIMER_TYPE_ONCE = 0,
     ATTEST_TIMER_TYPE_PERIOD,
 } AttestTimerType;
+
 typedef struct {
     timer_t timerId;
+    AttestTimerType type;
     uint32_t milliseconds;
     TimerCallbackFunc func;
-} TimerInfo;
+    void *arg;
+    AttestTimerStatus status;
+} AttestTimerInfo;
 
-int32_t CreateTimerTask(uint32_t milliseconds, void* userCallBack, AttestTimerType type);
+int32_t AttestStartTimerTask(AttestTimerType isOnce, uint32_t milliseconds,
+                              void *func, void *arg, ATTEST_TIMER_ID *timerHandle);
+
+int32_t AttestStopTimerTask(const ATTEST_TIMER_ID attestTimerId);
 
 #ifdef __cplusplus
 #if __cplusplus

@@ -55,7 +55,7 @@ bool Permission::IsSystem()
             break;
     }
     if (!result) {
-        HILOGW("[IsSystem] system denied, type=%{public}d, pid=%{public}d, uid=%{public}d",
+        HILOGE("[IsSystem] system denied, type=%{public}d, pid=%{public}d, uid=%{public}d",
             static_cast<int32_t>(type), pid, uid);
         return false;
     }

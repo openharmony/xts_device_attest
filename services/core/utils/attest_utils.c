@@ -182,6 +182,10 @@ int32_t ToLowerStr(char* str, int len)
     return ATTEST_OK;
 }
 
+/**
+ * @brief Encrypt string with sha256 algorithm, and generate uppercase string.
+ *
+ */
 int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
 {
     if (src == NULL) {

@@ -24,7 +24,7 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-int32_t AttestTask(int32_t isCreateTimer);
+int32_t AttestTask(void);
 
 int32_t QueryAttest(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength);
 
@@ -33,6 +33,10 @@ int32_t QueryAttestPublishable(int32_t* publishable);
 int32_t AttestPublishComplete(void);
 
 int32_t AttestWaitTaskOver(void);
+
+int32_t AttestCreateTimerTask(void);
+
+int32_t AttestDestroyTimerTask(void);
 
 #ifdef __cplusplus
 #if __cplusplus

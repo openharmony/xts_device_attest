@@ -18,6 +18,8 @@
     QueryAttestPublishable;
     AttestPublishComplete;
     AttestWaitTaskOver;
+    AttestCreateTimerTask;
+    AttestDestroyTimerTask;
   local:
     *;
 };

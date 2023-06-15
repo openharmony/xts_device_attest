@@ -19,21 +19,15 @@
 #include "attest_service.h"
 #include "attest_entry.h"
 
-int32_t AttestTask(int32_t isCreateTimer)
+static ATTEST_TIMER_ID g_ProcAttestTimerId = NULL;
+
+int32_t AttestTask(void)
 {
     ATTEST_LOG_INFO("[AttestTask] Begin.");
     // 执行主流程代码
     int32_t ret = ProcAttest();
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[AttestTask] Proc failed ret = %d.", ret);
-    }
-
-    // 创建主流程定时器
-    if (isCreateTimer) {
-        ret = CreateTimerTask(EXPIRED_INTERVAL, &ProcAttest, ATTEST_TIMER_TYPE_PERIOD);
-        if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[AttestTask] Create Periodic TimerTask return ret = %d.", ret);
-        }
     }
     ATTEST_LOG_INFO("[AttestTask] End.");
     return ret;
@@ -57,4 +51,26 @@ int32_t AttestPublishComplete(void)
 int32_t AttestWaitTaskOver(void)
 {
     return AttestWaitTaskOverImpl();
+}
+
+int32_t AttestCreateTimerTask(void)
+{
+    if (g_ProcAttestTimerId != NULL) {
+        return ATTEST_OK;
+    }
+
+    int32_t ret = AttestStartTimerTask(ATTEST_TIMER_TYPE_PERIOD,
+        EXPIRED_INTERVAL,
+        &ProcAttest,
+        NULL,
+        &g_ProcAttestTimerId);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[AttestCreateTimerTask] Create Periodic TimerTask failed, ret = %d.", ret);
+    }
+    return ret;
+}
+
+int32_t AttestDestroyTimerTask(void)
+{
+    return AttestStopTimerTask(g_ProcAttestTimerId);
 }

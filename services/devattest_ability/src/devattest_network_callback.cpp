@@ -25,11 +25,20 @@
 namespace OHOS {
 namespace DevAttest {
 using namespace OHOS;
+constexpr std::int32_t UNAVAILABLE_STATUS = 1;
+constexpr std::int32_t AVAILABLE_STATUS = 2;
+constexpr std::int32_t OTHER_STATUS = 3;
+constexpr std::int32_t STATUS_MAX_COUNT = 30;
 int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
     sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap)
 {
     if (netHandle == nullptr || netAllCap == nullptr) {
-        HILOGE("[NetCapabilitiesChange] invalid parameter");
+        HILOGW("[NetCapabilitiesChange] invalid parameter");
+        return DEVATTEST_SUCCESS;
+    }
+    if (netStatus_ == AVAILABLE_STATUS) {
+        HILOGW("[NetCapabilitiesChange] No need to operate");
+        netStatus_ = OTHER_STATUS;
         return DEVATTEST_SUCCESS;
     }
     int32_t netHandleId = netHandle->GetNetId();
@@ -54,7 +63,7 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 break;
             case NET_CAPABILITY_VALIDATED:
                 HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
-                (void)AttestTask(true);
+                (void)AttestTask();
                 DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;
             case NET_CAPABILITY_CAPTIVE_PORTAL:
@@ -64,6 +73,25 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 HILOGD("[NetCapabilitiesChange] default start");
                 break;
         }
+    }
+    return DEVATTEST_SUCCESS;
+}
+
+int32_t DevAttestNetworkCallback::NetAvailable(sptr<NetHandle> &netHandle)
+{
+    netStatus_ += AVAILABLE_STATUS;
+    if (netStatus_ > STATUS_MAX_COUNT) {
+        netStatus_ = OTHER_STATUS;
+    }
+    (void)AttestCreateTimerTask();
+    return DEVATTEST_SUCCESS;
+}
+
+int32_t DevAttestNetworkCallback::NetUnavailable(void)
+{
+    netStatus_ += UNAVAILABLE_STATUS;
+    if (netStatus_ > STATUS_MAX_COUNT) {
+        netStatus_ = OTHER_STATUS;
     }
     return DEVATTEST_SUCCESS;
 }

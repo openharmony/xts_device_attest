@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "devattest_notification_publish.h"
 
 #include <cstdint>

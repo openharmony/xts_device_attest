@@ -34,6 +34,7 @@ ohos_shared_library("devattest_service") {
     "${devattest_path}/common/permission/src/permission.cpp",
     "src/attest_result_info.cpp",
     "src/devattest_network_callback.cpp",
+    "src/devattest_network_manager.cpp",
     "src/devattest_notification_publish.cpp",
     "src/devattest_service.cpp",
     "src/devattest_service_stub.cpp",

@@ -49,7 +49,6 @@ sptr<DevAttestInterface> DevAttestClient::GetDeviceProfileService()
         sptr<IRemoteObject> object =
             samgrProxy->CheckSystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE);
         if (object != nullptr) {
-            HILOGI("[GetDeviceProfileService] get service succeeded");
             attestClientInterface_ = iface_cast<DevAttestInterface>(object);
             return attestClientInterface_;
         }

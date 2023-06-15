@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,25 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef DEVATTEST_NETWORK_CALLBACK_H
-#define DEVATTEST_NETWORK_CALLBACK_H
+#ifndef DEVATTEST_NETWORK_MANAGER_H
+#define DEVATTEST_NETWORK_MANAGER_H
 
-#include "net_conn_callback_stub.h"
+
+#include "singleton.h"
+#include "devattest_network_callback.h"
 
 namespace OHOS {
 namespace DevAttest {
-using namespace NetManagerStandard;
-
-class DevAttestNetworkCallback : public NetConnCallbackStub {
+class DevAttestNetworkManager {
+    DECLARE_DELAYED_SINGLETON(DevAttestNetworkManager)
 public:
-    int32_t NetCapabilitiesChange(sptr<NetHandle> &netHandle, const sptr<NetAllCapabilities> &netAllCap) override;
-    int32_t NetAvailable(sptr<NetHandle> &netHandle) override;
-    int32_t NetUnavailable() override;
+    void RegisterNetConnCallback(void);
+    void UnregisterNetConnCallback(void);
 private:
-    int32_t netId_ = 0;
-    // Default:0 fisrtUnavailable:1 fisrtAvailable:2 second:Other
-    int32_t netStatus_ = 0;
+    sptr<DevAttestNetworkCallback> netCallback_;
 };
 } // DevAttest
 } // OHOS
-#endif // DEVATTEST_NETWORK_CALLBACK_H
+#endif // DEVATTEST_NETWORK_MANAGER_H

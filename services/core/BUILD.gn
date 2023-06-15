@@ -31,7 +31,11 @@ config("devattest_core_config") {
   cflags = [ "-Wall" ]
   include_dirs = include_core_dirs
 
-  defines = [ "ATTEST_HILOG_LEVEL = 1" ]
+  if (enable_attest_common_debug) {
+    defines = [ "ATTEST_HILOG_LEVEL = 0" ]
+  } else {
+    defines = [ "ATTEST_HILOG_LEVEL = 1" ]
+  }
 
   if (enable_attest_test_mock_network) {
     defines += [ "__ATTEST_MOCK_NETWORK_STUB__" ]

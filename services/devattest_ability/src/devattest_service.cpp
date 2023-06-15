@@ -25,6 +25,7 @@
 #include "devattest_system_ability_listener.h"
 #include "devattest_task.h"
 #include "attest_entry.h"
+#include "devattest_network_manager.h"
 
 namespace OHOS {
 namespace DevAttest {
@@ -77,6 +78,14 @@ void DevAttestService::OnStart(const SystemAbilityOnDemandReason& startReason)
 
 bool DevAttestService::Init()
 {
+    shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(ATTEST_UNLOAD_TASK_ID);
+    if (unloadHandler_ == nullptr) {
+        unloadHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    }
+    if (unloadHandler_ == nullptr) {
+        return false;
+    }
+
     if (!registerToSa_) {
         bool ret = Publish(this);
         if (!ret) {
@@ -84,15 +93,6 @@ bool DevAttestService::Init()
             return false;
         }
         registerToSa_ = true;
-    }
-
-    // 用于延时卸载
-    shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(ATTEST_UNLOAD_TASK_ID);
-    if (unloadHandler_ == nullptr) {
-        unloadHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    }
-    if (unloadHandler_ == nullptr) {
-        return false;
     }
     return true;
 }
@@ -107,12 +107,15 @@ void DevAttestService::OnStop()
 int32_t DevAttestService::OnIdle(const SystemAbilityOnDemandReason& idleReason)
 {
     HILOGI("[OnIdle] reason %{public}d", idleReason.GetId());
+    (void)DelayedSingleton<DevAttestNetworkManager>::GetInstance()->UnregisterNetConnCallback();
+    (void)AttestDestroyTimerTask;
     AttestWaitTaskOver();
     return UNLOAD_IMMEDIATELY;
 }
 
 void DevAttestService::DelayUnloadTask(void)
 {
+    HILOGI("delay unload task begin");
     auto task = []() {
         sptr<ISystemAbilityManager> samgrProxy =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -127,8 +130,8 @@ void DevAttestService::DelayUnloadTask(void)
         }
     };
 
-    unloadHandler_->RemoveTask(std::string(ATTEST_UNLOAD_TASK_ID));
-    unloadHandler_->PostTask(task, std::string(ATTEST_UNLOAD_TASK_ID), DELAY_TIME);
+    unloadHandler_->RemoveTask(ATTEST_UNLOAD_TASK_ID);
+    unloadHandler_->PostTask(task, ATTEST_UNLOAD_TASK_ID, DELAY_TIME);
 }
 
 int32_t DevAttestService::CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo)
@@ -179,7 +182,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
     }
     free(resultArray);
     resultArray = NULL;
-    HILOGI("[GetAttestStatus] GetAttestStatus end success");
+    HILOGD("[GetAttestStatus] GetAttestStatus end");
     return ret;
 }
 } // end of DevAttest

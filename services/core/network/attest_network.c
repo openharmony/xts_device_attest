@@ -123,6 +123,10 @@ void DestroyDevicePacket(DevicePacket** devPacket)
     ATTEST_MEM_FREE(*devPacket);
 }
 
+/* 
+ * @brief Encrypt udid with sha256 algorithm, and generate lowercase string.
+ *
+ */
 static int32_t Sha256Udid(char *udid, char *outStr)
 {
     unsigned char hash[HTTPS_NETWORK_SHA256_LEN];
@@ -222,8 +226,8 @@ static int32_t BuildSocketInfo(DevicePacket *devValue, HttpPacket *msgHttpPack,
 
     ServerInfo* serverInfo = (ServerInfo*)g_attestNetworkList.head->data;
 
-    msgHttpPack->reqPort = serverInfo->hostName;
-    msgHttpPack->reqHost = serverInfo->port;
+    msgHttpPack->reqPort = serverInfo->port;
+    msgHttpPack->reqHost = serverInfo->hostName;
     msgHttpPack->reqMethod = g_uriPath[actionType];
     msgHttpPack->reqXappID = devValue->appId;
     msgHttpPack->reqXtenantID = devValue->tenantId;
@@ -533,20 +537,20 @@ static int32_t BuildTokenInfo(DevicePacket *postValue, cJSON **postData)
     return ATTEST_OK;
 }
 
-static int32_t Buildsoftware(DevicePacket *postValue, cJSON **postData)
+static int32_t BuildSoftware(DevicePacket *postValue, cJSON **postData)
 {
     if (postValue == NULL || postData == NULL) {
-        ATTEST_LOG_ERROR("[Buildsoftware] Invaild parameter");
+        ATTEST_LOG_ERROR("[BuildSoftware] Invaild parameter");
         return ATTEST_ERR;
     }
 
     cJSON *software = cJSON_CreateObject();
     if (software == NULL) {
-        ATTEST_LOG_ERROR("[Buildsoftware] software Create Object fail");
+        ATTEST_LOG_ERROR("[BuildSoftware] software Create Object fail");
         return ATTEST_ERR;
     }
     if (!cJSON_AddItemToObject(*postData, "software", software)) {
-        ATTEST_LOG_ERROR("[Buildsoftware] postData Add Item To Object fail");
+        ATTEST_LOG_ERROR("[BuildSoftware] postData Add Item To Object fail");
         cJSON_Delete(software);
         return ATTEST_ERR;
     }
@@ -558,7 +562,7 @@ static int32_t Buildsoftware(DevicePacket *postValue, cJSON **postData)
         cJSON_AddStringToObject(software, "version", postValue->productInfo.displayVersion) == NULL ||
         cJSON_AddStringToObject(software, "patchLevel", postValue->productInfo.patchTag) == NULL ||
         cJSON_AddStringToObject(software, "pcid", postValue->pcid) == NULL) {
-        ATTEST_LOG_ERROR("[Buildsoftware] software Add productInfo values fail");
+        ATTEST_LOG_ERROR("[BuildSoftware] software Add productInfo values fail");
         cJSON_Delete(software);
         return ATTEST_ERR;
     }
@@ -704,7 +708,7 @@ char* BuildHttpsAuthBody(DevicePacket *postValue)
             break;
         }
 
-        ret = Buildsoftware(postValue, &postData);
+        ret = BuildSoftware(postValue, &postData);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[BuildHttpsAuthBody] software Add item To Object fail");
             break;

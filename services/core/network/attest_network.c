@@ -123,7 +123,7 @@ void DestroyDevicePacket(DevicePacket** devPacket)
     ATTEST_MEM_FREE(*devPacket);
 }
 
-/* 
+/**
  * @brief Encrypt udid with sha256 algorithm, and generate lowercase string.
  *
  */

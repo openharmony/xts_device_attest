@@ -15,8 +15,6 @@
 
 #include "devattest_system_ability_listener.h"
 
-#include <thread>
-#include <cstdint>
 #include "net_conn_client.h"
 #include "system_ability_definition.h"
 #include "iservice_registry.h"

@@ -51,7 +51,7 @@ typedef struct {
 } AttestTimerInfo;
 
 int32_t AttestStartTimerTask(AttestTimerType isOnce, uint32_t milliseconds,
-                              void *func, void *arg, ATTEST_TIMER_ID *timerHandle);
+    void *func, void *arg, ATTEST_TIMER_ID *timerHandle);
 
 int32_t AttestStopTimerTask(const ATTEST_TIMER_ID attestTimerId);
 

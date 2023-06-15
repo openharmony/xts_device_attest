@@ -64,7 +64,6 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
             case NET_CAPABILITY_VALIDATED:
                 HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
                 (void)AttestTask();
-                (void)AttestCreateTimerTask();
                 DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;
             case NET_CAPABILITY_CAPTIVE_PORTAL:
@@ -84,6 +83,7 @@ int32_t DevAttestNetworkCallback::NetAvailable(sptr<NetHandle> &netHandle)
     if (netStatus_ > STATUS_MAX_COUNT) {
         netStatus_ = OTHER_STATUS;
     }
+    (void)AttestCreateTimerTask();
     return DEVATTEST_SUCCESS;
 }
 

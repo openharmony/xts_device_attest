@@ -263,7 +263,7 @@ char* GetPcid(void)
         return NULL;
     }
 
-    // SHA256转换
+    // SHA256 encrypt. pcidSha256 is uppercase string
     char *pcidSha256 = NULL;
     ret = EncodePcid(pcidBuff, PCID_MAIN_BYTES + privatePcidLen, &pcidSha256);
     if (ret != ATTEST_OK || pcidSha256 == NULL) {

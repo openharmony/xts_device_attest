@@ -182,7 +182,7 @@ int32_t ToLowerStr(char* str, int len)
     return ATTEST_OK;
 }
 
-/* 
+/**
  * @brief Encrypt string with sha256 algorithm, and generate uppercase string.
  *
  */

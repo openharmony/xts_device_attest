@@ -21,7 +21,7 @@
 #include "attest_utils_log.h"
 #include "attest_utils_timer.h"
 
-static void AttestFunction(union sigval attestTimer)
+static void AttestTimerCallback(union sigval attestTimer)
 {
     AttestTimerInfo *tmpTimerInfo = (AttestTimerInfo *)attestTimer.sival_ptr;
     if (tmpTimerInfo->type == ATTEST_TIMER_TYPE_ONCE) {
@@ -63,7 +63,7 @@ static ATTEST_TIMER_ID AttestTimerCreate(TimerCallbackFunc func, AttestTimerType
     timer_t timerId;
     struct sigevent sigEvp = { 0 };
     sigEvp.sigev_notify = SIGEV_THREAD;
-    sigEvp.sigev_notify_function = AttestFunction;
+    sigEvp.sigev_notify_function = AttestTimerCallback;
     sigEvp.sigev_value.sival_ptr = timerInfo;
     int32_t ret = timer_create(CLOCK_REALTIME, &sigEvp, &timerId);
     if (ret != 0) {

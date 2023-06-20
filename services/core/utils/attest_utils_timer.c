@@ -26,7 +26,7 @@
 
 static void AttestTimerCallback(union sigval attestTimer)
 {
-    (void)pthread_setname_np(pthread_self(), ATTEST_TIMER_TASK_ID);// set pthread name, at most 15 bytes.
+    (void)pthread_setname_np(pthread_self(), ATTEST_TIMER_TASK_ID); // set pthread name, at most 15 bytes.
     AttestTimerInfo *tmpTimerInfo = (AttestTimerInfo *)attestTimer.sival_ptr;
     if (tmpTimerInfo->type == ATTEST_TIMER_TYPE_ONCE) {
         tmpTimerInfo->status = ATTEST_TIMER_STATUS_STOP;

@@ -135,11 +135,11 @@ static int32_t Sha256Udid(char *udid, char *outStr)
         ATTEST_LOG_ERROR("[Sha256Udid] Invalid parameter");
         return -1;
     }
-    
+
     SHA256_Init(&sha256);
     SHA256_Update(&sha256, udid, strlen(udid));
     SHA256_Final(hash, &sha256);
-    
+
     uint32_t curLen = 0;
     for (uint32_t i = 0; i < strlen((char *)hash); i++) {
         if (curLen > (HTTPS_NETWORK_SHA256_LEN - 1)) {

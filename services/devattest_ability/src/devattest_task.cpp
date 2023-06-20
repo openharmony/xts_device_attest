@@ -16,7 +16,6 @@
 #include "devattest_task.h"
 
 #include <pthread.h>
-#include <sys/prctl.h>
 #include "iservice_registry.h"
 #include "singleton.h"
 #include "system_ability_definition.h"
@@ -28,7 +27,7 @@
 namespace OHOS {
 namespace DevAttest {
 using namespace OHOS;
-const char* ATTEST_RUN_TASK_ID = "attest_run_task";
+const char* ATTEST_RUN_TASK_ID = "attest_run";
 DevAttestTask::DevAttestTask()
 {
 }
@@ -59,8 +58,7 @@ bool DevAttestTask::CreateThread()
 
 void* DevAttestTask::Run(void* arg)
 {
-    prctl(PR_SET_NAME, ATTEST_RUN_TASK_ID);  // 设置线程名
-
+    (void)pthread_setname_np(pthread_self(), ATTEST_RUN_TASK_ID); // set pthread name, at most 15 bytes.
     (void)AttestTask();
     DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
     UnloadTask();

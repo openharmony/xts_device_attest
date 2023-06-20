@@ -37,9 +37,6 @@ sptr<DevAttestInterface> DevAttestClient::GetDeviceProfileService()
 {
     {
         std::lock_guard<std::mutex> lock(clientLock_);
-        if (attestClientInterface_ != nullptr) {
-            return attestClientInterface_;
-        }
         sptr<ISystemAbilityManager> samgrProxy =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy == nullptr) {
@@ -49,6 +46,7 @@ sptr<DevAttestInterface> DevAttestClient::GetDeviceProfileService()
         sptr<IRemoteObject> object =
             samgrProxy->CheckSystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE);
         if (object != nullptr) {
+            HILOGI("[GetDeviceProfileService] attestClientInterface currently exists");
             attestClientInterface_ = iface_cast<DevAttestInterface>(object);
             return attestClientInterface_;
         }

@@ -51,6 +51,7 @@ ohos_shared_library("devattest_service") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_core",
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "distributed_notification_service:ans_innerkits",
     "eventhandler:libeventhandler",

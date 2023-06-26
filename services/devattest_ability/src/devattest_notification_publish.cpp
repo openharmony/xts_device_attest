@@ -22,7 +22,6 @@
 #include "notification_request.h"
 #include "system_ability_definition.h"
 #include "iservice_registry.h"
-#include "bundle_mgr_interface.h"
 #include "os_account_manager.h"
 #include "locale_config.h"
 #include "devattest_log.h"
@@ -34,14 +33,16 @@ namespace DevAttest {
 using namespace OHOS;
 using namespace OHOS::EventFwk;
 using namespace std;
+using namespace AppExecFwk;
 
+constexpr std::int32_t INVALID_UID = -1;
 constexpr std::int32_t LOCALE_ITEM_SIZE = 5;
 constexpr std::int32_t PARAM_THREE = 3;
 constexpr std::int32_t DEVATTEST_PUBLISH_NOTIFICATION_ID = 0;
 const char* DEVATTEST_PUBLISH_BUNDLE = "com.ohos.settingsdata";
+const char* DEVATTEST_SETTINGS_BUNDLE = "com.ohos.settings";
 const char* DEVATTEST_CONTENT_TITLE = "OpenHarmony_Compatibility_Assessment";
 const char* DEVATTEST_CONTENT_TEXT = "assessmentPassFailedText";
-const char* SETTINGS_RESOURCE_PATH = "/system/app/com.ohos.settings/Settings.hap";
 
 DevAttestNotificationPublish::DevAttestNotificationPublish()
 {
@@ -77,6 +78,7 @@ void DevAttestNotificationPublish::PublishNotification(void)
 int32_t DevAttestNotificationPublish::PublishNotificationImpl(void)
 {
     int32_t uid = 0;
+    std::string settingsHapPath;
     std::string contentTitle;
     std::string contentText;
     if (GetDevattestBundleUid(&uid) != DEVATTEST_SUCCESS) {
@@ -84,7 +86,12 @@ int32_t DevAttestNotificationPublish::PublishNotificationImpl(void)
         return DEVATTEST_FAIL;
     }
 
-    if (GetDevattestContent(contentTitle, contentText) != DEVATTEST_SUCCESS) {
+    if (GetDevattestHapPath(settingsHapPath) != DEVATTEST_SUCCESS) {
+        HILOGE("[PublishNotificationImpl] failed to get hap path");
+        return DEVATTEST_FAIL;
+    }
+
+    if (GetDevattestContent(contentTitle, contentText, settingsHapPath) != DEVATTEST_SUCCESS) {
         HILOGE("[PublishNotificationImpl] failed to get Content");
         return DEVATTEST_FAIL;
     }
@@ -116,6 +123,27 @@ int32_t DevAttestNotificationPublish::PublishNotificationImpl(void)
     return DEVATTEST_SUCCESS;
 }
 
+sptr<IBundleMgr> DevAttestNotificationPublish::GetBundleMgr(void)
+{
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        HILOGE("[GetBundleMgr] get systemAbilityManager failed");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        HILOGE("[GetBundleMgr] get remoteObject failed");
+        return nullptr;
+    }
+    sptr<IBundleMgr> bundleMgr = iface_cast<IBundleMgr>(remoteObject);
+    if (bundleMgr == nullptr) {
+        HILOGE("[GetBundleMgr] get bundleMgr failed");
+        return nullptr;
+    }
+    return bundleMgr;
+}
+
 int32_t DevAttestNotificationPublish::GetDevattestBundleUid(int32_t* uid)
 {
     int32_t userId = -1;
@@ -124,26 +152,54 @@ int32_t DevAttestNotificationPublish::GetDevattestBundleUid(int32_t* uid)
         HILOGE("[GetDevattestBundleUid] GetOsAccountLocalIdFromProcess failed, ret:%{public}d", ret);
         return DEVATTEST_FAIL;
     }
-
-    sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        HILOGE("[GetDevattestBundleUid] get systemAbilityManager failed");
-        return DEVATTEST_FAIL;
-    }
-
-    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (remoteObject == nullptr) {
-        HILOGE("[GetDevattestBundleUid] get remoteObject failed");
-        return DEVATTEST_FAIL;
-    }
-
-    sptr<AppExecFwk::IBundleMgr> bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
+    sptr<IBundleMgr> bundleMgr = GetBundleMgr();
     if (bundleMgr == nullptr) {
-        HILOGE("[GetDevattestBundleUid] bundleMgr remoteObject failed");
+        HILOGE("[GetDevattestBundleUid] GetBundleMgr failed");
         return DEVATTEST_FAIL;
     }
     *uid = bundleMgr->GetUidByBundleName(std::string(DEVATTEST_PUBLISH_BUNDLE), userId);
+    if (*uid == INVALID_UID) {
+        HILOGE("[GetDevattestBundleUid] GetUidByBundleName failed");
+        return DEVATTEST_FAIL;
+    }
+    return DEVATTEST_SUCCESS;
+}
+
+int32_t DevAttestNotificationPublish::GetDevattestHapPath(std::string &settingsHapPath)
+{
+    sptr<IBundleMgr> bundleMgr = GetBundleMgr();
+    if (bundleMgr == nullptr) {
+        HILOGE("[GetDevattestHapPath] GetBundleMgr failed");
+        return DEVATTEST_FAIL;
+    }
+    std::vector<int32_t> ids;
+    int32_t ret = OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
+    if (ret != DEVATTEST_SUCCESS) {
+        HILOGE("[GetDevattestHapPath] QueryActiveOsAccountIds failed, ret:%{public}d", ret);
+        return DEVATTEST_FAIL;
+    }
+    BundleInfo bundleInfo;
+    ret = DEVATTEST_FAIL;
+    for (int32_t id : ids) {
+        if (bundleMgr->GetBundleInfo(DEVATTEST_SETTINGS_BUNDLE, GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, id)) {
+            ret = DEVATTEST_SUCCESS;
+            break;
+        }
+    }
+    if (ret != DEVATTEST_SUCCESS) {
+        HILOGE("[GetDevattestHapPath] GetBundleInfo failed");
+        return DEVATTEST_FAIL;
+    }
+    for (HapModuleInfo hapModuleInfo : bundleInfo.hapModuleInfos) {
+        std::string moduleResPath = hapModuleInfo.hapPath.empty() ? hapModuleInfo.resourcePath : hapModuleInfo.hapPath;
+        if (!moduleResPath.empty()) {
+            settingsHapPath = moduleResPath;
+        }
+    }
+    if (settingsHapPath.empty()) {
+        HILOGE("[GetDevattestHapPath] get setiingsHapPath failed");
+        return DEVATTEST_FAIL;
+    }
     return DEVATTEST_SUCCESS;
 }
 
@@ -178,7 +234,7 @@ std::shared_ptr<Global::Resource::ResConfig> DevAttestNotificationPublish::GetDe
     return pResConfig;
 }
 
-int32_t DevAttestNotificationPublish::GetDevattestContent(std::string &title, std::string &text)
+int32_t DevAttestNotificationPublish::GetDevattestContent(std::string &title, std::string &text, std::string &settingsHapPath)
 {
     std::shared_ptr<Global::Resource::ResourceManager> pResMgr(Global::Resource::CreateResourceManager());
     if (pResMgr == nullptr) {
@@ -186,7 +242,7 @@ int32_t DevAttestNotificationPublish::GetDevattestContent(std::string &title, st
         return DEVATTEST_FAIL;
     }
 
-    if (!pResMgr->AddResource(SETTINGS_RESOURCE_PATH)) {
+    if (!pResMgr->AddResource(settingsHapPath.c_str())) {
         HILOGE("[GetDevattestContent] failed to AddResource");
         return DEVATTEST_FAIL;
     }

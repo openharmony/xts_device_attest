@@ -22,8 +22,6 @@
 
 namespace OHOS {
 namespace DevAttest {
-using namespace AppExecFwk;
-
 class DevAttestNotificationPublish {
     DECLARE_DELAYED_SINGLETON(DevAttestNotificationPublish)
 public:
@@ -32,7 +30,7 @@ public:
 private:
     DevAttestNotificationPublish(const DevAttestNotificationPublish&);
     DevAttestNotificationPublish& operator=(const DevAttestNotificationPublish&);
-    sptr<IBundleMgr> GetBundleMgr(void);
+    sptr<AppExecFwk::IBundleMgr> GetBundleMgr(void);
     int32_t GetDevattestBundleUid(int32_t *uid);
     int32_t GetDevattestHapPath(std::string &settingsHapPath);
     int32_t GetDevattestContent(std::string &title, std::string &text, std::string &settingsHapPath);

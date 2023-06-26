@@ -234,7 +234,8 @@ std::shared_ptr<Global::Resource::ResConfig> DevAttestNotificationPublish::GetDe
     return pResConfig;
 }
 
-int32_t DevAttestNotificationPublish::GetDevattestContent(std::string &title, std::string &text, std::string &settingsHapPath)
+int32_t DevAttestNotificationPublish::GetDevattestContent(std::string &title,
+    std::string &text, std::string &settingsHapPath)
 {
     std::shared_ptr<Global::Resource::ResourceManager> pResMgr(Global::Resource::CreateResourceManager());
     if (pResMgr == nullptr) {

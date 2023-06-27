@@ -45,9 +45,6 @@ bool DevAttestTask::CreateThread()
     int priority = 0;
     struct sched_param sched = {static_cast<int>(priority)};
     pthread_attr_setschedparam(&attr, &sched);
-#if defined(THREAD_STACK_SIZE) and THREAD_STACK_SIZE > 0
-    pthread_attr_setstacksize(&attr, THREAD_STACK_SIZE);
-#endif
     int ret = pthread_create(&tid, &attr, DevAttestTask::Run, NULL);
     if (ret != DEVATTEST_SUCCESS) {
         HILOGE("thread create failed, ret: %{public}d", ret);

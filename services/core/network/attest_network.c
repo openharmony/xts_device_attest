@@ -1189,9 +1189,8 @@ static int32_t MergeDomain(char* hostName, char* port, char** resultDomain)
     }
     int32_t ret = ATTEST_OK;
     char* newDomain = NULL;
-    int newDomainSize = 0;
     do {
-        newDomainSize = strlen(hostName) + strlen(port) + strlen(CONNECTOR) + 1;
+        int newDomainSize = strlen(hostName) + strlen(port) + strlen(CONNECTOR) + 1;
         newDomain = (char *)ATTEST_MEM_MALLOC(newDomainSize);
         if (newDomain == NULL) {
             ret = ATTEST_ERR;
@@ -1259,7 +1258,7 @@ static int32_t CheckDomain(char* inputData, char** outData)
     } while (0);
     if (ret != ATTEST_OK) {
         ReleaseList(&g_attestNetworkList);
-        ret = SplitNetworkInfoSymbol(curDomain, &g_attestNetworkList);
+        (void)SplitNetworkInfoSymbol(curDomain, &g_attestNetworkList);
         return ATTEST_ERR;
     }
     *outData = newDomain;

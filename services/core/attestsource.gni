@@ -62,7 +62,7 @@ core_deps = [
 
 core_external_deps = [
   "c_utils:utils",
-  "hiviewdfx_hilog_native:libhilog",
+  "hilog:libhilog",
   "init:libbegetutil",
   "syscap_codec:syscap_interface_shared",
 ]

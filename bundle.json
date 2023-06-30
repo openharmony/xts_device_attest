@@ -42,7 +42,7 @@
         "dsoftbus"
       ],
       "third_party": [
-        "cjson",
+        "cJSON",
         "openssl"
       ]
     },

@@ -18,7 +18,6 @@
 
 #include <map>
 #include "iremote_stub.h"
-#include "iremote_object.h"
 #include "devattest_interface.h"
 
 namespace OHOS {

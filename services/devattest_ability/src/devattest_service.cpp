@@ -15,9 +15,6 @@
 
 #include "devattest_service.h"
 
-#include <string>
-#include <iostream>
-#include <cstdint>
 #include <securec.h>
 #include "iservice_registry.h"
 #include "devattest_errno.h"
@@ -30,6 +27,8 @@
 namespace OHOS {
 namespace DevAttest {
 using namespace std;
+
+constexpr int32_t COMM_NET_CONN_MANAGER_SA_ID = 1151;
 constexpr int32_t UNLOAD_IMMEDIATELY = 0;
 constexpr int32_t DELAY_TIME = 300000;
 const char* ATTEST_UNLOAD_TASK_ID = "attest_unload_task";
@@ -69,7 +68,7 @@ void DevAttestService::OnStart(const SystemAbilityOnDemandReason& startReason)
     } else {
         sptr<DevAttestSystemAbilityListener> pListener =
             (std::make_unique<DevAttestSystemAbilityListener>()).release();
-        if (!pListener->AddDevAttestSystemAbilityListener(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID)) {
+        if (!pListener->AddDevAttestSystemAbilityListener(COMM_NET_CONN_MANAGER_SA_ID)) {
             HILOGE("[OnStart] AddDevAttestSystemAbilityListener failed.");
         }
     }
@@ -169,7 +168,7 @@ int32_t DevAttestService::GetAttestStatus(AttestResultInfo &attestResultInfo)
         }
 
         attestResultInfo.ticketLength_ = ticketLength;
-        attestResultInfo.ticket_ = ticketStr;
+        attestResultInfo.ticket_ = (ticketStr == NULL) ? string("") : ticketStr;
         ret = CopyAttestResult(resultArray, attestResultInfo);
         if (ret != DEVATTEST_SUCCESS) {
             HILOGE("[GetAttestStatus] copy attest result failed");

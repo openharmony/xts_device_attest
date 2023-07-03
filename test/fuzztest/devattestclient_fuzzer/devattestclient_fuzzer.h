@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef DEVATTEST_FUZZER_TEST_H
-#define DEVATTEST_FUZZER_TEST_H
+#ifndef DEVATTEST_CLIENT_FUZZER_TEST_H
+#define DEVATTEST_CLIENT_FUZZER_TEST_H
 
-#define FUZZ_PROJECT_NAME "devattest_fuzzer"
+#define FUZZ_PROJECT_NAME "devattestclient_fuzzer"
 
-#endif // DEVATTEST_FUZZER_TEST_H
+#endif // DEVATTEST_CLIENT_FUZZER_TEST_H
 

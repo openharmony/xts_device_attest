@@ -11,16 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("fuzztest") {
-  testonly = true
-  deps = []
-
-  deps += [
-    # deps file
-    "devattestadapteroem_fuzzer:DevattestAdapterOemFuzzTest",
-    "devattestclient_fuzzer:DevattestClientFuzzTest",
-    "devattestnetworkcallback_fuzzer:DevattestNetworkCallbackFuzzTest",
-    "devattestservice_fuzzer:DevattestServiceFuzzTest",
-    "devattestservicestub_fuzzer:DevattestServiceStubFuzzTest",
-  ]
-}
+FUZZ

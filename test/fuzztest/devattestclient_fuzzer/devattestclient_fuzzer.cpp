@@ -30,7 +30,7 @@ namespace OHOS {
     template <class T>
     T GetData()
     {
-        T object{};
+        T object {};
         size_t objectSize = sizeof(object);
         if (g_baseFuzzData == nullptr || objectSize - g_baseFuzzPos) {
             return object;

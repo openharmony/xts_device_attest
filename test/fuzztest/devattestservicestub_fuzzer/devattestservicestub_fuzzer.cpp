@@ -27,10 +27,10 @@ namespace OHOS {
     size_t g_baseFuzzSize = 0;
     size_t g_baseFuzzPos;
     
-    class DevattestServiceStubFuzz : public DevAttestServiceStub {
+    class DevattestServiceStubFuzzer : public DevAttestServiceStub {
     public:
-        DevattestServiceStubFuzz() = default;
-        virtual ~DevattestServiceStubFuzz() = default;
+        DevattestServiceStubFuzzer() = default;
+        virtual ~DevattestServiceStubFuzzer() = default;
         int32_t GetAttestStatus(AttestResultInfo &attestResultInfo) override
         {
             return 0;
@@ -42,7 +42,7 @@ namespace OHOS {
     template <class T>
     T GetData()
     {
-        T object{};
+        T object {};
         size_t objectSize = sizeof(object);
         if (g_baseFuzzData == nullptr || objectSize - g_baseFuzzPos) {
             return object;
@@ -67,7 +67,7 @@ namespace OHOS {
         datas.RewindRead(0);
         MessageParcel reply;
         MessageOption option;
-        std::shared_ptr<DevAttestServiceStub> devattestservicestub = std::make_shared<DevattestServiceStubFuzz>();
+        std::shared_ptr<DevAttestServiceStub> devattestservicestub = std::make_shared<DevattestServiceStubFuzzer>();
         (void)devattestservicestub->OnRemoteRequest(code, datas, reply, option);
     }
 

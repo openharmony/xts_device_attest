@@ -21,7 +21,6 @@
 #include "singleton.h"
 #include "system_ability_ondemand_reason.h"
 #include "event_handler.h"
-#include "event_runner.h"
 #include "devattest_service_stub.h"
 
 namespace OHOS {

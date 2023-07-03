@@ -16,7 +16,6 @@
 #ifndef DEVATTEST_SYSTEM_ABILITY_LISTENER_H
 #define DEVATTEST_SYSTEM_ABILITY_LISTENER_H
 
-
 #include "system_ability_status_change_stub.h"
 
 namespace OHOS {
@@ -28,7 +27,7 @@ public:
     bool AddDevAttestSystemAbilityListener(int32_t systemAbilityId);
 private:
     bool RemoveDevAttestSystemAbilityListener(int32_t systemAbilityId);
-    bool CheckInputSysAbilityId(int32_t systemAbilityId);
+    static bool CheckInputSysAbilityId(int32_t systemAbilityId);
 };
 } // DevAttest
 } // OHOS

@@ -22,12 +22,10 @@
 using namespace std;
 
 namespace OHOS {
-    typedef enum OEM_INTERFACE_TYPE {
-        OEM_TICKET_FUZZ = 0,
-        OEM_AUTH_STATUS_FUZZ = 1,
-        OEM_NETWORK_CONFIG_FUZZ = 2,
-        OEM_AUTH_RESULT_CODE_FUZZ = 3,
-    } OEM_INTERFACE_TYPE;
+    constexpr int32_t OEM_TICKET_FUZZ = 0;
+    constexpr int32_t OEM_AUTH_STATUS_FUZZ = 1;
+    constexpr int32_t OEM_NETWORK_CONFIG_FUZZ = 2;
+    constexpr int32_t OEM_AUTH_RESULT_CODE_FUZZ = 3;
     constexpr int32_t INTERFACE_NUM = 4;
 
     const uint8_t *g_baseFuzzData = nullptr;
@@ -36,7 +34,7 @@ namespace OHOS {
 
     template <class T> T GetData()
     {
-        T object{};
+        T object {};
         size_t objectSize = sizeof(object);
         if (g_baseFuzzData == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
             return object;
@@ -61,13 +59,13 @@ namespace OHOS {
         return;
     }
 
-    static void OEMWriteData(const uint8_t* data, size_t size, OEM_INTERFACE_TYPE type)
+    static void OEMWriteData(const uint8_t* data, size_t size, int32_t type)
     {
         uint32_t len  = GetData<uint32_t>();
         uint32_t remainSize = size - g_baseFuzzPos;
         len = (len > remainSize) ? remainSize : len;
  
-        switch(type) {
+        switch (type) {
             case OEM_AUTH_STATUS_FUZZ:
                 (void)OEMWriteAuthStatus((char *)(data + g_baseFuzzPos), len);
                 break;
@@ -94,21 +92,10 @@ namespace OHOS {
         }
 
         char randomId  = (GetData<char>() % INTERFACE_NUM);
-        switch(randomId) {
-            case 0:
-                OEMWriteTicketData(data, size);
-                break;
-            case 1:
-                OEMWriteData(data, size, OEM_AUTH_STATUS_FUZZ);
-                break;
-            case 2:
-                OEMWriteData(data, size, OEM_NETWORK_CONFIG_FUZZ);
-                break;
-            case 3:
-                OEMWriteData(data, size, OEM_AUTH_RESULT_CODE_FUZZ);
-                break;
-            default:
-                break;
+        if (randomId == OEM_TICKET_FUZZ) {
+            OEMWriteTicketData(data, size);
+        } else {
+            OEMWriteData(data, size, randomId);
         }
         return;
     }

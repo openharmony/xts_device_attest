@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <securec.h>
 #include "attest_type.h"
 #include "attest_utils_list.h"
 #include "attest_utils_log.h"

@@ -88,7 +88,7 @@ bool DevAttestService::Init()
     if (!registerToSa_) {
         bool ret = Publish(this);
         if (!ret) {
-            HILOGE("[OnStart] DevAttestService Init Publish failed");
+            HILOGE("[Init] DevAttestService Init Publish failed");
             return false;
         }
         registerToSa_ = true;

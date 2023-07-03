@@ -15,21 +15,19 @@
 
 #include "devattest_system_ability_listener.h"
 
-#include "net_conn_client.h"
-#include "system_ability_definition.h"
 #include "iservice_registry.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
-#include "devattest_network_callback.h"
 #include "devattest_network_manager.h"
 
 namespace OHOS {
 namespace DevAttest {
-using namespace NetManagerStandard;
-
+constexpr std::int32_t COMM_NET_CONN_MANAGER_SA_ID = 1151;
+constexpr std::int32_t FIRST_SA_ID = 0x00000001;
+constexpr std::int32_t LAST_SA_ID = 0x00ffffff;
 void DevAttestSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    if (systemAbilityId == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
+    if (systemAbilityId == COMM_NET_CONN_MANAGER_SA_ID) {
         (void)DelayedSingleton<DevAttestNetworkManager>::GetInstance()->RegisterNetConnCallback();
     } else {
         HILOGW("[OnAddSystemAbility] Do Nothing");
@@ -87,7 +85,7 @@ bool DevAttestSystemAbilityListener::RemoveDevAttestSystemAbilityListener(int32_
 
 bool DevAttestSystemAbilityListener::CheckInputSysAbilityId(int32_t systemAbilityId)
 {
-    return (systemAbilityId >= FIRST_SYS_ABILITY_ID) && (systemAbilityId <= LAST_SYS_ABILITY_ID);
+    return (systemAbilityId >= FIRST_SA_ID) && (systemAbilityId <= LAST_SA_ID);
 }
 } // DevAttest
 } // OHOS

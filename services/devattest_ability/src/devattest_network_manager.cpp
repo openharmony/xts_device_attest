@@ -15,8 +15,6 @@
 
 #include "devattest_network_manager.h"
 
-#include <thread>
-#include <cstdint>
 #include "net_conn_client.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
@@ -38,13 +36,13 @@ void DevAttestNetworkManager::RegisterNetConnCallback(void)
     }
     std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
     if (netManager == nullptr) {
-        HILOGE("[OnAddSystemAbility] Failed to init NetConnClient.");
+        HILOGE("[RegisterNetConnCallback] Failed to init NetConnClient.");
         return;
     }
 
     int32_t ret = netManager->RegisterNetConnCallback(netCallback_);
     if (ret != NETMANAGER_SUCCESS) {
-        HILOGE("[OnAddSystemAbility] RegisterNetConnCallback failed.");
+        HILOGE("[RegisterNetConnCallback] RegisterNetConnCallback failed.");
         return;
     }
 }
@@ -56,13 +54,13 @@ void DevAttestNetworkManager::UnregisterNetConnCallback(void)
     }
     std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
     if (netManager == nullptr) {
-        HILOGE("[OnAddSystemAbility] Failed to init NetConnClient.");
+        HILOGE("[UnregisterNetConnCallback] Failed to init NetConnClient.");
         return;
     }
 
     int32_t ret = netManager->UnregisterNetConnCallback(netCallback_);
     if (ret != NETMANAGER_SUCCESS) {
-        HILOGE("[OnAddSystemAbility] RegisterNetConnCallback failed.");
+        HILOGE("[UnregisterNetConnCallback] RegisterNetConnCallback failed.");
         return;
     }
 }

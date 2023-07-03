@@ -15,12 +15,10 @@
 
 #include "devattest_notification_publish.h"
 
-#include <cstdint>
 #include <securec.h>
 #include "notification_helper.h"
 #include "notification_content.h"
 #include "notification_request.h"
-#include "system_ability_definition.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
 #include "locale_config.h"
@@ -35,6 +33,7 @@ using namespace OHOS::EventFwk;
 using namespace std;
 using namespace AppExecFwk;
 
+constexpr std::int32_t BUNDLE_MGR_SERVICE_SA_ID = 401;
 constexpr std::int32_t INVALID_UID = -1;
 constexpr std::int32_t LOCALE_ITEM_SIZE = 5;
 constexpr std::int32_t PARAM_THREE = 3;
@@ -131,7 +130,7 @@ sptr<IBundleMgr> DevAttestNotificationPublish::GetBundleMgr(void)
         HILOGE("[GetBundleMgr] get systemAbilityManager failed");
         return nullptr;
     }
-    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SA_ID);
     if (remoteObject == nullptr) {
         HILOGE("[GetBundleMgr] get remoteObject failed");
         return nullptr;

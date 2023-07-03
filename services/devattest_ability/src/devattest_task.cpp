@@ -18,7 +18,6 @@
 #include <pthread.h>
 #include "iservice_registry.h"
 #include "singleton.h"
-#include "system_ability_definition.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
 #include "devattest_notification_publish.h"
@@ -27,6 +26,8 @@
 namespace OHOS {
 namespace DevAttest {
 using namespace OHOS;
+
+constexpr std::int32_t SA_ID_DEVICE_ATTEST_SERVICE = 5501;
 const char* ATTEST_RUN_TASK_ID = "attest_run";
 DevAttestTask::DevAttestTask()
 {
@@ -70,7 +71,7 @@ void DevAttestTask::UnloadTask(void)
         HILOGE("get samgr failed");
         return;
     }
-    int32_t ret = samgrProxy->UnloadSystemAbility(DEVICE_ATTEST_PROFILE_SA_ID);
+    int32_t ret = samgrProxy->UnloadSystemAbility(SA_ID_DEVICE_ATTEST_SERVICE);
     if (ret != DEVATTEST_SUCCESS) {
         HILOGE("remove system ability failed");
         return;

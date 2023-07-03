@@ -24,7 +24,7 @@
         "safwk",
         "samgr",
         "ipc",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "c_utils",
         "napi",
         "resource_management",

@@ -41,24 +41,12 @@ ohos_fuzztest("DevattestNetworkCallbackFuzzTest") {
   ]
 
   sources = [
-    # "${devattest_path}/common/permission/src/permission.cpp",
     "${devattest_path}/services/devattest_ability/src/devattest_network_callback.cpp",
-
-    # "${devattest_path}/services/devattest_ability/src/devattest_network_manager.cpp",
     "${devattest_path}/services/devattest_ability/src/devattest_notification_publish.cpp",
     "devattestnetworkcallback_fuzzer.cpp",
-
-    # "${devattest_path}/services/devattest_ability/src/devattest_service.cpp",
-    # "${devattest_path}/services/devattest_ability/src/devattest_service_stub.cpp",
-    # "${devattest_path}/services/devattest_ability/src/devattest_system_ability_listener.cpp",
-    # "${devattest_path}/services/devattest_ability/src/devattest_task.cpp",
-    # "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
   ]
 
-  deps = [
-    # "${devattest_path}/services/devattest_ability:devattest_service",
-    "${devattest_path}/services/core:devattest_core",
-  ]
+  deps = [ "${devattest_path}/services/core:devattest_core" ]
 
   external_deps = [
     "ability_base:zuri",

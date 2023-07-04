@@ -17,7 +17,6 @@
 
 #include <securec.h>
 #include "singleton.h"
-#include "devattest_notification_publish.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
 #include "attest_entry.h"
@@ -64,7 +63,6 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
             case NET_CAPABILITY_VALIDATED:
                 HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
                 (void)AttestTask();
-                DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
                 break;
             case NET_CAPABILITY_CAPTIVE_PORTAL:
                 HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_CAPTIVE_PORTAL start");

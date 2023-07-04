@@ -25,9 +25,6 @@ bool OEMIsFlagExist(OEM_FLAG_TYPE type)
         case OEM_FLAG_RESET:
             result = IsFileExist(AUTH_RESULT_PATH, RESET_FLAG_FILE_NAME);
             break;
-        case OEM_FLAG_PUBLISH:
-            result = IsFileExist(AUTH_RESULT_PATH, PUBLISH_FLAG_FILE_NAME);
-            break;
         default:
             break;
     }
@@ -41,9 +38,6 @@ int32_t OEMCreateFlag(OEM_FLAG_TYPE type)
     switch (type) {
         case OEM_FLAG_RESET:
             result = CreateFile(AUTH_RESULT_PATH, RESET_FLAG_FILE_NAME);
-            break;
-        case OEM_FLAG_PUBLISH:
-            result = CreateFile(AUTH_RESULT_PATH, PUBLISH_FLAG_FILE_NAME);
             break;
         default:
             break;

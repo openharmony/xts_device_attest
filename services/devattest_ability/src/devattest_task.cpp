@@ -20,7 +20,6 @@
 #include "singleton.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"
-#include "devattest_notification_publish.h"
 #include "attest_entry.h"
 
 namespace OHOS {
@@ -58,7 +57,6 @@ void* DevAttestTask::Run(void* arg)
 {
     (void)pthread_setname_np(pthread_self(), ATTEST_RUN_TASK_ID); // set pthread name, at most 15 bytes.
     (void)AttestTask();
-    DelayedSingleton<DevAttestNotificationPublish>::GetInstance()->PublishNotification();
     UnloadTask();
     HILOGI("Thread exited...");
     return nullptr;

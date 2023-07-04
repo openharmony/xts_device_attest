@@ -123,8 +123,10 @@ int DevAttestClient::GetAttestStatus(AttestResultInfo &attestResultInfo)
     int ret = attestClientInterface->GetAttestStatus(attestResultInfo);
     if (ret != DEVATTEST_SUCCESS) {
         HILOGE("[GetAttestStatus] DevAttestClient failed ret = %{public}d", ret);
+        LoadSystemAbilityFail();
         return ret;
     }
+    LoadSystemAbilityFail();
     return DEVATTEST_SUCCESS;
 }
 }

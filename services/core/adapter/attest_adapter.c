@@ -100,15 +100,3 @@ int32_t AttestReadAuthResultCode(char* buffer, uint32_t bufferLen)
 {
     return OEMReadAuthResultCode(buffer, bufferLen);
 }
-
-// 是否存在已发布标记
-bool AttestIsPublishFlagExist(void)
-{
-    return OEMIsFlagExist(OEM_FLAG_PUBLISH);
-}
-
-// 创建已发布标记
-int32_t AttestCreatePublishFlag(void)
-{
-    return OEMCreateFlag(OEM_FLAG_PUBLISH);
-}

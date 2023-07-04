@@ -38,12 +38,12 @@
         "i18n",
         "relational_store",
         "init",
-        "eventhandler",
-        "dsoftbus"
+        "eventhandler"
       ],
       "third_party": [
         "cJSON",
-        "openssl"
+        "openssl",
+        "mbedtls"
       ]
     },
     "build": {

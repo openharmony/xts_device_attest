@@ -16,6 +16,8 @@
 #ifndef ATTEST_ADAPTER_OEM_H
 #define ATTEST_ADAPTER_OEM_H
 
+#include "attest_type.h"
+
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {

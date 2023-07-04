@@ -53,6 +53,7 @@ int DevAttestServiceStub::OnRemoteRequest(uint32_t code,
 
 int DevAttestServiceStub::GetAttestStatusInner(MessageParcel& data, MessageParcel& reply)
 {
+    (void)data;
     if (!DelayedSingleton<Permission>::GetInstance()->IsSystem()) {
         HILOGE("[GetAttestStatusInner] not a system");
         if (!reply.WriteInt32(DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP)) {

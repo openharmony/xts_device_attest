@@ -18,12 +18,15 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 module_output_path = "devattest/devattest_ability"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DevattestFuzzTest") {
+ohos_fuzztest("DevattestServiceStubFuzzTest") {
   module_out_path = module_output_path
 
   fuzz_config_file = "."
 
-  include_dirs = [ "${devattest_innerkit_path}/native_cpp/include" ]
+  include_dirs = [
+    "${devattest_innerkit_path}/native_cpp/include",
+    "${devattest_path}/services/devattest_ability/include",
+  ]
 
   cflags = [
     "-g",
@@ -32,9 +35,9 @@ ohos_fuzztest("DevattestFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "devattest_fuzzer.cpp" ]
+  sources = [ "devattestservicestub_fuzzer.cpp" ]
 
-  deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
+  deps = [ "${devattest_path}/services/devattest_ability:devattest_service" ]
 
   external_deps = [
     "c_utils:utils",

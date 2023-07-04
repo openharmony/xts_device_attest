@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "attest_type.h"
+
 #include "attest_utils_log.h"
 #include "attest_adapter_oem.h"
 #include "attest_adapter_os.h"

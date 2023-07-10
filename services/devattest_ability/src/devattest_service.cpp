@@ -115,6 +115,14 @@ int32_t DevAttestService::OnIdle(const SystemAbilityOnDemandReason& idleReason)
 void DevAttestService::DelayUnloadTask(void)
 {
     HILOGI("delay unload task begin");
+    if (unloadHandler_ == nullptr) {
+        shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(ATTEST_UNLOAD_TASK_ID);
+        unloadHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    }
+    if (unloadHandler_ == nullptr) {
+        HILOGE("unloadHandler is null");
+        return;
+    }
     auto task = []() {
         sptr<ISystemAbilityManager> samgrProxy =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();

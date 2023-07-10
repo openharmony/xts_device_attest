@@ -59,6 +59,7 @@
       ],
       "test": [
         "//test/xts/device_attest/test/fuzztest:fuzztest",
+        "//test/xts/device_attest/test/performancetest:performance",
         "//test/xts/device_attest/test/unittest:unittest"
       ]
     }

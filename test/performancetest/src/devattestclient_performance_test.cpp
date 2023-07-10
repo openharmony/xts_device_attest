@@ -31,6 +31,7 @@ using namespace OHOS::DevAttest;
 namespace {
 static const int SA_ID_DEVICE_ATTEST_SERVICE = 5501;
 static const int PERFORMANCE_TEST_REPEAT_TIMES = 2000;
+static const int MS_PER_SECOND = 1000;
 static const long long PERFORMANCE_TEST_MAX_UNWIND_TIME_MS = 10;
 static long long phaseConsumeTimeArray[static_cast<int>(AttestPhaseType::ATTEST_PHASE_MAX_TYPE)] = {0};
 
@@ -38,7 +39,7 @@ long long GetSysTime()
 {
     struct timeb t;
     ftime(&t);
-    return 1000*t.time + t.millitm;
+    return MS_PER_SECOND * t.time + t.millitm;
 }
 
 void SetPhaseConsumeTime(AttestPhaseType type, long long time)
@@ -144,9 +145,7 @@ HWTEST_F (DevAttestClientPerformanceTest, CheckSystemAbilityTest001, TestSize.Le
 {
     sptr<ISystemAbilityManager> samgrProxy;
     long long startTime = GetSysTime();
-    // for (int i = 0; i < PERFORMANCE_TEST_REPEAT_TIMES; i++) {
-        samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    // }
+    samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     long long endTime = GetSysTime();
     long long diffTime = (endTime - startTime);
     ASSERT_NE(nullptr, samgrProxy);

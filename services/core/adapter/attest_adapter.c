@@ -76,7 +76,7 @@ bool AttestNetworkConfigExist(void)
     return OEMIsNetworkConfigExist();
 }
 
-int32_t AttestWriteNetworkConfig(char* buffer, uint32_t bufferLen)
+int32_t AttestWriteNetworkConfig(const char* buffer, uint32_t bufferLen)
 {
     return OEMWriteNetworkConfig(buffer, bufferLen);
 }

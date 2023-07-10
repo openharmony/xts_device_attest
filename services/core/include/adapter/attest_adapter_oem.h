@@ -53,7 +53,7 @@ bool OEMIsFlagExist(OEM_FLAG_TYPE type);
 
 bool OEMIsNetworkConfigExist(void);
 
-int32_t OEMWriteNetworkConfig(char* buffer, uint32_t bufferLen);
+int32_t OEMWriteNetworkConfig(const char* buffer, uint32_t bufferLen);
 
 int32_t OEMReadNetworkConfig(char* buffer, uint32_t bufferLen);
 

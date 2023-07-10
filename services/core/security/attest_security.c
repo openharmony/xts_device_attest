@@ -23,10 +23,10 @@
 #include "attest_adapter.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"
-#include "attest_security.h"
 #include "hks_api.h"
 #include "hks_param.h"
 #include "hks_type.h"
+#include "attest_security.h"
 
 const uint32_t IV_SIZE = 16;
 uint8_t IV[16] = {0};
@@ -254,7 +254,7 @@ static int32_t InitHksParamSet(struct HksParamSet** paramSet, const struct HksPa
     return ret;
 }
 
-static int32_t DecryptHksImpl(struct HksBlob *cipherText, struct HksBlob *keyAlias, uint8_t *outputData, size_t outputDataLen)
+static int32_t DecryptHksImpl(struct HksBlob *cipherText, struct HksBlob *keyAlias, uint8_t *outData, size_t outDataLen)
 {
     struct HksParamSet *decryptParamSet = NULL;
     int32_t ret = InitHksParamSet(&decryptParamSet, g_decryptParams, sizeof(g_decryptParams) / sizeof(struct HksParam));
@@ -270,7 +270,7 @@ static int32_t DecryptHksImpl(struct HksBlob *cipherText, struct HksBlob *keyAli
         HksFreeParamSet(&decryptParamSet);
         return ATTEST_ERR;
     }
-    ret = memcpy_s(outputData, outputDataLen, plainText.data, (int)plainText.size);
+    ret = memcpy_s(outData, outDataLen, plainText.data, (int)plainText.size);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHksImpl] copy result failed");
         HksFreeParamSet(&decryptParamSet);
@@ -406,7 +406,7 @@ static int32_t DecryptAesCbc(AesCryptBufferDatas* datas, const uint8_t* aesKey,
     return ret;
 }
 
-static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, uint8_t* outputData, size_t outputDataLen)
+static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, uint8_t* outData, size_t outDataLen)
 {
     struct HksParamSet *encryptParamSet = NULL;
     int32_t ret = InitHksParamSet(&encryptParamSet, g_encryptParams, sizeof(g_encryptParams) / sizeof(struct HksParam));
@@ -426,18 +426,17 @@ static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, 
     uint8_t base64Data[BASE64_LEN + 1] = {0};
     ret = mbedtls_base64_encode(base64Data, sizeof(base64Data), &outputLen,
                                 (const uint8_t*)cipherText.data, (size_t)cipherText.size);
-    
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHksImpl] Base64 encode symbol info failed, ret = -0x00%x", -ret);
         HksFreeParamSet(&encryptParamSet);
         return ret;
     }
-    if (outputLen > outputDataLen) {
+    if (outputLen > outDataLen) {
         ATTEST_LOG_ERROR("[EncryptHksImpl] output Len is wrong length");
         HksFreeParamSet(&encryptParamSet);
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
-    ret = memcpy_s(outputData, outputDataLen, base64Data, outputLen);
+    ret = memcpy_s(outData, outDataLen, base64Data, outputLen);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHksImpl] Encrypt memcpy_s failed, ret = %d", ret);
         HksFreeParamSet(&encryptParamSet);
@@ -446,7 +445,7 @@ static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, 
     return ret;
 }
 
-int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData, size_t outputDataLen) 
+int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData, size_t outputDataLen)
 {
     if ((inputData == NULL) || (inputDataLen == 0) || (outputData == NULL)) {
         ATTEST_LOG_ERROR("[EncryptHks] EncryptHks Invalid parameter");

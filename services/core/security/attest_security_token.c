@@ -70,13 +70,14 @@ static int32_t GetDecryptedTokenValue(TokenInfo* tokenInfo, uint8_t* tokenValue,
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
 
-    int32_t ret = DecryptHks((const uint8_t*)tokenInfo->tokenValue, sizeof(tokenInfo->tokenValue), tokenValue, tokenValueLen);
+    int32_t ret = DecryptHks((const uint8_t*)tokenInfo->tokenValue, sizeof(tokenInfo->tokenValue),
+                             tokenValue, tokenValueLen);
     if (ret == ATTEST_OK) {
         ATTEST_LOG_INFO("[GetDecryptedTokenValue] Decrypt token value using Huks success!");
         return ret;
     }
     ATTEST_LOG_ERROR("[GetDecryptedTokenValue] DecryptHks failed");
-    
+
     ret = TransTokenVersion(tokenInfo->version, sizeof(tokenInfo->version));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetDecryptedTokenValue] Update token version failed, ret = %d", ret);

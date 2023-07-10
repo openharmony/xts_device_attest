@@ -74,7 +74,8 @@ int32_t ReadTicketFromDevice(char* ticket, uint8_t ticketLen)
         return ATTEST_ERR;
     }
     uint8_t decryptedTicket[MAX_TICKET_LEN + 1] = {0};
-    int32_t ret = DecryptHks((const uint8_t*)ticketInfo.ticket, sizeof(ticketInfo.ticket), decryptedTicket, MAX_TICKET_LEN);
+    int32_t ret = DecryptHks((const uint8_t*)ticketInfo.ticket, sizeof(ticketInfo.ticket),
+                             decryptedTicket, MAX_TICKET_LEN);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ReadTicketFromDevice] ticket DcryptHks failed");
         return ATTEST_ERR;

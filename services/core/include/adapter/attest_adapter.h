@@ -73,7 +73,7 @@ int32_t AttestGetParameter(const char *key, const char *def, char *value, uint32
 
 bool AttestNetworkConfigExist(void);
 
-int32_t AttestWriteNetworkConfig(char* buffer, uint32_t bufferLen);
+int32_t AttestWriteNetworkConfig(const char* buffer, uint32_t bufferLen);
 
 int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen);
 

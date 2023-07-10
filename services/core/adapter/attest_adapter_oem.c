@@ -102,7 +102,7 @@ bool OEMIsNetworkConfigExist(void)
 }
 
 // 写入网络配置信息
-int32_t OEMWriteNetworkConfig(char* buffer, uint32_t bufferLen)
+int32_t OEMWriteNetworkConfig(const char* buffer, uint32_t bufferLen)
 {
     if (CreateFile(AUTH_RESULT_PATH, NETWORK_CONFIG_FILE_NAME) != 0) {
         return ATTEST_ERR;

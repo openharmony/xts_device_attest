@@ -70,7 +70,14 @@ static int32_t GetDecryptedTokenValue(TokenInfo* tokenInfo, uint8_t* tokenValue,
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
 
-    int32_t ret = TransTokenVersion(tokenInfo->version, sizeof(tokenInfo->version));
+    int32_t ret = DecryptHks((const uint8_t*)tokenInfo->tokenValue, sizeof(tokenInfo->tokenValue), tokenValue, tokenValueLen);
+    if (ret == ATTEST_OK) {
+        ATTEST_LOG_INFO("[GetDecryptedTokenValue] Decrypt token value using Huks success!");
+        return ret;
+    }
+    ATTEST_LOG_ERROR("[GetDecryptedTokenValue] DecryptHks failed");
+    
+    ret = TransTokenVersion(tokenInfo->version, sizeof(tokenInfo->version));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetDecryptedTokenValue] Update token version failed, ret = %d", ret);
         return ret;
@@ -102,7 +109,14 @@ static int32_t GetTokenIdDecrypted(TokenInfo* tokenInfo, uint8_t* tokenId, uint8
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
 
-    int32_t ret = TransTokenVersion(tokenInfo->version, sizeof(tokenInfo->version));
+    int32_t ret = DecryptHks((const uint8_t*)tokenInfo->tokenId, sizeof(tokenInfo->tokenId), tokenId, tokenIdLen);
+    if (ret == ATTEST_OK) {
+        ATTEST_LOG_INFO("[GetTokenIdDecrypted] Decrypt token value using Huks success!");
+        return ret;
+    }
+    ATTEST_LOG_ERROR("[GetTokenIdDecrypted] DecryptHks failed");
+
+    ret = TransTokenVersion(tokenInfo->version, sizeof(tokenInfo->version));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenIdDecrypted] Update token version failed, ret = %d", ret);
         return ret;
@@ -130,7 +144,7 @@ static int32_t GetTokenIdDecrypted(TokenInfo* tokenInfo, uint8_t* tokenId, uint8
     return ret;
 }
 
-static int32_t EncryptTokenValueToTokenInfo(const char* data, uint8_t dataLen, uint8_t* aesKey, TokenInfo* tokenInfo)
+static int32_t EncryptTokenValueToTokenInfo(const char* data, uint8_t dataLen, TokenInfo* tokenInfo)
 {
     ATTEST_LOG_DEBUG("[EncryptTokenValueToTokenInfo] Begin.");
     if ((data == NULL) || (tokenInfo == NULL)) {
@@ -146,9 +160,9 @@ static int32_t EncryptTokenValueToTokenInfo(const char* data, uint8_t dataLen, u
     }
 
     uint8_t encryptedTokenData[TOKEN_VALUE_ENCRYPT_LEN] = {0};
-    ret = Encrypt(tokenData, dataLen, aesKey, encryptedTokenData, sizeof(encryptedTokenData));
+    ret = EncryptHks(tokenData, dataLen, encryptedTokenData, sizeof(encryptedTokenData));
     if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[EncryptTokenValueToTokenInfo] Encrypt token value failed, ret = %d", ret);
+        ATTEST_LOG_ERROR("[EncryptTokenValueToTokenInfo] EncryptHks token value failed, ret = %d", ret);
         return ret;
     }
 
@@ -163,7 +177,7 @@ static int32_t EncryptTokenValueToTokenInfo(const char* data, uint8_t dataLen, u
     return ATTEST_OK;
 }
 
-static int32_t EncryptTokenIdToTokenInfo(const char* data, uint8_t dataLen, uint8_t* aesKey, TokenInfo* tokenInfo)
+static int32_t EncryptTokenIdToTokenInfo(const char* data, uint8_t dataLen, TokenInfo* tokenInfo)
 {
     ATTEST_LOG_DEBUG("[EncryptTokenIdToTokenInfo] Begin.");
     if ((data == NULL) || (tokenInfo == NULL)) {
@@ -179,9 +193,9 @@ static int32_t EncryptTokenIdToTokenInfo(const char* data, uint8_t dataLen, uint
     }
 
     uint8_t encryptedTokenData[TOKEN_ID_ENCRYPT_LEN] = {0};
-    ret = Encrypt(tokenData, dataLen, aesKey, encryptedTokenData, sizeof(encryptedTokenData));
+    ret = EncryptHks(tokenData, dataLen, encryptedTokenData, sizeof(encryptedTokenData));
     if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[EncryptTokenIdToTokenInfo] Encrypt token value failed, ret = %d", ret);
+        ATTEST_LOG_ERROR("[EncryptTokenIdToTokenInfo] EncryptHks token value failed, ret = %d", ret);
         return ret;
     }
 
@@ -205,22 +219,13 @@ static int32_t GetTokenInfo(const char* tokenValue, uint8_t tokenValueLen,
     }
     uint8_t salt[SALT_LEN] = {0};
     GetSalt(salt, SALT_LEN);
-    uint8_t aesKey[AES_KEY_LEN] = {0};
-    SecurityParam saltParam = {salt, SALT_LEN};
-    SecurityParam aesKeyParam = {aesKey, sizeof(aesKey)};
-    VersionData versionData = {g_tokenVersion, sizeof(g_tokenVersion)};
-    int32_t ret = GetAesKey(&saltParam, &versionData, &aesKeyParam);
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[GetTokenInfo] Generate AES key failed, ret = %d", ret);
-        return ret;
-    }
     // Encrypt tokenId and tokenValue to tokenInfo
-    ret = EncryptTokenIdToTokenInfo(tokenId, tokenIdLen, aesKey, tokenInfo);
+    int32_t ret = EncryptTokenIdToTokenInfo(tokenId, tokenIdLen, tokenInfo);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenInfo] Encrypt token value or token id failed, ret = %d", ret);
         return ret;
     }
-    ret = EncryptTokenValueToTokenInfo(tokenValue, tokenValueLen, aesKey, tokenInfo);
+    ret = EncryptTokenValueToTokenInfo(tokenValue, tokenValueLen, tokenInfo);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenInfo] Encrypt TokenValue To TokenInfo failed");
         return ret;

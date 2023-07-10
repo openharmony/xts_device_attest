@@ -67,13 +67,13 @@ namespace OHOS {
  
         switch (type) {
             case OEM_AUTH_STATUS_FUZZ:
-                (void)OEMWriteAuthStatus((char *)(data + g_baseFuzzPos), len);
+                (void)OEMWriteAuthStatus(reinterpret_cast<const char *>(data + g_baseFuzzPos), len);
                 break;
             case OEM_NETWORK_CONFIG_FUZZ:
-                (void)OEMWriteNetworkConfig((char *)(data + g_baseFuzzPos), len);
+                (void)OEMWriteNetworkConfig(reinterpret_cast<const char *>(data + g_baseFuzzPos), len);
                 break;
             case OEM_AUTH_RESULT_CODE_FUZZ:
-                (void)OEMWriteAuthResultCode((char *)(data + g_baseFuzzPos), len);
+                (void)OEMWriteAuthResultCode(reinterpret_cast<const char *>(data + g_baseFuzzPos), len);
                 break;
             default:
                 break;

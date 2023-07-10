@@ -17,7 +17,6 @@
 
 #include <string>
 #include <unistd.h>
-// #include <vector>
 #include <securec.h>
 #include <sys/timeb.h>
 #include "singleton.h"
@@ -30,13 +29,14 @@ using namespace testing::ext;
 using namespace OHOS::DevAttest;
 namespace {
 static const int PERFORMANCE_TEST_REPEAT_TIMES = 2000;
+static const int MS_PER_SECOND = 1000;
 static long long phaseConsumeTimeArray[static_cast<int>(AttestPhaseType::ATTEST_PHASE_MAX_TYPE)] = {0};
 
 long long GetSysTime()
 {
     struct timeb t;
     ftime(&t);
-    return 1000*t.time + t.millitm;
+    return MS_PER_SECOND * t.time + t.millitm;
 }
 
 void SetPhaseConsumeTime(AttestPhaseType type, long long time)
@@ -103,7 +103,8 @@ HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest001, TestSize.Leve
     startTime = GetSysTime();
     for (int i = 0; i < PERFORMANCE_TEST_REPEAT_TIMES; i++) {
         datas.WriteInterfaceToken(DevAttestServiceStub::GetDescriptor());
-        ret = DelayedSingleton<DevAttestService>::GetInstance()->OnRemoteRequest(DevAttestInterface::GET_AUTH_RESULT, datas, reply, option);
+        ret = DelayedSingleton<DevAttestService>::GetInstance()->OnRemoteRequest(
+            DevAttestInterface::GET_AUTH_RESULT, datas, reply, option);
     }
     endTime = GetSysTime();
     long long diffTime = ((endTime - startTime) - diffTimeForWritingtoken);

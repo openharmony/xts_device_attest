@@ -67,8 +67,9 @@ void GetSalt(uint8_t* salt, uint32_t saltLen);
 
 int32_t GetAesKey(const SecurityParam* salt, const VersionData* versionData,  const SecurityParam* aesKey);
 
-int32_t Encrypt(uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
-                uint8_t* outputData, size_t outputDataLen);
+int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData, size_t outputDataLen);
+
+int32_t DecryptHks(const uint8_t *inputData, size_t inputDataLen, uint8_t *outputData, size_t outputDataLen);
 
 int32_t Decrypt(const uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
                 uint8_t* outputData, size_t outputDataLen);

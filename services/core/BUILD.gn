@@ -74,8 +74,6 @@ ohos_shared_library("devattest_core") {
 
   external_deps = core_external_deps
 
-  external_deps += [ "huks:libhukssdk" ]
-
   subsystem_name = "xts"
   part_name = "device_attest"
 }

@@ -445,7 +445,7 @@ static int32_t EncryptHksImpl(struct HksBlob *inData, uint8_t* outputData, size_
     return ret;
 }
 
-int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData, size_t outputDataLen) 
+int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData, size_t outputDataLen)
 {
     if ((inputData == NULL) || (inputDataLen == 0) || (outputData == NULL) || (outputDataLen == 0)) {
         ATTEST_LOG_ERROR("[EncryptHks] EncryptHks Invalid parameter");

@@ -65,4 +65,5 @@ core_external_deps = [
   "hilog:libhilog",
   "init:libbegetutil",
   "syscap_codec:syscap_interface_shared",
+  "huks:libhukssdk",
 ]

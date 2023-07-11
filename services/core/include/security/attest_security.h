@@ -40,6 +40,10 @@ extern "C" {
 #define PSK_LEN 16
 #define AES_KEY_LEN 32
 
+//Hks相关
+#define HKS_ENCRYPT_LEN 1024
+#define HKS_DECRYPT_LEN 1024
+
 #define TOKEN_VER0_0 "1000"
 #define TOKEN_VER1_0 "1100"
 

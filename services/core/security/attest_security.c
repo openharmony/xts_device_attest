@@ -30,6 +30,7 @@
 
 const uint32_t IV_SIZE = 16;
 uint8_t IV[16] = {0};
+static struct HksBlob g_attestKeyAlias = { sizeof("xts_device_attest"), (uint8_t *)"xts_device_attest"};
 static struct HksParam g_genParams[] = {
     {
         .tag = HKS_TAG_ALGORITHM,
@@ -102,6 +103,7 @@ static struct HksParam g_decryptParams[] = {
         }
     }
 };
+
 // g_pskKey 和 g_encryptedPsk 是psk的计算因子，通过相关算法获取解码需要的psk。
 // psk不能直接硬编码，因此设计两个计算因子。
 uint8_t g_pskKey[BASE64_PSK_LENGTH] = {
@@ -254,7 +256,7 @@ static int32_t InitHksParamSet(struct HksParamSet** paramSet, const struct HksPa
     return ret;
 }
 
-static int32_t DecryptHksImpl(struct HksBlob *cipherText, struct HksBlob *keyAlias, uint8_t *outData, size_t outDataLen)
+static int32_t DecryptHksImpl(struct HksBlob *cipherText, uint8_t *outputData, size_t outputDataLen)
 {
     struct HksParamSet *decryptParamSet = NULL;
     int32_t ret = InitHksParamSet(&decryptParamSet, g_decryptParams, sizeof(g_decryptParams) / sizeof(struct HksParam));
@@ -262,15 +264,15 @@ static int32_t DecryptHksImpl(struct HksBlob *cipherText, struct HksBlob *keyAli
         ATTEST_LOG_ERROR("[DecryptHksImpl] InitHksParamSet g_decryptParams failed");
         return ATTEST_ERR;
     }
-    uint8_t tmpOut1[1024] = {0};
-    struct HksBlob plainText = { 1024, tmpOut1 };
-    ret = HksDecrypt(keyAlias, decryptParamSet, cipherText, &plainText);
+    uint8_t tmpOut1[HKS_DECRYPT_LEN] = {0};
+    struct HksBlob plainText = { HKS_DECRYPT_LEN, tmpOut1 };
+    ret = HksDecrypt(&g_attestKeyAlias, decryptParamSet, cipherText, &plainText);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHksImpl] HksDecrypt failed");
         HksFreeParamSet(&decryptParamSet);
         return ATTEST_ERR;
     }
-    ret = memcpy_s(outData, outDataLen, plainText.data, (int)plainText.size);
+    ret = memcpy_s(outputData, outputDataLen, plainText.data, (int)plainText.size);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHksImpl] copy result failed");
         HksFreeParamSet(&decryptParamSet);
@@ -281,22 +283,20 @@ static int32_t DecryptHksImpl(struct HksBlob *cipherText, struct HksBlob *keyAli
 
 int32_t DecryptHks(const uint8_t *inputData, size_t inputDataLen, uint8_t *outputData, size_t outputDataLen)
 {
-    if ((inputData == NULL) || (inputDataLen == 0) || (outputData == NULL)) {
+    if ((inputData == NULL) || (inputDataLen == 0) || (outputData == NULL) || (outputDataLen == 0)) {
         ATTEST_LOG_ERROR("[DecryptHks] DecryptHks Invalid parameter");
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
-    char tmpKeyAlias[] = "xts_device_attest";
-    struct HksBlob keyAlias = { (uint32_t)strlen(tmpKeyAlias), (uint8_t *)tmpKeyAlias};
-    struct HksParamSet *genParamSet = NULL;
-    int32_t ret = InitHksParamSet(&genParamSet, g_genParams, sizeof(g_genParams) / sizeof(struct HksParam));
+    struct HksParamSet *genParamSetDecrypt = NULL;
+    int32_t ret = InitHksParamSet(&genParamSetDecrypt, g_genParams, sizeof(g_genParams) / sizeof(struct HksParam));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHks] InitHksParamSet g_genParams failed");
         return ATTEST_ERR;
     }
-    ret = HksKeyExist(&keyAlias, genParamSet);
+    ret = HksKeyExist(&g_attestKeyAlias, genParamSetDecrypt);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHks] Hks key doesn't exist");
-        HksFreeParamSet(&genParamSet);
+        HksFreeParamSet(&genParamSetDecrypt);
         return ATTEST_ERR;
     }
     size_t base64Len = 0;
@@ -304,14 +304,14 @@ int32_t DecryptHks(const uint8_t *inputData, size_t inputDataLen, uint8_t *outpu
     ret = mbedtls_base64_decode(encryptData, sizeof(encryptData), &base64Len, inputData, inputDataLen);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHks] Base64 decode symbol info failed, ret = %d", ret);
-        HksFreeParamSet(&genParamSet);
+        HksFreeParamSet(&genParamSetDecrypt);
         return ERR_ATTEST_SECURITY_BASE64_DECODE;
     }
     struct HksBlob cipherText = { sizeof(encryptData), encryptData };
-    ret = DecryptHksImpl(&cipherText, &keyAlias, outputData, outputDataLen);
+    ret = DecryptHksImpl(&cipherText, outputData, outputDataLen);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHks] DecryptHksImpl failed");
-        HksFreeParamSet(&genParamSet);
+        HksFreeParamSet(&genParamSetDecrypt);
         return ATTEST_ERR;
     }
     return ret;
@@ -406,7 +406,7 @@ static int32_t DecryptAesCbc(AesCryptBufferDatas* datas, const uint8_t* aesKey,
     return ret;
 }
 
-static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, uint8_t* outData, size_t outDataLen)
+static int32_t EncryptHksImpl(struct HksBlob *inData, uint8_t* outputData, size_t outputDataLen)
 {
     struct HksParamSet *encryptParamSet = NULL;
     int32_t ret = InitHksParamSet(&encryptParamSet, g_encryptParams, sizeof(g_encryptParams) / sizeof(struct HksParam));
@@ -414,9 +414,9 @@ static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, 
         ATTEST_LOG_ERROR("[EncryptHksImpl] InitHksParamSet g_encryptParams failed");
         return ATTEST_ERR;
     }
-    uint8_t tmpOut[1024] = {0};
-    struct HksBlob cipherText = { 1024, tmpOut };
-    ret = HksEncrypt(keyAlias, encryptParamSet, inData, &cipherText);
+    uint8_t tmpOut[HKS_ENCRYPT_LEN] = {0};
+    struct HksBlob cipherText = { HKS_ENCRYPT_LEN, tmpOut };
+    ret = HksEncrypt(&g_attestKeyAlias, encryptParamSet, inData, &cipherText);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHksImpl] HksEncrypt failed");
         HksFreeParamSet(&encryptParamSet);
@@ -431,12 +431,12 @@ static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, 
         HksFreeParamSet(&encryptParamSet);
         return ret;
     }
-    if (outputLen > outDataLen) {
+    if (outputLen > outputDataLen) {
         ATTEST_LOG_ERROR("[EncryptHksImpl] output Len is wrong length");
         HksFreeParamSet(&encryptParamSet);
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
-    ret = memcpy_s(outData, outDataLen, base64Data, outputLen);
+    ret = memcpy_s(outputData, outputDataLen, base64Data, outputLen);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHksImpl] Encrypt memcpy_s failed, ret = %d", ret);
         HksFreeParamSet(&encryptParamSet);
@@ -445,32 +445,30 @@ static int32_t EncryptHksImpl(struct HksBlob *inData, struct HksBlob *keyAlias, 
     return ret;
 }
 
-int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData, size_t outputDataLen)
+int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData, size_t outputDataLen) 
 {
-    if ((inputData == NULL) || (inputDataLen == 0) || (outputData == NULL)) {
+    if ((inputData == NULL) || (inputDataLen == 0) || (outputData == NULL) || (outputDataLen == 0)) {
         ATTEST_LOG_ERROR("[EncryptHks] EncryptHks Invalid parameter");
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
-    char tmpKeyAlias[] = "xts_device_attest";
-    struct HksBlob keyAlias = { (uint32_t)strlen(tmpKeyAlias), (uint8_t *)tmpKeyAlias};
     struct HksParamSet *genParamSetEncrypt = NULL;
     int32_t ret = InitHksParamSet(&genParamSetEncrypt, g_genParams, sizeof(g_genParams) / sizeof(struct HksParam));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHks] InitHksParamSet g_genParams failed");
         return ATTEST_ERR;
     }
-    ret = HksKeyExist(&keyAlias, genParamSetEncrypt);
+    ret = HksKeyExist(&g_attestKeyAlias, genParamSetEncrypt);
     if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[EncryptHks] Hks key doesn't exist");
-        ret = HksGenerateKey(&keyAlias, genParamSetEncrypt, NULL);
+        ret = HksGenerateKey(&g_attestKeyAlias, genParamSetEncrypt, NULL);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[EncryptHks] HksGenerateKey failed");
             HksFreeParamSet(&genParamSetEncrypt);
             return ATTEST_ERR;
         }
     }
+    ATTEST_LOG_INFO("[EncryptHks] HksKeyExist or HksGenerateKey success");
     struct HksBlob inData = { inputDataLen, inputData };
-    ret = EncryptHksImpl(&inData, &keyAlias, outputData, outputDataLen);
+    ret = EncryptHksImpl(&inData, outputData, outputDataLen);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHks] EncryptHksImpl failed");
         HksFreeParamSet(&genParamSetEncrypt);

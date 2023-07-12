@@ -31,7 +31,8 @@
         "access_token",
         "syscap_codec",
         "init",
-        "eventhandler"
+        "eventhandler",
+        "huks"
       ],
       "third_party": [
         "cJSON",

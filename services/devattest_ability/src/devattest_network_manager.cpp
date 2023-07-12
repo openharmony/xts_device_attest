@@ -34,13 +34,8 @@ void DevAttestNetworkManager::RegisterNetConnCallback(void)
     if (netCallback_ == NULL) {
         netCallback_ = (std::make_unique<DevAttestNetworkCallback>()).release();
     }
-    std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
-    if (netManager == nullptr) {
-        HILOGE("[RegisterNetConnCallback] Failed to init NetConnClient.");
-        return;
-    }
 
-    int32_t ret = netManager->RegisterNetConnCallback(netCallback_);
+    int32_t ret = NetConnClient::GetInstance().RegisterNetConnCallback(netCallback_);
     if (ret != NETMANAGER_SUCCESS) {
         HILOGE("[RegisterNetConnCallback] RegisterNetConnCallback failed.");
         return;
@@ -52,13 +47,8 @@ void DevAttestNetworkManager::UnregisterNetConnCallback(void)
     if (netCallback_ == NULL) {
         return;
     }
-    std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
-    if (netManager == nullptr) {
-        HILOGE("[UnregisterNetConnCallback] Failed to init NetConnClient.");
-        return;
-    }
 
-    int32_t ret = netManager->UnregisterNetConnCallback(netCallback_);
+    int32_t ret = NetConnClient::GetInstance().UnregisterNetConnCallback(netCallback_);
     if (ret != NETMANAGER_SUCCESS) {
         HILOGE("[UnregisterNetConnCallback] RegisterNetConnCallback failed.");
         return;

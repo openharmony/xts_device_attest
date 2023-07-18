@@ -51,10 +51,8 @@ namespace OHOS {
         AttestResultInfo attestResultInfo;
         attestResultInfo.authResult_ = GetData<int32_t>();
         attestResultInfo.softwareResult_ = GetData<int32_t>();
-        int32_t testData = 0;
         for (int i = 0; i < SOFTWARE_RESULT_DETAIL_SIZE; i++) {
-            testData = GetData<int32_t>();
-            attestResultInfo.softwareResultDetail_[i] = testData;
+            attestResultInfo.softwareResultDetail_[i] = GetData<int32_t>();
         }
 
         int32_t len = GetData<int32_t>();

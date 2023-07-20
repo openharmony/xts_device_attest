@@ -187,9 +187,9 @@ int32_t OEMGetManufacturekey(char* manufacturekey, uint32_t len)
         return DEVICE_ATTEST_OEM_ERR;
     }
     const char manufacturekeyBuf[] = {
-        0x13, 0x42, 0x3F, 0x3F, 0x53, 0x3F, 0x72, 0x30, 0x3F, 0x3F, 0x1C, 0x3F, 0x2F, 0x3F, 0x2E, 0x42,
-        0x3F, 0x08, 0x3F, 0x57, 0x3F, 0x10, 0x3F, 0x3F, 0x29, 0x17, 0x52, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-        0x57, 0x16, 0x3F, 0x7D, 0x4A, 0x0F, 0x3F, 0x3F, 0x3F, 0x30, 0x0C, 0x3F, 0x3F, 0x4C, 0x3F, 0x47
+        0X4C, 0X3F, 0X5F, 0X3F, 0X3F, 0X56, 0X3F, 0X06, 0X6E, 0X62, 0X3F, 0X3D, 0X3F, 0X43, 0X3F, 0X3F,
+        0X36, 0X20, 0X3F, 0X3F, 0X24, 0X0B, 0X16, 0X40, 0X3F, 0X3F, 0X05, 0X57, 0X3F, 0X26, 0X3F, 0X3F,
+        0X3F, 0X57, 0X3F, 0X3F, 0X3F, 0X21, 0X28, 0X74, 0X1D, 0X3F, 0X3F, 0X3F, 0X04, 0X3F, 0X3F, 0X04
     };
     uint32_t manufacturekeyBufLen = sizeof(manufacturekeyBuf);
     if (len < manufacturekeyBufLen) {
@@ -205,7 +205,7 @@ int32_t OEMGetProductId(char* productId, uint32_t len)
     if ((productId == NULL) || (len == 0)) {
         return DEVICE_ATTEST_OEM_ERR;
     }
-    const char productIdBuf[] = "OH00000D";
+    const char productIdBuf[] = "OH0009L4";
     uint32_t productIdLen = strlen(productIdBuf);
     if (len < productIdLen) {
         return DEVICE_ATTEST_OEM_ERR;

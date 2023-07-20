@@ -27,7 +27,6 @@ int32_t WriteTicketToDevice(const char* ticket, uint8_t ticketLen)
     uint8_t ticketData[ENCRYPT_LEN + 1] = {0};
     uint8_t encryptedData[BASE64_LEN] = {0};
     uint8_t salt[SALT_LEN] = {0};
-
     if ((ticket == NULL) || (ticketLen < MIN_TICKET_LEN) || (ticketLen >= MAX_TICKET_LEN)) {
         ATTEST_LOG_ERROR("[WriteTicketToDevice] Input Parameter.");
         return ERR_ATTEST_SECURITY_INVALID_ARG;
@@ -56,7 +55,6 @@ int32_t WriteTicketToDevice(const char* ticket, uint8_t ticketLen)
             return ERR_ATTEST_SECURITY_ENCRYPT;
         }
     }
-
     TicketInfo ticketInfo;
     (void)memset_s(&ticketInfo, sizeof(TicketInfo), 0, sizeof(TicketInfo));
     if (memcpy_s(ticketInfo.ticket, sizeof(ticketInfo.ticket), encryptedData, BASE64_LEN) != 0 ||
@@ -64,12 +62,10 @@ int32_t WriteTicketToDevice(const char* ticket, uint8_t ticketLen)
         ATTEST_LOG_ERROR("[WriteTicketToDevice] ticket or salt memcpy_s fail.");
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
-
     if (AttestWriteTicket(&ticketInfo) != 0) {
         ATTEST_LOG_ERROR("[WriteTicketToDevice] Write ticket failed");
         return ATTEST_ERR;
     }
-
     ATTEST_LOG_DEBUG("[WriteTicketToDevice] End.");
     return ret;
 }
@@ -104,7 +100,7 @@ int32_t ReadTicketFromDevice(char* ticket, uint8_t ticketLen)
         }
         uint8_t decryptedTicket[MAX_TICKET_LEN + 1] = {0};
         ret = Decrypt((const uint8_t*)ticketInfo.ticket, sizeof(ticketInfo.ticket),
-                    aesKey, decryptedTicket, MAX_TICKET_LEN);
+                      aesKey, decryptedTicket, MAX_TICKET_LEN);
         (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ReadTicketFromDevice] Decrypt token value failed, ret = %d");

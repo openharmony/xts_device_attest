@@ -76,7 +76,7 @@ static int32_t GetDecryptedTokenValue(TokenInfo* tokenInfo, uint8_t* tokenValue,
         ATTEST_LOG_INFO("[GetDecryptedTokenValue] Decrypt token value using Huks success!");
         return ret;
     }
-    ATTEST_LOG_ERROR("[GetDecryptedTokenValue] DecryptHks failed");
+    ATTEST_LOG_ERROR("[GetDecryptedTokenValue] Decrypt token value using Huks failed");
 
     ret = TransTokenVersion(tokenInfo->version, sizeof(tokenInfo->version));
     if (ret != ATTEST_OK) {
@@ -112,10 +112,10 @@ static int32_t GetTokenIdDecrypted(TokenInfo* tokenInfo, uint8_t* tokenId, uint8
 
     int32_t ret = DecryptHks((const uint8_t*)tokenInfo->tokenId, sizeof(tokenInfo->tokenId), tokenId, tokenIdLen);
     if (ret == ATTEST_OK) {
-        ATTEST_LOG_INFO("[GetTokenIdDecrypted] Decrypt token value using Huks success!");
+        ATTEST_LOG_INFO("[GetTokenIdDecrypted] Decrypt token Id using Huks success!");
         return ret;
     }
-    ATTEST_LOG_ERROR("[GetTokenIdDecrypted] DecryptHks failed");
+    ATTEST_LOG_ERROR("[GetTokenIdDecrypted] Decrypt token Id using Huks failed");
 
     ret = TransTokenVersion(tokenInfo->version, sizeof(tokenInfo->version));
     if (ret != ATTEST_OK) {
@@ -163,11 +163,11 @@ static int32_t EncryptTokenValueToTokenInfo(const char* data, uint8_t dataLen, u
     uint8_t encryptedTokenData[TOKEN_VALUE_ENCRYPT_LEN] = {0};
     ret = EncryptHks(tokenData, dataLen, encryptedTokenData, sizeof(encryptedTokenData));
     if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[EncryptTokenValueToTokenInfo] EncryptHks token value failed, ret = %d", ret);
+        ATTEST_LOG_ERROR("[EncryptTokenValueToTokenInfo] Encrypt token value using Huks failed");
         (void)memset_s(encryptedTokenData, sizeof(encryptedTokenData), 0, sizeof(encryptedTokenData));
         ret = Encrypt(tokenData, dataLen, aesKey, encryptedTokenData, sizeof(encryptedTokenData));
         if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[EncryptTokenIdToTokenInfo] Encrypt token value failed, ret = %d", ret);
+            ATTEST_LOG_ERROR("[EncryptTokenValueToTokenInfo] Encrypt token value failed, ret = %d", ret);
             return ret;
         }
     }
@@ -201,11 +201,11 @@ static int32_t EncryptTokenIdToTokenInfo(const char* data, uint8_t dataLen, uint
     uint8_t encryptedTokenData[TOKEN_ID_ENCRYPT_LEN] = {0};
     ret = EncryptHks(tokenData, dataLen, encryptedTokenData, sizeof(encryptedTokenData));
     if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[EncryptTokenIdToTokenInfo] EncryptHks token value failed, ret = %d", ret);
+        ATTEST_LOG_ERROR("[EncryptTokenIdToTokenInfo] Encrypt token Id using Huks failed");
         (void)memset_s(encryptedTokenData, sizeof(encryptedTokenData), 0, sizeof(encryptedTokenData));
         ret = Encrypt(tokenData, dataLen, aesKey, encryptedTokenData, sizeof(encryptedTokenData));
         if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[EncryptTokenIdToTokenInfo] Encrypt token value failed, ret = %d", ret);
+            ATTEST_LOG_ERROR("[EncryptTokenIdToTokenInfo] Encrypt token Id failed, ret = %d", ret);
             return ret;
         }
     }
@@ -242,7 +242,7 @@ static int32_t GetTokenInfo(const char* tokenValue, uint8_t tokenValueLen,
     // Encrypt tokenId and tokenValue to tokenInfo
     ret = EncryptTokenIdToTokenInfo(tokenId, tokenIdLen, aesKey, tokenInfo);
     if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[GetTokenInfo] Encrypt token value or token id failed, ret = %d", ret);
+        ATTEST_LOG_ERROR("[GetTokenInfo] Encrypt TokenId To TokenInfo failed");
         return ret;
     }
     ret = EncryptTokenValueToTokenInfo(tokenValue, tokenValueLen, aesKey, tokenInfo);

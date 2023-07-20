@@ -40,7 +40,21 @@ int32_t WriteTicketToDevice(const char* ticket, uint8_t ticketLen)
     int32_t ret = EncryptHks(ticketData, ticketLen, encryptedData, BASE64_LEN);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[WriteTicketToDevice] ticketData EncryptHks fail.");
-        return ERR_ATTEST_SECURITY_ENCRYPT;
+        (void)memset_s(encryptedData, sizeof(encryptedData), 0, sizeof(encryptedData));
+        uint8_t aesKey[AES_KEY_LEN] = {0};
+        SecurityParam aesKeyParam = {aesKey, sizeof(aesKey)};
+        SecurityParam saltParam = {salt, sizeof(salt)};
+        VersionData versionData = {TOKEN_VER0_0, sizeof(TOKEN_VER0_0)};
+        ret = GetAesKey(&saltParam, &versionData, &aesKeyParam);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[WriteTicketToDevice] Get AesKey fail.");
+            return ERR_ATTEST_SECURITY_GEN_AESKEY;
+        }
+        ret = Encrypt(ticketData, ticketLen, aesKey, encryptedData, BASE64_LEN);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[WriteTicketToDevice] ticketData Encrypt fail.");
+            return ERR_ATTEST_SECURITY_ENCRYPT;
+        }
     }
 
     TicketInfo ticketInfo;
@@ -78,7 +92,24 @@ int32_t ReadTicketFromDevice(char* ticket, uint8_t ticketLen)
                              decryptedTicket, MAX_TICKET_LEN);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ReadTicketFromDevice] ticket DcryptHks failed");
-        return ATTEST_ERR;
+        (void)memset_s(decryptedTicket, sizeof(decryptedTicket), 0, sizeof(decryptedTicket));
+        uint8_t aesKey[AES_KEY_LEN] = {0};
+        SecurityParam aesKeyParam = {aesKey, sizeof(aesKey)};
+        SecurityParam saltParam = {(uint8_t*)ticketInfo.salt, sizeof(ticketInfo.salt)};
+        VersionData versionData = {TOKEN_VER0_0, sizeof(TOKEN_VER0_0)};
+        int32_t ret = GetAesKey(&saltParam, &versionData, &aesKeyParam);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ReadTicketFromDevice] Generate aes key failed, ret = %d", ret);
+            return ERR_ATTEST_SECURITY_GEN_AESKEY;
+        }
+        uint8_t decryptedTicket[MAX_TICKET_LEN + 1] = {0};
+        ret = Decrypt((const uint8_t*)ticketInfo.ticket, sizeof(ticketInfo.ticket),
+                    aesKey, decryptedTicket, MAX_TICKET_LEN);
+        (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ReadTicketFromDevice] Decrypt token value failed, ret = %d");
+            return ERR_ATTEST_SECURITY_DECRYPT;
+        }
     }
     ret = memcpy_s(ticket, ticketLen, decryptedTicket, MAX_TICKET_LEN);
     if (ret != ATTEST_OK) {

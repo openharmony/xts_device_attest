@@ -477,6 +477,101 @@ int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData,
     return ret;
 }
 
+// AES-128-CBC-PKCS#7加密
+static int32_t EncryptAesCbc(AesCryptBufferDatas* datas, const uint8_t* aesKey,
+                             const char* iv, size_t ivLen)
+{
+    if ((datas == NULL) || (datas->input == NULL) || (datas->output == NULL) ||
+        (datas->outputLen == NULL) || (aesKey == NULL)) {
+        ATTEST_LOG_ERROR("[EncryptAesCbc] Invalid parameter");
+        return ERR_ATTEST_SECURITY_INVALID_ARG;
+    }
+    if ((iv == NULL) || (ivLen != IV_LEN)) {
+        ATTEST_LOG_ERROR("[EncryptAesCbc] iv out of range");
+        return ERR_ATTEST_SECURITY_INVALID_ARG;
+    }
+    
+    if ((datas->inputLen / AES_BLOCK + 1) > (UINT_MAX / AES_BLOCK)) {
+        ATTEST_LOG_ERROR("[EncryptAesCbc] AesCryptBufferDatas inputLen overflow");
+        return ERR_ATTEST_SECURITY_INVALID_ARG;
+    }
+    *datas->outputLen = (datas->inputLen / AES_BLOCK + 1) * AES_BLOCK;
+
+    mbedtls_cipher_info_t cipherInfo;
+    (void)memset_s(&cipherInfo, sizeof(cipherInfo), 0, sizeof(cipherInfo));
+    cipherInfo.mode = MBEDTLS_MODE_CBC;
+
+    mbedtls_cipher_context_t cipherCtx;
+    mbedtls_cipher_init(&cipherCtx);
+    cipherCtx.cipher_info = &cipherInfo;
+    int32_t ret = mbedtls_cipher_set_padding_mode(&cipherCtx, MBEDTLS_PADDING_PKCS7);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[EncryptAesCbc] Set padding mode failed, ret = -0x%x", ret);
+        return ret;
+    }
+    cipherCtx.add_padding(datas->input, *(datas->outputLen), datas->inputLen);
+
+    mbedtls_aes_context aesCtx;
+    mbedtls_aes_init(&aesCtx);
+    ret = mbedtls_aes_setkey_enc(&aesCtx, aesKey, AES_CIPHER_BITS);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[EncryptAesCbc] Set mbedtls enc key failed, ret = -0x%x", ret);
+        return ret;
+    }
+
+    uint8_t ivTmp[IV_LEN] = {0};
+    if (memcpy_s(ivTmp, sizeof(ivTmp), iv, ivLen) != 0) {
+        ATTEST_LOG_ERROR("[EncryptAesCbc] memcpy_s iv fail");
+        return ERR_ATTEST_SECURITY_MEM_MEMCPY;
+    }
+    // iv is updated after use, so define ivTmp
+    ret = mbedtls_aes_crypt_cbc(&aesCtx, MBEDTLS_AES_ENCRYPT, *datas->outputLen, ivTmp,
+                                (const uint8_t*)datas->input, datas->output);
+    (void)memset_s(ivTmp, sizeof(ivTmp), 0, sizeof(ivTmp));
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[EncryptAesCbc] Encrypt failed, ret = -0x%x", ret);
+    }
+    return ret;
+}
+
+int32_t Encrypt(uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
+                uint8_t* outputData, size_t outputDataLen)
+{
+    if ((inputData == NULL) || (inputDataLen == 0) || (aesKey == NULL) || (outputData == NULL)) {
+        ATTEST_LOG_ERROR("[Encrypt] Encrypt Invalid parameter");
+        return ERR_ATTEST_SECURITY_INVALID_ARG;
+    }
+
+    size_t aesOutLen = 0;
+    uint8_t encryptedData[ENCRYPT_LEN] = {0};
+    AesCryptBufferDatas datas = {inputData, inputDataLen, encryptedData, &aesOutLen};
+    int32_t ret = EncryptAesCbc(&datas, aesKey, (const char*)(aesKey + PSK_LEN), AES_KEY_LEN - PSK_LEN);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[Encrypt] Aes CBC encrypt symbol info failed, ret = %d", ret);
+        return ret;
+    }
+
+    size_t outputLen = 0;
+    uint8_t base64Data[BASE64_LEN + 1] = {0};
+    ret = mbedtls_base64_encode(base64Data, sizeof(base64Data), &outputLen,
+                                (const uint8_t*)encryptedData, aesOutLen);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[Encrypt] Base64 encode symbol info failed, ret = -0x00%x", -ret);
+        return ret;
+    }
+
+    if (outputLen > outputDataLen) {
+        ATTEST_LOG_ERROR("[Encrypt] output Len is wrong length");
+        return ERR_ATTEST_SECURITY_INVALID_ARG;
+    }
+    ret = memcpy_s(outputData, outputDataLen, base64Data, outputLen);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[Encrypt] Encrypt memcpy_s failed, ret = %d", ret);
+        return ERR_ATTEST_SECURITY_MEM_MEMCPY;
+    }
+    return ATTEST_OK;
+}
+
 int32_t Decrypt(const uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
                 uint8_t* outputData, size_t outputDataLen)
 {

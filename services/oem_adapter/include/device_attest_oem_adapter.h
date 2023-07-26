@@ -27,7 +27,7 @@ extern "C" {
 #define TOKEN_SIZE 151
 #define TOKEN_FLAG_SIZE 4
 #define TOKEN_WITH_FLAG_SIZE (TOKEN_SIZE + TOKEN_FLAG_SIZE)
-#define TOKEN_ADDR "/data/device_attest"
+#define TOKEN_ADDR "/data/service/el1/public/device_attest"
 #define TOKEN_A_ADDR "tokenA"
 #define TOKEN_B_ADDR "tokenB"
 #define BITS_PER_BYTE 8

@@ -238,6 +238,7 @@ static int32_t AttestStartup(AuthResult *authResult)
     }
     if (ret != ATTEST_OK) {
         UpdateAuthResultCode(AUTH_FAILED);
+        AttestSetParameter(STARTSUP_PARA_ATTEST_KEY, STARTSUP_PARA_ATTEST_ERROR);
         ATTEST_LOG_ERROR("[AttestStartup] Auth token failed, ret = %d.", ret);
         return ATTEST_ERR;
     }

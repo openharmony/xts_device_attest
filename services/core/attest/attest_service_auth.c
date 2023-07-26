@@ -443,6 +443,13 @@ int32_t CheckAuthResult(AuthStatus* authStatus, uint64_t currentTime)
         return ATTEST_ERR;
     }
 
+    int32_t hardwareResult = authStatus->hardwareResult;
+    int32_t softwareResult = authStatus->softwareResult;
+    if (hardwareResult != ATTEST_OK || softwareResult != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[CheckAuthResult] auth result is ATTEST_ERR.");
+        return ATTEST_ERR;
+    }
+
     return ATTEST_OK;
 }
 

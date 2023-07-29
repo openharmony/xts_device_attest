@@ -246,6 +246,7 @@ static int32_t AttestStartup(AuthResult *authResult)
     ATTEST_LOG_INFO("[AttestStartup] Flush auth result.");
     FlushAttestData(authResult->ticket, authResult->authStatus);
     UpdateAuthResultCode(AUTH_SUCCESS);
+    AttestCreateResetFlag();
     // token激活
     ATTEST_LOG_INFO("[AttestStartup] Active token.");
     for (int32_t i = 0; i <= WISE_RETRY_CNT; i++) {

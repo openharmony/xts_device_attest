@@ -12,8 +12,8 @@
 # limitations under the License.
 
 on post-fs-data
-    mkdir /data/device_attest
-    chown device_attest device_attest /data/device_attest
+    mkdir /data/service/el1/public/device_attest
+    chown device_attest device_attest /data/service/el1/public/device_attest
     start devattest_service
 
 service devattest_service /system/bin/sa_main /system/profile/devattest_service.json

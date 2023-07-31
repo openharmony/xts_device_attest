@@ -29,7 +29,7 @@ typedef enum {
     OEM_FLAG_MAX,
 } OEM_FLAG_TYPE;
 
-#define AUTH_RESULT_PATH "/data/device_attest"
+#define AUTH_RESULT_PATH "/data/service/el1/public/device_attest"
 #define ETC_DEVICE_ATTEST_PATH "/etc/device_attest"
 #define AUTH_STATUS_FILE_NAME "auth_status"
 #define AUTH_RESULT_CODE_FILE_NAME "auth_result_code"

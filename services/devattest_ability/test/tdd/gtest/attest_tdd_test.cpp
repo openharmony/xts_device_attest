@@ -236,6 +236,29 @@ HWTEST_F(AttestTddTest, TestDecodeAuthStatus001, TestSize.Level1)
 }
 
 /*
+ * @tc.name: TestCheckExpireTime001
+ * @tc.desc: Test check expire time.
+ * @tc.type: FUNC
+ */
+HWTEST_F(AttestTddTest, TestCheckExpireTime001, TestSize.Level1)
+{
+    AuthStatus* outStatus = CreateAuthStatus();
+    EXPECT_TRUE(outStatus != nullptr);
+    if (outStatus == nullptr) {
+        return;
+    }
+    outStatus->expireTime = 19673222;
+    uint64_t currentTime = 19673223;
+    int32_t ret = CheckExpireTime(outStatus, currentTime);
+    EXPECT_TRUE(ret != DEVATTEST_SUCCESS);
+    outStatus->expireTime = 19673222;
+    currentTime = 19673221;
+    ret = CheckExpireTime(outStatus, currentTime);
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+    free(outStatus);
+}
+
+/*
  * @tc.name: TestCheckAuthResult001
  * @tc.desc: Test check auth result.
  * @tc.type: FUNC
@@ -247,13 +270,12 @@ HWTEST_F(AttestTddTest, TestCheckAuthResult001, TestSize.Level1)
     if (outStatus == nullptr) {
         return;
     }
-    outStatus->expireTime = 19673222;
-    uint64_t currentTime = 19673223;
-    int32_t ret = CheckAuthResult(outStatus, currentTime);
+    outStatus->hardwareResult = 1;
+    outStatus->softwareResult = 0;
+    int32_t ret = CheckAuthResult(outStatus);
     EXPECT_TRUE(ret != DEVATTEST_SUCCESS);
-    outStatus->expireTime = 19673222;
-    currentTime = 19673221;
-    ret = CheckAuthResult(outStatus, currentTime);
+    outStatus->hardwareResult = 0;
+    ret = CheckAuthResult(outStatus);
     EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
     free(outStatus);
 }

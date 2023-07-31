@@ -36,7 +36,9 @@ int32_t CheckVersionChanged(AuthStatus* authStatus);
 
 uint64_t GetCurrentTime(void);
 
-int32_t CheckAuthResult(AuthStatus* authStatus, uint64_t currentTime);
+int32_t CheckExpireTime(AuthStatus* authStatus, uint64_t currentTime);
+
+int32_t CheckAuthResult(AuthStatus* authStatus);
 
 AuthStatus* CreateAuthStatus(void);
 

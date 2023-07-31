@@ -57,7 +57,12 @@ bool IsAuthStatusChg(void)
             ATTEST_LOG_ERROR("[IsAuthStatusChg] CurrentTime invalied");
             break;
         }
-        ret = CheckAuthResult(authStatus, currentTime);
+        ret = CheckExpireTime(authStatus, currentTime);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[IsAuthStatusChg] Check expire time failed");
+            break;
+        }
+        ret = CheckAuthResult(authStatus);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[IsAuthStatusChg] Check auth result failed");
             break;
@@ -429,17 +434,27 @@ int32_t GetAuthStatus(char** authStatus)
     return ATTEST_OK;
 }
 
-int32_t CheckAuthResult(AuthStatus* authStatus, uint64_t currentTime)
+int32_t CheckExpireTime(AuthStatus* authStatus, uint64_t currentTime)
 {
     if (authStatus == NULL) {
-        ATTEST_LOG_ERROR("[CheckAuthResult] Invalid parameter");
+        ATTEST_LOG_ERROR("[CheckExpireTime] Invalid parameter");
         return ATTEST_ERR;
     }
 
     uint64_t expireTime = authStatus->expireTime;
 
     if (expireTime <= currentTime) {
-        ATTEST_LOG_ERROR("[CheckAuthResult] expireTime is Wrong.");
+        ATTEST_LOG_ERROR("[CheckExpireTime] expireTime is Wrong.");
+        return ATTEST_ERR;
+    }
+
+    return ATTEST_OK;
+}
+
+int32_t CheckAuthResult(AuthStatus* authStatus)
+{
+    if(authStatus == NULL) {
+        ATTEST_LOG_ERROR("[CheckAuthResult] Invalid parameter");
         return ATTEST_ERR;
     }
 

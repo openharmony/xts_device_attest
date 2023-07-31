@@ -453,7 +453,7 @@ int32_t CheckExpireTime(AuthStatus* authStatus, uint64_t currentTime)
 
 int32_t CheckAuthResult(AuthStatus* authStatus)
 {
-    if(authStatus == NULL) {
+    if (authStatus == NULL) {
         ATTEST_LOG_ERROR("[CheckAuthResult] Invalid parameter");
         return ATTEST_ERR;
     }

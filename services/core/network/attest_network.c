@@ -408,7 +408,7 @@ static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
     return ATTEST_OK;
 }
 
-static int32_t SendSSL(SSL *socketSSL, char *postData, int32_t postDataLen)
+static int32_t SendSSL(SSL *socketSSL, const char *postData, int32_t postDataLen)
 {
     int32_t sendCnt = 0;
 
@@ -1006,7 +1006,7 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
 int32_t SendAttestMsg(DevicePacket *devPacket, ATTEST_ACTION_TYPE actionType, char **respBody)
 {
     ATTEST_LOG_DEBUG("[SendAttestMsg] Begin.");
-    char *reqData = NULL;
+    const char *reqData = NULL;
     char *respData = NULL;
     int32_t retCode;
     if (devPacket == NULL || respBody == NULL) {

@@ -48,9 +48,11 @@
 #endif
 #endif
 
+#define ATTEST_MAX_INT32_BIT 10
+
 List g_attestNetworkList;
 
-char *g_httpHeaderName[ATTEST_HTTPS_MAX] = {
+const char *g_httpHeaderName[ATTEST_HTTPS_MAX] = {
     "HTTP/1.1",
     "Content-Type:",
     "Content-Length:",
@@ -867,7 +869,7 @@ static int32_t GenHttpsMsg(DevicePacket *devPacket, ATTEST_ACTION_TYPE actionTyp
     return ATTEST_OK;
 }
 
-static int32_t SendHttpsMsg(char *postData, char **respData)
+static int32_t SendHttpsMsg(const char *postData, char **respData)
 {
     /* 判断入参合法性 */
     if (postData == NULL || respData == NULL) {
@@ -918,29 +920,37 @@ static int32_t SendHttpsMsg(char *postData, char **respData)
     return ret;
 }
 
-static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *intPara)
+static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int32_t *intPara)
 {
     if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] Invalid parameter.");
         return ATTEST_ERR;
     }
     
-    char *httpTypeStr = g_httpHeaderName[httpType];
+    const char *httpTypeStr = g_httpHeaderName[httpType];
     if (httpTypeStr == NULL) {
-        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] g_httpHeaderName fail.");
+        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] get http header name fail.");
         return ATTEST_ERR;
     }
     
-    char *appearAddr = strstr(respMsg, httpTypeStr);
+    const char *appearAddr = strstr(respMsg, httpTypeStr);
     if (appearAddr == NULL) {
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara]Find httpName in response msg fail, httpName = %s.", httpTypeStr);
         return ATTEST_ERR;
     }
 
-    char *httpValueAddr = appearAddr + strlen(httpTypeStr) + 1;
+    const char *httpValueAddr = appearAddr + strlen(httpTypeStr) + 1;
     int32_t len = 0;
     while (isdigit(httpValueAddr[len])) {
         len++;
+        if (len > ATTEST_MAX_INT32_BIT) {
+            len = -1;
+            break;
+        }
+    }
+    if (len <= 0) {
+        *intPara = ATTEST_ERR;
+        return ATTEST_ERR;
     }
 
     char *httpValue = (char *)ATTEST_MEM_MALLOC(len + 1);
@@ -972,7 +982,7 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
     
     int32_t contentLen = 0;
     retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESLEN, &contentLen);
-    if (retCode != ATTEST_OK || contentLen == 0) {
+    if (retCode != ATTEST_OK || contentLen <= 0) {
         ATTEST_LOG_ERROR("[ParseHttpsResp] Parse content length failed, ret = %d, length =  %d.", retCode, contentLen);
         return ATTEST_ERR;
     }

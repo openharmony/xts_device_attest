@@ -16,8 +16,6 @@
 #ifndef __ATTEST_SERVICE_DEVICE_H__
 #define __ATTEST_SERVICE_DEVICE_H__
 
-#include "attest_type.h"
-
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {

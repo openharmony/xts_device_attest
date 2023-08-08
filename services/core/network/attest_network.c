@@ -920,7 +920,7 @@ static int32_t SendHttpsMsg(const char *postData, char **respData)
     return ret;
 }
 
-static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int32_t *intPara)
+static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *intPara)
 {
     if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] Invalid parameter.");
@@ -1006,7 +1006,7 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
 int32_t SendAttestMsg(DevicePacket *devPacket, ATTEST_ACTION_TYPE actionType, char **respBody)
 {
     ATTEST_LOG_DEBUG("[SendAttestMsg] Begin.");
-    const char *reqData = NULL;
+    char *reqData = NULL;
     char *respData = NULL;
     int32_t retCode;
     if (devPacket == NULL || respBody == NULL) {

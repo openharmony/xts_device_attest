@@ -16,6 +16,8 @@
 #ifndef __ATTEST_SERVICE_CHALLENGE_H__
 #define __ATTEST_SERVICE_CHALLENGE_H__
 
+#include "attest_type.h"
+
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {

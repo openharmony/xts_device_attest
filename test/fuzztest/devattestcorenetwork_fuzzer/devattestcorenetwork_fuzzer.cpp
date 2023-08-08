@@ -23,15 +23,15 @@
 
 using namespace std;
 
-typedef enum {
-    ATTEST_HTTPS_RESCODE = 0,
-    ATTEST_HTTPS_RESTYPE,
-    ATTEST_HTTPS_RESLEN,
-    ATTEST_HTTPS_BLANK,
-    ATTEST_HTTPS_MAX,
-} ATTEST_HTTPHEAD_TYPE;
-
 namespace OHOS {
+    typedef enum ATTEST_HTTPHEAD_TYPE {
+        ATTEST_HTTPS_RESCODE = 0,
+        ATTEST_HTTPS_RESTYPE,
+        ATTEST_HTTPS_RESLEN,
+        ATTEST_HTTPS_BLANK,
+        ATTEST_HTTPS_MAX,
+    } ATTEST_HTTPHEAD_TYPE;
+
     const uint8_t *g_baseFuzzData = nullptr;
 
     const char* g_httpHeaderName[ATTEST_HTTPS_MAX] = {
@@ -51,17 +51,17 @@ namespace OHOS {
 
     static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int32_t *intPara)
     {
-        if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
+        if (respMsg == nullptr || intPara == nullptr || httpType >= ATTEST_HTTPS_MAX) {
             return ATTEST_FUZZTEST_ERR;
         }
 
         const char *httpTypeStr = g_httpHeaderName[httpType];
-        if (httpTypeStr == NULL) {
+        if (httpTypeStr == nullptr) {
             return ATTEST_FUZZTEST_ERR;
         }
 
         const char *appearAddr = strstr(respMsg, httpTypeStr);
-        if (appearAddr == NULL) {
+        if (appearAddr == nullptr) {
             return ATTEST_FUZZTEST_ERR;
         }
 
@@ -80,20 +80,20 @@ namespace OHOS {
         }
 
         char *httpValue = (char *)malloc(len + 1);
-        if (httpValue == NULL) {
+        if (httpValue == nullptr) {
             return ATTEST_FUZZTEST_ERR;
         }
 
         int32_t retCode = memcpy_s(httpValue, len + 1, httpValueAddr, len);
         if (retCode != ATTEST_FUZZTEST_OK) {
             free(httpValue);
-            httpValue = NULL;
+            httpValue = nullptr;
             return ATTEST_FUZZTEST_ERR;
         }
 
         *intPara = atoi(httpValue);
         free(httpValue);
-        httpValue = NULL;
+        httpValue = nullptr;
         return ATTEST_FUZZTEST_OK;
     }
 
@@ -112,14 +112,14 @@ namespace OHOS {
         }
 
         char *body = (char *)malloc(contentLen + 1);
-        if (body == NULL) {
+        if (body == nullptr) {
             return ATTEST_FUZZTEST_ERR;
         }
         uint32_t headerLen = strlen(respMsg) - contentLen;
         retCode = memcpy_s(body, contentLen + 1, respMsg + headerLen, contentLen);
         if (retCode != ATTEST_FUZZTEST_OK) {
             free(body);
-            body = NULL;
+            body = nullptr;
             return ATTEST_FUZZTEST_ERR;
         }
         *outBody = body;
@@ -148,12 +148,12 @@ namespace OHOS {
         g_baseFuzzSize = size;
         g_baseFuzzPos = 0;
         uint32_t type  = (GetData<uint32_t>() % ATTEST_ACTION_MAX);
-        char* outputStr = NULL;
-        int32_t ret = ParseHttpsResp(reinterpret_cast<const char *>(data + g_baseFuzzPos), &outputStr);
+        char* outputStr = nullptr;
+        int32_t ret = ParseHttpsResp((const char *)(data + g_baseFuzzPos), &outputStr);
         if (ret != ATTEST_FUZZTEST_OK) {
             return;
         }
-        AuthResult *authResult = NULL;
+        AuthResult *authResult = nullptr;
         switch (type) {
             case ATTEST_ACTION_CHALLENGE:
                 break;

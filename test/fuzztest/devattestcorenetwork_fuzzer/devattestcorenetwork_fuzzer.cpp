@@ -20,111 +20,15 @@
 #include "attest_service_active.h"
 #include "attest_service_auth.h"
 #include "attest_service_reset.h"
+#include "devattest_core_network_fuzz.h"
 
 using namespace std;
 
 namespace OHOS {
-    typedef enum ATTEST_HTTPHEAD_TYPE {
-        ATTEST_HTTPS_RESCODE = 0,
-        ATTEST_HTTPS_RESTYPE,
-        ATTEST_HTTPS_RESLEN,
-        ATTEST_HTTPS_BLANK,
-        ATTEST_HTTPS_MAX,
-    } ATTEST_HTTPHEAD_TYPE;
-
+    const int32_t FUZZ_ATTEST_OK = 0;
     const uint8_t *g_baseFuzzData = nullptr;
-
-    const char* g_httpHeaderName[ATTEST_HTTPS_MAX] = {
-        "HTTP/1.1",
-        "Content-Type:",
-        "Content-Length:",
-        ""
-    };
-
-    const static int32_t ATTEST_FUZZTEST_ERR = (-1);
-    const static int32_t ATTEST_FUZZTEST_OK = (0);
-    const static int32_t ATTEST_MAX_INT32_BIT = 10;
-    const static int32_t ATTEST_FUZZTEST_HTTP_OK = 200;
-
     size_t g_baseFuzzSize = 0;
     size_t g_baseFuzzPos;
-
-    static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int32_t *intPara)
-    {
-        if (respMsg == nullptr || intPara == nullptr || httpType >= ATTEST_HTTPS_MAX) {
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        const char *httpTypeStr = g_httpHeaderName[httpType];
-        if (httpTypeStr == nullptr) {
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        const char *appearAddr = strstr(respMsg, httpTypeStr);
-        if (appearAddr == nullptr) {
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        const char *httpValueAddr = appearAddr + strlen(httpTypeStr) + 1;
-        int32_t len = 0;
-        while (isdigit(httpValueAddr[len])) {
-            len++;
-            if (len > ATTEST_MAX_INT32_BIT) {
-                len = -1;
-                break;
-            }
-        }
-        if (len <= 0) {
-            *intPara = ATTEST_FUZZTEST_ERR;
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        char *httpValue = (char *)malloc(len + 1);
-        if (httpValue == nullptr) {
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        int32_t retCode = memcpy_s(httpValue, len + 1, httpValueAddr, len);
-        if (retCode != ATTEST_FUZZTEST_OK) {
-            free(httpValue);
-            httpValue = nullptr;
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        *intPara = atoi(httpValue);
-        free(httpValue);
-        httpValue = nullptr;
-        return ATTEST_FUZZTEST_OK;
-    }
-
-    static int32_t ParseHttpsResp(const char *respMsg, char **outBody)
-    {
-        int32_t httpRetCode = 0;
-        int32_t retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESCODE, &httpRetCode);
-        if ((retCode != ATTEST_FUZZTEST_OK) || (httpRetCode != ATTEST_FUZZTEST_HTTP_OK)) {
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        int32_t contentLen = 0;
-        retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESLEN, &contentLen);
-        if (retCode != ATTEST_FUZZTEST_OK || contentLen <= 0) {
-            return ATTEST_FUZZTEST_ERR;
-        }
-
-        char *body = (char *)malloc(contentLen + 1);
-        if (body == nullptr) {
-            return ATTEST_FUZZTEST_ERR;
-        }
-        uint32_t headerLen = strlen(respMsg) - contentLen;
-        retCode = memcpy_s(body, contentLen + 1, respMsg + headerLen, contentLen);
-        if (retCode != ATTEST_FUZZTEST_OK) {
-            free(body);
-            body = nullptr;
-            return ATTEST_FUZZTEST_ERR;
-        }
-        *outBody = body;
-        return ATTEST_FUZZTEST_OK;
-    }
 
     template <class T>
     T GetData()
@@ -149,8 +53,8 @@ namespace OHOS {
         g_baseFuzzPos = 0;
         uint32_t type  = (GetData<uint32_t>() % ATTEST_ACTION_MAX);
         char* outputStr = nullptr;
-        int32_t ret = ParseHttpsResp((const char *)(data + g_baseFuzzPos), &outputStr);
-        if (ret != ATTEST_FUZZTEST_OK) {
+        int32_t ret = ParseHttpsResp(reinterpret_cast<const char*>(data + g_baseFuzzPos), &outputStr);
+        if (ret != FUZZ_ATTEST_OK) {
             return;
         }
         AuthResult *authResult = nullptr;
@@ -171,7 +75,7 @@ namespace OHOS {
             default:
                 break;
         }
-        if (ret != ATTEST_FUZZTEST_OK) {
+        if (ret != FUZZ_ATTEST_OK) {
             return;
         }
         return;

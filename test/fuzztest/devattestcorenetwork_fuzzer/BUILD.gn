@@ -24,6 +24,7 @@ ohos_fuzztest("DevattestCoreNetworkFuzzTest") {
   fuzz_config_file = "."
 
   include_dirs = [
+    ".",
     "${devattest_path}/services/core/include",
     "${devattest_path}/services/core/include/adapter",
     "${devattest_path}/services/core/include/attest",
@@ -40,7 +41,10 @@ ohos_fuzztest("DevattestCoreNetworkFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "devattestcorenetwork_fuzzer.cpp" ]
+  sources = [
+    "devattest_core_network_fuzz.c",
+    "devattestcorenetwork_fuzzer.cpp",
+  ]
 
   deps = [ "${devattest_path}/services/core:devattest_core" ]
 

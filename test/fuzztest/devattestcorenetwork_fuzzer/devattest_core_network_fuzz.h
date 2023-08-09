@@ -13,10 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef DEVATTEST_CORE_NETWORK_FUZZER_TEST_H
-#define DEVATTEST_CORE_NETWORK_FUZZER_TEST_H
+#ifndef DEVATTEST_CORE_NETWORK_FUZZ_H
+#define DEVATTEST_CORE_NETWORK_FUZZ_H
 
-#define FUZZ_PROJECT_NAME "devattestcorenetwork_fuzzer"
+#include <stdint.h>
 
-#endif // DEVATTEST_CORE_NETWORK_FUZZER_TEST_H
+#ifdef __cplusplus
+#if __cplusplus
+extern "C" {
+#endif
+#endif /* __cplusplus */
+
+int32_t ParseHttpsResp(const char *respMsg, char **outBody);
+
+#ifdef __cplusplus
+#if __cplusplus
+}
+#endif
+#endif /* __cplusplus */
+
+#endif // DEVATTEST_CORE_NETWORK_FUZZ_H
 

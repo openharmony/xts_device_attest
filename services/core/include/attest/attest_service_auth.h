@@ -17,6 +17,7 @@
 #define __ATTEST_SERVICE_AUTH_H__
 
 #include <stdint.h>
+#include "attest_type.h"
 
 #ifdef __cplusplus
 #if __cplusplus

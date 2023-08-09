@@ -19,6 +19,7 @@ group("fuzztest") {
     # deps file
     "devattestadapteroem_fuzzer:DevattestAdapterOemFuzzTest",
     "devattestclient_fuzzer:DevattestClientFuzzTest",
+    "devattestcorenetwork_fuzzer:DevattestCoreNetworkFuzzTest",
     "devattestnetworkcallback_fuzzer:DevattestNetworkCallbackFuzzTest",
     "devattestservice_fuzzer:DevattestServiceFuzzTest",
     "devattestservicestub_fuzzer:DevattestServiceStubFuzzTest",

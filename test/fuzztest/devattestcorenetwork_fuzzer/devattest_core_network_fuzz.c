@@ -15,7 +15,6 @@
 
 #include "devattest_core_network_fuzz.h"
 
-// #include <string>
 #include <ctype.h>
 #include <string.h>
 #include <securec.h>
@@ -39,11 +38,6 @@ const char* g_httpHeaderName[ATTEST_HTTPS_MAX] = {
 #define ATTEST_FUZZTEST_OK 0
 #define ATTEST_MAX_INT32_BIT 10
 #define ATTEST_FUZZTEST_HTTP_OK 2000
-
-// const static int32_t ATTEST_FUZZTEST_ERR = (-1);
-// const static int32_t ATTEST_FUZZTEST_OK = (0);
-// const static int32_t ATTEST_MAX_INT32_BIT = 10;
-// const static int32_t ATTEST_FUZZTEST_HTTP_OK = 200;
 
 static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int32_t *intPara)
 {

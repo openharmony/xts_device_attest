@@ -46,7 +46,7 @@ namespace OHOS {
         return object;
     }
 
-    static void testFunc(const uint8_t* data, size_t size)
+    static void ParseResp(const uint8_t* data, size_t size)
     {
         g_baseFuzzData = data;
         g_baseFuzzSize = size;
@@ -85,7 +85,7 @@ namespace OHOS {
     {
         int32_t demandSize = sizeof(uint32_t);
         if (static_cast<int32_t>(size) >= demandSize) {
-            testFunc(data, size);
+            ParseResp(data, size);
         }
         return;
     }

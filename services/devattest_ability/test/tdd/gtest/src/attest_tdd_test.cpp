@@ -93,17 +93,6 @@ static void WriteAuthResult(AuthResult *authResult_)
     EXPECT_TRUE((ret == DEVATTEST_SUCCESS));
 }
 
-static DevicePacket* ConstructDevicePacket()
-{
-    DevicePacket* result = (DevicePacket*)malloc(sizeof(DevicePacket));
-    if (result == nullptr) {
-        return nullptr;
-    }
-    memset_s(result, sizeof(DevicePacket), 0, sizeof(DevicePacket));
-    EXPECT_TRUE(result != NULL);
-    return result;
-}
-
 /*
  * @tc.name: TestInitSysData001
  * @tc.desc: Test init system data.
@@ -113,16 +102,16 @@ HWTEST_F(AttestTddTest, TestInitSysData001, TestSize.Level1)
 {
     int32_t ret = InitSysData();
     EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
-    EXPECT_STREQ(g_devSysInfos[0], ATTEST_NET_VERSIONID);
-    EXPECT_STREQ(g_devSysInfos[1], ATTEST_BUILD_ROOT_HASH);
-    EXPECT_STREQ(g_devSysInfos[2], ATTEST_SOFTWARE_VERSION);
-    EXPECT_STREQ(g_devSysInfos[4], ATTEST_PRODUCT_MODEL);
-    EXPECT_STREQ(g_devSysInfos[5], ATTEST_BRAND);
-    EXPECT_STREQ(g_devSysInfos[6], ATTEST_SECURITY_PATCH);
-    EXPECT_STREQ(g_devSysInfos[7], ATTEST_UDID);
+    EXPECT_STREQ(StrdupDevInfo(VERSION_ID), ATTEST_NET_VERSIONID);
+    EXPECT_STREQ(StrdupDevInfo(ROOT_HASH), ATTEST_BUILD_ROOT_HASH);
+    EXPECT_STREQ(StrdupDevInfo(DISPLAY_VERSION), ATTEST_SOFTWARE_VERSION);
+    EXPECT_STREQ(StrdupDevInfo(PRODUCT_MODEL), ATTEST_PRODUCT_MODEL);
+    EXPECT_STREQ(StrdupDevInfo(BRAND), ATTEST_BRAND);
+    EXPECT_STREQ(StrdupDevInfo(SECURITY_PATCH_TAG), ATTEST_SECURITY_PATCH);
+    EXPECT_STREQ(StrdupDevInfo(UDID), ATTEST_UDID);
     // step 3: 恢复环境
     DestroySysData();
-    EXPECT_TRUE(g_devSysInfos[0] == NULL);
+    EXPECT_TRUE(StrdupDevInfo(VERSION_ID) == NULL);
 }
 
 /*
@@ -248,10 +237,7 @@ HWTEST_F(AttestTddTest, TestCheckAuthResult001, TestSize.Level1)
 
 static DevicePacket* TddGenMsg(int input)
 {
-    DevicePacket* reqMsg = ConstructDevicePacket();
-    if (reqMsg == NULL) {
-        return NULL;
-    }
+    DevicePacket* reqMsg = nullptr;
     int32_t ret = DEVATTEST_SUCCESS;
     ChallengeResult challenge;
     do {

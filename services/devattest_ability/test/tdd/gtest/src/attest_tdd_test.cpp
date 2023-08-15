@@ -254,20 +254,17 @@ static DevicePacket* TddGenMsg(int input)
     }
     int32_t ret = DEVATTEST_SUCCESS;
     ChallengeResult challenge;
-    HILOGE("[TddGenMsg] input:%{public}d", input);
     do {
         if (input == ATTEST_CASE_RESET) {
             challenge.challenge = (char*)ATTEST_RESET_CHAP;
             challenge.currentTime = ATTEST_RESET_CHAP_TIME;
             ret = GenResetMsg(&challenge, &reqMsg);
-            HILOGE("[TddGenMsg] reset");
             break;
         }
         if (input == ATTEST_CASE_AUTH) {
             challenge.challenge = (char*)ATTEST_AUTH_CHAP;
             challenge.currentTime = ATTEST_AUTH_CHAP_TIME;
             ret = GenAuthMsg(&challenge, &reqMsg);
-            HILOGE("[TddGenMsg] auth");
             break;
         }
         if (input == ATTEST_CASE_ACTIVE) {
@@ -275,7 +272,6 @@ static DevicePacket* TddGenMsg(int input)
             challenge.currentTime = ATTEST_ACTIVE_CHAP_TIME;
             AuthResult *authResult = GetAuthResult();
             ret = GenActiveMsg(authResult, &challenge, &reqMsg);
-            HILOGE("[TddGenMsg] active");
             break;
         }
     } while (0);
@@ -461,8 +457,6 @@ HWTEST_F(AttestTddTest, TestQueryAttestStatus001, TestSize.Level1)
         return;
     }
     EXPECT_TRUE(strcmp(attestResultInfo.ticket_.c_str(), ATTEST_TICKET) == 0);
-    HILOGI("[TestQueryAttestStatus001] ticket_ : %{public}s", attestResultInfo.ticket_.c_str());
-    HILOGI("[TestQueryAttestStatus001] TestQueryAttestStatus001 end success");
 }
 }
 }

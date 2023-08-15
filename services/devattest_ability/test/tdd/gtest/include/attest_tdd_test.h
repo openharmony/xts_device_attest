@@ -16,7 +16,6 @@
 #define ATTEST_TDD_TEST_H
 #include "attest_utils_list.h"
 
-extern char* g_devSysInfos [];
-extern const char* g_devSysInfosStr[];
+extern char* g_devSysInfos [SYS_DEV_MAX];
 extern List g_attestNetworkList;
 #endif

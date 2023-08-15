@@ -158,13 +158,13 @@ int32_t AttestReadAuthStatus(char* buffer, uint32_t bufferLen)
 int32_t AttestWriteNetworkConfig(const char* buffer, uint32_t bufferLen)
 {
     return ATTEST_OK;
-} 
+}
 
 int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen)
 {
     int32_t ret = memcpy_s(buffer, bufferLen, ATTEST_NETWORK_CONFIG, ATTEST_NETWORK_CONFIG_LEN);
     return ret;
-} 
+}
 
 int32_t AttestWriteAuthResultCode(const char* data, uint32_t len)
 {
@@ -175,7 +175,7 @@ int32_t AttestReadAuthResultCode(char* buffer, uint32_t bufferLen)
 {
     int32_t ret = memcpy_s(buffer, bufferLen, ATTEST_RESULT_CODE, ATTEST_RESULT_CODE_LEN);
     return ret;
-} 
+}
 
 bool AttestNetworkConfigExist(void)
 {

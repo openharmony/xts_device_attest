@@ -39,7 +39,8 @@ ohos_unittest("device_attest_tdd") {
   ]
   sources += sources_notmock
   sources -= [ "${devattest_path}/services/core/adapter/attest_adapter.c" ]
-  sources -= [ "${devattest_path}/services/core/security/attest_security_ticket.c" ]
+  sources -=
+      [ "${devattest_path}/services/core/security/attest_security_ticket.c" ]
   deps = core_deps
   external_deps = core_external_deps
 

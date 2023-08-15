@@ -31,8 +31,8 @@
 #include "attest_adapter.h"
 #include "devattest_errno.h"
 #include "attest_tdd_mock_property.h"
-#include "attest_tdd_test.h"
 #include "attest_tdd_mock_hal.h"
+#include "attest_tdd_test.h"
 
 using namespace testing::ext;
 namespace OHOS {

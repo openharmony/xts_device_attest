@@ -995,7 +995,7 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
 static int32_t ParseHttpsResp(char *respMsg, char **outBody)
 {
     if (respMsg == NULL || outBody == NULL || *outBody != NULL) {
-        return ATTEST_FUZZTEST_ERR;
+        return ATTEST_ERR;
     }
     int32_t httpRetCode = 0;
     int32_t retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESCODE, &httpRetCode);

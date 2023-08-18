@@ -920,6 +920,28 @@ static int32_t SendHttpsMsg(const char *postData, char **respData)
     return ret;
 }
 
+static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
+{
+    if (value == NULL || len <= 0 || intPara == NULL) {
+        return ATTEST_ERR;
+    }
+
+    char *httpValue = (char *)ATTEST_MEM_MALLOC(len + 1);
+    if (httpValue == NULL) {
+        return ATTEST_ERR;
+    }
+    memset_s(httpValue, len + 1, 0, len + 1);
+    int32_t ret = memcpy_s(httpValue, len + 1, value, len);
+    if (ret != ATTEST_OK) {
+        ATTEST_MEM_FREE(httpValue);
+        return ATTEST_ERR;
+    }
+
+    *intPara = atoi(httpValue);
+    ATTEST_MEM_FREE(httpValue);
+    return ATTEST_OK;
+}
+
 static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *intPara)
 {
     if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
@@ -939,40 +961,42 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
         return ATTEST_ERR;
     }
 
-    const char *httpValueAddr = appearAddr + strlen(httpTypeStr) + 1;
+    int32_t offsetLen = strlen(httpTypeStr);
+    while ((appearAddr + offsetLen) != NULL) {
+        if (appearAddr[offsetLen] != ' ') {
+            break;
+        }
+        offsetLen++;
+    }
+    const char *httpValueAddr = appearAddr + offsetLen;
+    if (httpValueAddr == NULL || *httpValueAddr == '\0') {
+        return ATTEST_ERR;
+    }
+
     int32_t len = 0;
-    while (isdigit(httpValueAddr[len])) {
-        len++;
-        if (len > ATTEST_MAX_INT32_BIT) {
-            len = -1;
+    while ((httpValueAddr + len) != NULL) {
+        if (isdigit(httpValueAddr[len])) {
+            len++;
+            if (len > ATTEST_MAX_INT32_BIT) {
+                len = -1;
+                break;
+            }
+        } else {
             break;
         }
     }
     if (len <= 0) {
-        *intPara = ATTEST_ERR;
         return ATTEST_ERR;
     }
 
-    char *httpValue = (char *)ATTEST_MEM_MALLOC(len + 1);
-    if (httpValue == NULL) {
-        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] httpValue ATTEST_MEM_MALLOC fail.");
-        return ATTEST_ERR;
-    }
-
-    int32_t retCode = memcpy_s(httpValue, len + 1, httpValueAddr, len);
-    if (retCode != ATTEST_OK) {
-        ATTEST_MEM_FREE(httpValue);
-        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] httpValueAddr memcpy_s fail.");
-        return ATTEST_ERR;
-    }
-
-    *intPara = atoi(httpValue);
-    ATTEST_MEM_FREE(httpValue);
-    return ATTEST_OK;
+    return StringToInt32(httpValueAddr, len, intPara);
 }
 
 static int32_t ParseHttpsResp(char *respMsg, char **outBody)
 {
+    if (respMsg == NULL || outBody == NULL || *outBody != NULL) {
+        return ATTEST_FUZZTEST_ERR;
+    }
     int32_t httpRetCode = 0;
     int32_t retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESCODE, &httpRetCode);
     if ((retCode != ATTEST_OK) || (httpRetCode != HTTP_OK)) {
@@ -992,6 +1016,7 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
         ATTEST_LOG_ERROR("[ParseHttpsResp] body ATTEST_MEM_MALLOC fail.");
         return ATTEST_ERR;
     }
+    (void)memset_s(body, contentLen + 1, 0, contentLen + 1);
     uint32_t headerLen = strlen(respMsg) - contentLen;
     retCode = memcpy_s(body, contentLen + 1, respMsg + headerLen, contentLen);
     if (retCode != ATTEST_OK) {

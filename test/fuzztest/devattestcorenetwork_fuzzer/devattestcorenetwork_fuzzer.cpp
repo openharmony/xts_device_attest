@@ -54,7 +54,7 @@ namespace OHOS {
         uint32_t type  = (GetData<uint32_t>() % ATTEST_ACTION_MAX);
         char* outputStr = nullptr;
         int32_t ret = ParseHttpsResp(reinterpret_cast<const char*>(data + g_baseFuzzPos), &outputStr);
-        if (ret != FUZZ_ATTEST_OK) {
+        if (ret != FUZZ_ATTEST_OK || outputStr == nullptr) {
             return;
         }
         AuthResult *authResult = nullptr;
@@ -83,7 +83,7 @@ namespace OHOS {
 
     void DevattestCoreNetworkFuzzTest(const uint8_t* data, size_t size)
     {
-        int32_t demandSize = sizeof(uint32_t);
+        int32_t demandSize = sizeof(uint32_t) + sizeof(char);
         if (static_cast<int32_t>(size) >= demandSize) {
             ParseResp(data, size);
         }

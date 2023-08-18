@@ -39,6 +39,30 @@ const char* g_httpHeaderName[ATTEST_HTTPS_MAX] = {
 #define ATTEST_MAX_INT32_BIT 10
 #define ATTEST_FUZZTEST_HTTP_OK 2000
 
+static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
+{
+    if (value == NULL || len <= 0 || intPara == NULL) {
+        return ATTEST_FUZZTEST_ERR;
+    }
+
+    char *httpValue = (char *)malloc(len + 1);
+    if (httpValue == NULL) {
+        return ATTEST_FUZZTEST_ERR;
+    }
+    memset_s(httpValue, len + 1, 0, len + 1);
+    int32_t ret = memcpy_s(httpValue, len + 1, value, len);
+    if (ret != ATTEST_FUZZTEST_OK) {
+        free(httpValue);
+        httpValue = NULL;
+        return ATTEST_FUZZTEST_ERR;
+    }
+
+    *intPara = atoi(httpValue);
+    free(httpValue);
+    httpValue = NULL;
+    return ATTEST_FUZZTEST_OK;
+}
+
 static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int32_t *intPara)
 {
     if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
@@ -55,40 +79,42 @@ static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int3
         return ATTEST_FUZZTEST_ERR;
     }
 
-    const char *httpValueAddr = appearAddr + strlen(httpTypeStr) + 1;
+    int32_t offsetLen = strlen(httpTypeStr);
+    while ((appearAddr + offsetLen) != NULL) {
+        if (appearAddr[offsetLen] != ' ') {
+            break;
+        }
+        offsetLen++;
+    }
+    const char *httpValueAddr = appearAddr + offsetLen;
+    if (httpValueAddr == NULL || *httpValueAddr == '\0') {
+        return ATTEST_FUZZTEST_ERR;
+    }
+
     int32_t len = 0;
-    while (isdigit(httpValueAddr[len])) {
-        len++;
-        if (len > ATTEST_MAX_INT32_BIT) {
-            len = -1;
+    while ((httpValueAddr + len) != NULL) {
+        if (isdigit(httpValueAddr[len])) {
+            len++;
+            if (len > ATTEST_MAX_INT32_BIT) {
+                len = -1;
+                break;
+            }
+        } else {
             break;
         }
     }
     if (len <= 0) {
-        *intPara = ATTEST_FUZZTEST_ERR;
         return ATTEST_FUZZTEST_ERR;
     }
 
-    char *httpValue = (char *)malloc(len + 1);
-    if (httpValue == NULL) {
-        return ATTEST_FUZZTEST_ERR;
-    }
-
-    int32_t retCode = memcpy_s(httpValue, len + 1, httpValueAddr, len);
-    if (retCode != ATTEST_FUZZTEST_OK) {
-        free(httpValue);
-        httpValue = NULL;
-        return ATTEST_FUZZTEST_ERR;
-    }
-
-    *intPara = atoi(httpValue);
-    free(httpValue);
-    httpValue = NULL;
-    return ATTEST_FUZZTEST_OK;
+    return StringToInt32(httpValueAddr, len, intPara);
 }
 
 int32_t ParseHttpsResp(const char *respMsg, char **outBody)
 {
+    if (respMsg == NULL || outBody == NULL || *outBody != NULL) {
+        return ATTEST_FUZZTEST_ERR;
+    }
     int32_t httpRetCode = 0;
     int32_t retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESCODE, &httpRetCode);
     if ((retCode != ATTEST_FUZZTEST_OK) || (httpRetCode != ATTEST_FUZZTEST_HTTP_OK)) {
@@ -105,6 +131,7 @@ int32_t ParseHttpsResp(const char *respMsg, char **outBody)
     if (body == NULL) {
         return ATTEST_FUZZTEST_ERR;
     }
+    (void)memset_s(body, contentLen + 1, 0, contentLen + 1);
     uint32_t headerLen = strlen(respMsg) - contentLen;
     retCode = memcpy_s(body, contentLen + 1, respMsg + headerLen, contentLen);
     if (retCode != ATTEST_FUZZTEST_OK) {

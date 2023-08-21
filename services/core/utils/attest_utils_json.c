@@ -88,6 +88,7 @@ double GetObjectItemValueNumber(const char* rootStr, const char* key)
     }
     cJSON* item = cJSON_GetObjectItem(root, key);
     if (item == NULL) {
+        cJSON_Delete(root);
         return (double)NAN;
     }
     double valueDouble = cJSON_GetNumberValue(item);

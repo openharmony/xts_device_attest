@@ -30,7 +30,7 @@ char* OsGetBuildRootHash(void)
 
 char* OsGetDisplayVersion(void)
 {
-    return AttestStrdup(GetDisplayVersion());
+    return AttestStrdup(GetOSFullName());
 }
 
 char* OsGetManufacture(void)
@@ -66,6 +66,10 @@ char* OsGetUdid(void)
     }
     char *devUdid = udid;
     int32_t ret = GetDevUdid(devUdid, sizeof(udid));
+    if (ret != ATTEST_OK) {
+        return NULL;
+    }
+    ret = ToLowerStr(devUdid, sizeof(udid));
     if (ret != ATTEST_OK) {
         return NULL;
     }

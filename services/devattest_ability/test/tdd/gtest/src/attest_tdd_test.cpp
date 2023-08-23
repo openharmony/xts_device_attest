@@ -34,6 +34,8 @@
 #include "attest_tdd_mock_hal.h"
 #include "attest_tdd_test.h"
 
+extern List g_attestNetworkList;
+
 using namespace testing::ext;
 namespace OHOS {
 namespace DevAttest {
@@ -51,8 +53,6 @@ public:
 
 AttestTddTest::AttestTddTest()
 {
-/*     int32_t ret = InitSysData(); // 初始化系统参数
-    HILOGI("[AttestTdd] Init system data ret = %d.", ret); */
 }
 
 void AttestTddTest::SetUpTestCase(void)
@@ -73,23 +73,21 @@ void AttestTddTest::TearDown()
 
 static AuthResult *GetAuthResult()
 {
-    AuthResult *authResult_ = CreateAuthResult();
-    EXPECT_TRUE((authResult_ != nullptr));
-    if (authResult_ == nullptr) {
+    AuthResult *authResult = CreateAuthResult();
+    if (authResult == nullptr) {
         return nullptr;
     }
-    int32_t ret = ParseAuthResultResp(ATTEST_AUTH_EXPECT_RESULT, authResult_);
-    EXPECT_TRUE((ret == DEVATTEST_SUCCESS));
+    int32_t ret = ParseAuthResultResp(ATTEST_AUTH_EXPECT_RESULT, authResult);
     if (ret != DEVATTEST_SUCCESS) {
-        DestroyAuthResult(&authResult_);
+        DestroyAuthResult(&authResult);
         return nullptr;
     }
-    return authResult_;
+    return authResult;
 }
 
-static void WriteAuthResult(AuthResult *authResult_)
+static void WriteAuthResult(AuthResult *authResult)
 {
-    int32_t ret = FlushToken(authResult_);
+    int32_t ret = FlushToken(authResult);
     EXPECT_TRUE((ret == DEVATTEST_SUCCESS));
 }
 
@@ -109,7 +107,7 @@ HWTEST_F(AttestTddTest, TestInitSysData001, TestSize.Level1)
     EXPECT_STREQ(StrdupDevInfo(BRAND), ATTEST_BRAND);
     EXPECT_STREQ(StrdupDevInfo(SECURITY_PATCH_TAG), ATTEST_SECURITY_PATCH);
     EXPECT_STREQ(StrdupDevInfo(UDID), ATTEST_UDID);
-    // step 3: 恢复环境
+    // 恢复环境
     DestroySysData();
     EXPECT_TRUE(StrdupDevInfo(VERSION_ID) == NULL);
 }
@@ -146,20 +144,6 @@ HWTEST_F(AttestTddTest, TestGetAuthStatus001, TestSize.Level1)
     free(status);
 }
 
-static void FreeAuthStatus(AuthStatus* authStatus)
-{
-    if (authStatus->versionId != NULL) {
-        free(authStatus->versionId);
-    }
-    if (authStatus->authType != NULL) {
-        free(authStatus->authType);
-    }
-    if (authStatus->softwareResultDetail != NULL) {
-        free(authStatus->softwareResultDetail);
-    }
-    free(authStatus);
-}
-
 /*
  * @tc.name: TestDecodeAuthStatus001
  * @tc.desc: Test decode auth status.
@@ -179,7 +163,7 @@ HWTEST_F(AttestTddTest, TestDecodeAuthStatus001, TestSize.Level1)
     SoftwareResultDetail* detail = outStatus->softwareResultDetail;
     EXPECT_TRUE((outStatus->versionId != nullptr) && (outStatus->authType != nullptr) && (detail != nullptr));
     if ((outStatus->versionId == nullptr) || (outStatus->authType == nullptr) || (detail == nullptr)) {
-        FreeAuthStatus(outStatus);
+        DestroyAuthStatus(&outStatus);
         return;
     }
     EXPECT_TRUE(outStatus->hardwareResult == ATTEST_HARDWARE_RESULT);
@@ -187,7 +171,7 @@ HWTEST_F(AttestTddTest, TestDecodeAuthStatus001, TestSize.Level1)
     EXPECT_TRUE(outStatus->expireTime == ATTEST_EXPIRE_TIME);
     EXPECT_STREQ(outStatus->versionId, ATTEST_VERSION_ID);
     EXPECT_TRUE(outStatus->softwareResult == ATTEST_SOFTWARE_RESULT);
-    FreeAuthStatus(outStatus);
+    DestroyAuthStatus(&outStatus);
 }
 
 /*
@@ -428,11 +412,11 @@ static int32_t GetAttestStatus(AttestResultInfo &attestResultInfo)
  */
 HWTEST_F(AttestTddTest, TestQueryAttestStatus001, TestSize.Level1)
 {
-    AuthResult *authResult_ = GetAuthResult();
-    if (authResult_ == nullptr) {
+    AuthResult *authResult = GetAuthResult();
+    if (authResult == nullptr) {
         return;
     }
-    WriteAuthResult(authResult_);
+    WriteAuthResult(authResult);
     uint8_t authResultCode = ATTEST_RESULT_CODE;
     AttestWriteAuthResultCode((char*)&authResultCode, 1);
     AttestResultInfo attestResultInfo;

@@ -32,10 +32,10 @@ ohos_unittest("device_attest_tdd") {
   ]
   sources = [
     "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "${devattest_path}/services/devattest_ability/test/tdd/gtest/src/attest_tdd_data_transfer.c",
-    "${devattest_path}/services/devattest_ability/test/tdd/gtest/src/attest_tdd_mock_hal.c",
-    "${devattest_path}/services/devattest_ability/test/tdd/gtest/src/attest_tdd_mock_property.c",
-    "${devattest_path}/services/devattest_ability/test/tdd/gtest/src/attest_tdd_test.cpp",
+    "./src/attest_tdd_data_transfer.c",
+    "./src/attest_tdd_mock_hal.c",
+    "./src/attest_tdd_mock_property.c",
+    "./src/attest_tdd_test.cpp",
   ]
   sources += sources_notmock
   sources -= [ "${devattest_path}/services/core/adapter/attest_adapter.c" ]

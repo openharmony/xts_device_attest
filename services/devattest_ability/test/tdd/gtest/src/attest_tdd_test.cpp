@@ -34,8 +34,6 @@
 #include "attest_tdd_mock_hal.h"
 #include "attest_tdd_test.h"
 
-extern List g_attestNetworkList;
-
 using namespace testing::ext;
 namespace OHOS {
 namespace DevAttest {

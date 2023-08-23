@@ -16,4 +16,6 @@
 #define ATTEST_TDD_TEST_H
 #include "attest_utils_list.h"
 
+extern List g_attestNetworkList;
+
 #endif

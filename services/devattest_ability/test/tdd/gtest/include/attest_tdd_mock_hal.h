@@ -56,9 +56,9 @@ T3Blbkhhcm1vbnkgMi4zIGJldGEvZGVidWcifQ."
 /OpenHarmony 2.3 beta/debug"
 #define ATTEST_SOFTWARE_RESULT 30002
 
-#define ATTEST_NETWORK_CONFIG "{\"serverInfo\":\"wisedevice-drcn.openharmony.cn:443\"}"
+#define ATTEST_NETWORK_CONFIG "{\"serverInfo\":\"testserver:443\"}"
 #define ATTEST_NETWORK_CONFIG_LEN 256
-#define ATTEST_NETWORK_RESULT "wisedevice-drcn.openharmony.cn"
+#define ATTEST_NETWORK_RESULT "testserver"
 #define ATTEST_RESULT_CODE 0
 #define ATTEST_RESULT_CODE_LEN 1
 

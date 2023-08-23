@@ -187,7 +187,7 @@ static int32_t SetSocketTracekId(char *clientId, char* randomUuid, char **outTra
         return ATTEST_ERR;
     }
     
-    int32_t traceIdLen = strlen(randomUuid) + clientIdLastLen + 2; // traceid拼写规则:randomUuid+'_'+clientId后10位+'\0'(2字符)
+    int32_t traceIdLen = strlen(randomUuid) + clientIdLastLen + 2; // traceid拼写规则:clientId后10位+'_'+randomUuid+'\0'(2字符)
     char *tracekId = (char *)ATTEST_MEM_MALLOC(traceIdLen);
     if (tracekId == NULL) {
         ATTEST_LOG_ERROR("[SetSocketTracekId] tracekId ATTEST MEM MALLOC failed");
@@ -222,8 +222,8 @@ static int32_t BuildSocketInfo(DevicePacket *devValue, HttpPacket *msgHttpPack,
 
     ServerInfo* serverInfo = (ServerInfo*)g_attestNetworkList.head->data;
 
-    msgHttpPack->reqPort = serverInfo->hostName;
-    msgHttpPack->reqHost = serverInfo->port;
+    msgHttpPack->reqPort = serverInfo->port;
+    msgHttpPack->reqHost = serverInfo->hostName;
     msgHttpPack->reqMethod = g_uriPath[actionType];
     msgHttpPack->reqXappID = devValue->appId;
     msgHttpPack->reqXtenantID = devValue->tenantId;

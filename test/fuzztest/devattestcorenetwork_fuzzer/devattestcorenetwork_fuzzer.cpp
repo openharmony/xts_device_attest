@@ -48,7 +48,7 @@ namespace OHOS {
 
     static void ParseRespImpl(char* msgData, uint32_t type)
     {
-        if (msgData == NULL) {
+        if (msgData == nullptr) {
             return;
         }
         char* outputStr = nullptr;
@@ -75,7 +75,7 @@ namespace OHOS {
                 break;
         }
         free(outputStr);
-        outputStr = NULL;
+        outputStr = nullptr;
         return;
     }
 
@@ -84,7 +84,7 @@ namespace OHOS {
         g_baseFuzzData = data;
         g_baseFuzzSize = size;
         g_baseFuzzPos = 0;
-        if (data == NULL) {
+        if (data == nullptr) {
             return;
         }
 
@@ -97,18 +97,18 @@ namespace OHOS {
         int32_t ret = memset_s(msgData, msgDataSize, 0, msgDataSize);
         if (ret != FUZZ_ATTEST_OK) {
             free(msgData);
-            msgData = NULL;
+            msgData = nullptr;
             return;
         }
         ret = memcpy_s(msgData, msgDataSize, data + g_baseFuzzPos, size - g_baseFuzzPos);
         if (ret != FUZZ_ATTEST_OK) {
             free(msgData);
-            msgData = NULL;
+            msgData = nullptr;
             return;
         }
         ParseRespImpl(msgData, type);
         free(msgData);
-        msgData = NULL;
+        msgData = nullptr;
         return;
     }
 

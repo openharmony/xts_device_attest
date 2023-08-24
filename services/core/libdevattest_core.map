@@ -21,6 +21,8 @@
     ParseActiveResult;
     ParseAuthResultResp;
     ParseResetResult;
+    CreateAuthResult;
+    DestroyAuthResult;
   local:
     *;
 };

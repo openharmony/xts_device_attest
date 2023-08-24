@@ -32,7 +32,7 @@ namespace OHOS {
     {
         T object {};
         size_t objectSize = sizeof(object);
-        if (g_baseFuzzData == nullptr || objectSize - g_baseFuzzPos) {
+        if (g_baseFuzzData == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
             return object;
         }
         errno_t ret = memcpy_s(&object, objectSize, g_baseFuzzData + g_baseFuzzPos, objectSize);

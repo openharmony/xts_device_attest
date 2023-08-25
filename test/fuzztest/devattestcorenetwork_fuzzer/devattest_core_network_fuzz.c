@@ -50,7 +50,7 @@ static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
         return ATTEST_FUZZTEST_ERR;
     }
     memset_s(httpValue, len + 1, 0, len + 1);
-    int32_t ret = memcpy_s(httpValue, len + 1, value, len);
+    int32_t ret = memcpy_s(httpValue, len, value, len);
     if (ret != ATTEST_FUZZTEST_OK) {
         free(httpValue);
         httpValue = NULL;
@@ -130,7 +130,7 @@ int32_t ParseHttpsResp(char *respMsg, char **outBody)
     }
     (void)memset_s(body, contentLen + 1, 0, contentLen + 1);
     uint32_t headerLen = strlen(respMsg) - contentLen;
-    retCode = memcpy_s(body, contentLen + 1, respMsg + headerLen, contentLen);
+    retCode = memcpy_s(body, contentLen, respMsg + headerLen, contentLen);
     if (retCode != ATTEST_FUZZTEST_OK) {
         free(body);
         body = NULL;

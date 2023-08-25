@@ -24,7 +24,7 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-int32_t ParseHttpsResp(const char *respMsg, char **outBody);
+int32_t ParseHttpsResp(char *respMsg, char **outBody);
 
 #ifdef __cplusplus
 #if __cplusplus

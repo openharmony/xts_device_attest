@@ -19,4 +19,3 @@
 #define FUZZ_PROJECT_NAME "devattestcorenetwork_fuzzer"
 
 #endif // DEVATTEST_CORE_NETWORK_FUZZER_TEST_H
-

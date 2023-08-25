@@ -63,22 +63,19 @@ static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
     return ATTEST_FUZZTEST_OK;
 }
 
-static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int32_t *intPara)
+static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *intPara)
 {
     if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
         return ATTEST_FUZZTEST_ERR;
     }
-
     const char *httpTypeStr = g_httpHeaderName[(int32_t)(httpType)];
     if (httpTypeStr == NULL) {
         return ATTEST_FUZZTEST_ERR;
     }
-
     const char *appearAddr = strstr(respMsg, httpTypeStr);
     if (appearAddr == NULL) {
         return ATTEST_FUZZTEST_ERR;
     }
-
     int32_t offsetLen = strlen(httpTypeStr);
     while ((appearAddr + offsetLen) != NULL) {
         if (appearAddr[offsetLen] != ' ') {
@@ -110,7 +107,7 @@ static int32_t ParseHttpsRespIntPara(const char *respMsg, int32_t httpType, int3
     return StringToInt32(httpValueAddr, len, intPara);
 }
 
-int32_t ParseHttpsResp(const char *respMsg, char **outBody)
+int32_t ParseHttpsResp(char *respMsg, char **outBody)
 {
     if (respMsg == NULL || outBody == NULL || *outBody != NULL) {
         return ATTEST_FUZZTEST_ERR;

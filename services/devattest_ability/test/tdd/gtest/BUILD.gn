@@ -24,6 +24,7 @@ ohos_unittest("device_attest_tdd") {
   include_dirs = include_core_dirs
   include_dirs += [
     ".",
+    "./include",
     "${devattest_path}/services/core",
     "${devattest_path}/interfaces/innerkits/native_cpp/include",
     "${devattest_path}/common",
@@ -31,12 +32,15 @@ ohos_unittest("device_attest_tdd") {
   ]
   sources = [
     "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "attest_tdd_data_transfer.c",
-    "attest_tdd_mock_hal.c",
-    "attest_tdd_mock_property.c",
-    "attest_tdd_test.cpp",
+    "./src/attest_tdd_data_transfer.c",
+    "./src/attest_tdd_mock_hal.c",
+    "./src/attest_tdd_mock_property.c",
+    "./src/attest_tdd_test.cpp",
   ]
   sources += sources_notmock
+  sources -= [ "${devattest_path}/services/core/adapter/attest_adapter.c" ]
+  sources -=
+      [ "${devattest_path}/services/core/security/attest_security_ticket.c" ]
   deps = core_deps
   external_deps = core_external_deps
 

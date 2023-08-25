@@ -116,6 +116,8 @@ int32_t InitNetworkServerInfo(void);
 
 int32_t UpdateNetConfig(char* activeSite, char* standbySite, int32_t* updateFlag);
 
+int32_t CheckNetworkConnectted(void);
+
 #ifdef __cplusplus
 #if __cplusplus
 }

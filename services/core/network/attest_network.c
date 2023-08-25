@@ -360,6 +360,19 @@ static int32_t InitSocketClient(int32_t *socketFd)
     return ATTEST_OK;
 }
 
+int32_t CheckNetworkConnectted(void)
+{
+    int32_t socketFd = -1;
+    int32_t ret = InitSocketClient(&socketFd);
+    if (ret != ATTEST_OK) {
+        return ATTEST_ERR;
+    }
+    if (socketFd != -1) {
+        close(socketFd);
+    }
+    return ATTEST_OK;
+}
+
 static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
 {
     int32_t retCode;
@@ -1281,8 +1294,7 @@ static int32_t CheckDomain(char* inputData, char** outData)
             ATTEST_LOG_ERROR("[CheckDomain] update g_attestNetworkList failed");
             break;
         }
-        int32_t socketFd = -1;
-        ret = InitSocketClient(&socketFd);
+        ret = CheckNetworkConnectted();
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[CheckDomain] connect to new domain failed");
             break;

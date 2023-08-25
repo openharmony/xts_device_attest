@@ -948,19 +948,17 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] Invalid parameter.");
         return ATTEST_ERR;
     }
-    
+
     const char *httpTypeStr = g_httpHeaderName[httpType];
     if (httpTypeStr == NULL) {
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] get http header name fail.");
         return ATTEST_ERR;
     }
-    
     const char *appearAddr = strstr(respMsg, httpTypeStr);
     if (appearAddr == NULL) {
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara]Find httpName in response msg fail, httpName = %s.", httpTypeStr);
         return ATTEST_ERR;
     }
-
     int32_t offsetLen = strlen(httpTypeStr);
     while ((appearAddr + offsetLen) != NULL) {
         if (appearAddr[offsetLen] != ' ') {
@@ -988,7 +986,6 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
     if (len <= 0) {
         return ATTEST_ERR;
     }
-
     return StringToInt32(httpValueAddr, len, intPara);
 }
 
@@ -1003,7 +1000,7 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
         ATTEST_LOG_ERROR("[ParseHttpsResp] Parse return code failed, ret = %d, httpCode =  %d.", retCode, httpRetCode);
         return ATTEST_ERR;
     }
-    
+
     int32_t contentLen = 0;
     retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESLEN, &contentLen);
     if (retCode != ATTEST_OK || contentLen <= 0) {

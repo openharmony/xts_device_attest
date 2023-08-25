@@ -35,7 +35,7 @@ namespace OHOS {
     {
         T object {};
         size_t objectSize = sizeof(object);
-        if (g_baseFuzzData == nullptr || objectSize - g_baseFuzzPos) {
+        if (g_baseFuzzData == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
             return object;
         }
         errno_t ret = memcpy_s(&object, objectSize, g_baseFuzzData + g_baseFuzzPos, objectSize);
@@ -46,14 +46,13 @@ namespace OHOS {
         return object;
     }
 
-    static void ParseResp(const uint8_t* data, size_t size)
+    static void ParseRespImpl(char* msgData, uint32_t type)
     {
-        g_baseFuzzData = data;
-        g_baseFuzzSize = size;
-        g_baseFuzzPos = 0;
-        uint32_t type  = (GetData<uint32_t>() % ATTEST_ACTION_MAX);
+        if (msgData == nullptr) {
+            return;
+        }
         char* outputStr = nullptr;
-        int32_t ret = ParseHttpsResp(reinterpret_cast<const char*>(data + g_baseFuzzPos), &outputStr);
+        int32_t ret = ParseHttpsResp(msgData, &outputStr);
         if (ret != FUZZ_ATTEST_OK || outputStr == nullptr) {
             return;
         }
@@ -75,9 +74,41 @@ namespace OHOS {
             default:
                 break;
         }
-        if (ret != FUZZ_ATTEST_OK) {
+        free(outputStr);
+        outputStr = nullptr;
+        return;
+    }
+
+    static void ParseResp(const uint8_t* data, size_t size)
+    {
+        g_baseFuzzData = data;
+        g_baseFuzzSize = size;
+        g_baseFuzzPos = 0;
+        if (data == nullptr) {
             return;
         }
+
+        uint32_t type  = (GetData<uint32_t>() % ATTEST_ACTION_MAX);
+        uint32_t msgDataSize = size - g_baseFuzzPos + 1;
+        char* msgData = (char*)malloc(msgDataSize);
+        if (msgData == nullptr) {
+            return;
+        }
+        int32_t ret = memset_s(msgData, msgDataSize, 0, msgDataSize);
+        if (ret != FUZZ_ATTEST_OK) {
+            free(msgData);
+            msgData = nullptr;
+            return;
+        }
+        ret = memcpy_s(msgData, msgDataSize, data + g_baseFuzzPos, size - g_baseFuzzPos);
+        if (ret != FUZZ_ATTEST_OK) {
+            free(msgData);
+            msgData = nullptr;
+            return;
+        }
+        ParseRespImpl(msgData, type);
+        free(msgData);
+        msgData = nullptr;
         return;
     }
 

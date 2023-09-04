@@ -415,7 +415,10 @@ int32_t GetAuthStatus(char** authStatus)
         return ATTEST_ERR;
     }
     uint32_t fileSize = 0;
-    if (AttestGetAuthStatusFileSize(&fileSize) != 0 || fileSize == 0) {
+    if (AttestGetAuthStatusFileSize(&fileSize) != 0) {
+        return ATTEST_ERR;
+    }
+    if (fileSize == 0 || fileSize >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         return ATTEST_ERR;
     }
     uint32_t buffSize = fileSize + 1;
@@ -561,7 +564,7 @@ int32_t DecodeAuthStatus(const char* infoByBase64, AuthStatus* authStats)
 
     size_t requiredBufferSize = 0;
     (void)mbedtls_base64_decode(NULL, 0, &requiredBufferSize, (const uint8_t*)base64Str, base64Len);
-    if ((requiredBufferSize == 0) || (requiredBufferSize >= SIZE_MAX)) {
+    if ((requiredBufferSize == 0) || (requiredBufferSize >= MAX_ATTEST_MALLOC_BUFF_SIZE)) {
         ATTEST_LOG_ERROR("[DecodeAuthStatus] invalid required buffer size for base64 decode");
         ATTEST_MEM_FREE(base64Str);
         return ATTEST_ERR;
@@ -707,7 +710,7 @@ static int32_t ParseAuthStats(const cJSON* json, AuthResult* authResult)
         return ATTEST_ERR;
     }
     uint32_t len = strlen(item);
-    if ((len == 0) || (len >= UINT32_MAX)) {
+    if ((len == 0) || (len >= MAX_ATTEST_MALLOC_BUFF_SIZE)) {
         ATTEST_LOG_ERROR("[ParseAuthStats] authStats length out of range");
         return ATTEST_ERR;
     }

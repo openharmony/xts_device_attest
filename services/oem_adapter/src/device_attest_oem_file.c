@@ -18,12 +18,18 @@
 #include <securec.h>
 #include "device_attest_oem_file.h"
 
+#define MAX_ATTEST_MALLOC_BUFF_SIZE 1024
+
 char* OEMGenFilePath(const char* dirPath, const char* fileName)
 {
     if (dirPath == NULL || fileName == NULL) {
         return NULL;
     }
-
+    if ((strlen(dirPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(dirPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        return NULL;
+    }
     uint32_t filePathLen = strlen(dirPath) + 1 + strlen(fileName) + 1;
     if (filePathLen > PATH_MAX) {
         return NULL;
@@ -160,6 +166,11 @@ int32_t OEMCreateFile(const char* path, const char* fileName)
 
     char* formatPath = realpath(path, NULL);
     if (formatPath == NULL) {
+        return DEVICE_ATTEST_OEM_ERR;
+    }
+    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         return DEVICE_ATTEST_OEM_ERR;
     }
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;

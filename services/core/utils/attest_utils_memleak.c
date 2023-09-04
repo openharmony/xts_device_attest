@@ -133,16 +133,18 @@ static char* StrdupMemInfo(const char* input)
     if (input == NULL) {
         return NULL;
     }
-    size_t len = strlen(input) + 1;
-    if (len == 1) {
+    size_t inputLen = strlen(input);
+    if (inputLen == 0 || inputLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         return NULL;
     }
-    char* out = malloc(len);
+
+    size_t outputLen = inputLen + 1;
+    char* out = malloc(outputLen);
     if (out == NULL) {
         return NULL;
     }
-    (void)memset_s(out, len, 0, len);
-    if (memcpy_s(out, len, input, strlen(input)) != 0) {
+    (void)memset_s(out, outputLen, 0, outputLen);
+    if (memcpy_s(out, outputLen, input, inputLen) != 0) {
         free(out);
         return NULL;
     }

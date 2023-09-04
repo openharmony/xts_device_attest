@@ -105,34 +105,36 @@ void DevAttestService::OnStop()
 
 int32_t DevAttestService::OnIdle(const SystemAbilityOnDemandReason& idleReason)
 {
-    HILOGI("[OnIdle] reason %{public}d", idleReason.GetId());
-    (void)DelayedSingleton<DevAttestNetworkManager>::GetInstance()->UnregisterNetConnCallback();
-    (void)AttestDestroyTimerTask;
-    AttestWaitTaskOver();
     return UNLOAD_IMMEDIATELY;
 }
 
 void DevAttestService::DelayUnloadTask(void)
 {
-    HILOGI("delay unload task begin");
+    HILOGI("[DelayUnloadTask] Delay unload task begin");
     if (unloadHandler_ == nullptr) {
         shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(ATTEST_UNLOAD_TASK_ID);
         unloadHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
     if (unloadHandler_ == nullptr) {
-        HILOGE("unloadHandler is null");
+        HILOGE("[DelayUnloadTask] UnloadHandler is null");
         return;
     }
     auto task = []() {
         sptr<ISystemAbilityManager> samgrProxy =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy == nullptr) {
-            HILOGE("[unload] samgrProxy is null");
+            HILOGE("[DelayUnloadTask] SamgrProxy is null");
             return;
         }
-        int32_t ret = samgrProxy->UnloadSystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE);
+        DelayedSingleton<DevAttestNetworkManager>::GetInstance()->UnregisterNetConnCallback();
+        int32_t ret = AttestDestroyTimerTask();
         if (ret != DEVATTEST_SUCCESS) {
-            HILOGE("[unload] system ability failed");
+            // Don't return
+            HILOGW("[DelayUnloadTask] Stop timer failed");
+        }
+        ret = samgrProxy->UnloadSystemAbility(DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE);
+        if (ret != DEVATTEST_SUCCESS) {
+            HILOGE("[DelayUnloadTask] System ability failed");
             return;
         }
     };

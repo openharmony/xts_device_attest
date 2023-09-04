@@ -948,6 +948,30 @@ static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
     return ATTEST_OK;
 }
 
+static const char* SkipBlank(const char* appearAddr, size_t offsetLen)
+{
+    if (appearAddr == NULL || offsetLen == 0 || offsetLen > MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        ATTEST_LOG_ERROR("[SkipBlank] Invalid parameter.");
+        return NULL;
+    }
+    int32_t blankLen = 0;
+    while ((appearAddr + offsetLen + blankLen) != NULL) {
+        if (appearAddr[offsetLen + blankLen] != ' ') {
+            break;
+        }
+        if (blankLen > ATTEST_MAX_INT32_BIT) {
+            blankLen = -1;
+            break;
+        }
+        blankLen++;
+    }
+    if (blankLen < 0) {
+        ATTEST_LOG_ERROR("[SkipBlank] blankLen too large.");
+        return NULL;
+    }
+    return (appearAddr + offsetLen + blankLen);
+}
+
 static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *intPara)
 {
     if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
@@ -964,25 +988,13 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara]Find httpName in response msg fail, httpName = %s.", httpTypeStr);
         return ATTEST_ERR;
     }
-    int32_t offsetLen = strlen(httpTypeStr);
-    int32_t len = 0;
-    while ((appearAddr + offsetLen) != NULL) {
-        if (appearAddr[offsetLen] != ' ') {
-            break;
-        }
-        if (offsetLen > ATTEST_MAX_INT32_BIT) {
-            len = -1;
-            break;
-        }
-        offsetLen++;
-    }
-    if (len < 0) {
-        return ATTEST_ERR;
-    }
-    const char *httpValueAddr = appearAddr + offsetLen;
+
+    const char *httpValueAddr = SkipBlank(appearAddr, strlen(httpTypeStr));
     if (httpValueAddr == NULL || *httpValueAddr == '\0') {
+        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] SkipBlank failed");
         return ATTEST_ERR;
     }
+    int32_t len = 0;
     while ((httpValueAddr + len) != NULL) {
         if (isdigit(httpValueAddr[len])) {
             len++;
@@ -995,6 +1007,7 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
         }
     }
     if (len <= 0) {
+        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] get digit failed");
         return ATTEST_ERR;
     }
     return StringToInt32(httpValueAddr, len, intPara);
@@ -1025,7 +1038,7 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
         return ATTEST_ERR;
     }
     (void)memset_s(body, contentLen + 1, 0, contentLen + 1);
-    if (strlen(respMsg) <= contentLen) {
+    if (strlen(respMsg) <= (uint32_t)contentLen) {
         return ATTEST_ERR;
     }
     uint32_t headerLen = strlen(respMsg) - contentLen;

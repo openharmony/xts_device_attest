@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <ctype.h>
 #include <securec.h>
 #include "attest_utils.h"
 #include "attest_utils_log.h"
@@ -23,17 +24,21 @@
 static size_t AttestGetMallocLen(const char* input)
 {
     size_t totalFlag = 0;
-    char *indexInput = (char *)input;
-    while (*indexInput != '\0') {
-        if (indexInput >= MAX_ATTEST_MALLOC_BUFF_SIZE || totalFlag >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+    for (size_t inputIndex = 0; inputIndex < strlen(input); inputIndex++) {
+        if (*(input + inputIndex) == '\0') {
+            break;
+        }
+
+        if (*(input + inputIndex) == ',') {
+            totalFlag++;
+        }
+
+        if (totalFlag >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
             totalFlag = 0;
             break;
         }
-        if (*indexInput == ',') {
-            totalFlag++;
-        }
-        indexInput++;
     }
+
     size_t totalByte = totalFlag + 1;
     size_t charLen = sizeof(unsigned char);
     size_t mallocLen = charLen * totalByte + 1;

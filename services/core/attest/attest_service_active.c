@@ -107,7 +107,7 @@ int32_t ParseActiveResult(const char* jsonStr)
         return ATTEST_ERR;
     }
     if ((int32_t)errorCode != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[ParseActiveResult] -errorCode = %d.", -(int32_t)(errorCode));
+        ATTEST_LOG_ERROR("[ParseActiveResult] errorCode = %d.", -(int32_t)(errorCode));
         return -(int32_t)((errorCode));
     }
     return ATTEST_OK;

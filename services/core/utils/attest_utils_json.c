@@ -52,7 +52,7 @@ int32_t GetObjectItemValueStr(const char* rootStr, const char* key, char** dest)
     if (root == NULL) {
         return ATTEST_ERR;
     }
-    int32_t ret;
+    int32_t ret = ATTEST_ERR;
     do {
         char *valueString = cJSON_GetStringValue(cJSON_GetObjectItem(root, key));
         if (valueString == NULL) {
@@ -60,6 +60,10 @@ int32_t GetObjectItemValueStr(const char* rootStr, const char* key, char** dest)
             break;
         }
         uint32_t len = strlen(valueString);
+        if (len == 0 || len >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+            ret = ATTEST_ERR;
+            break;
+        }
         char* buffer = (char *)ATTEST_MEM_MALLOC(len + 1);
         if (buffer == NULL) {
             ret = ATTEST_ERR;

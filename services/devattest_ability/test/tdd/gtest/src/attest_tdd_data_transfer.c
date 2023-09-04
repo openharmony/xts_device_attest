@@ -18,11 +18,17 @@
 #include "attest_utils_log.h"
 #include "attest_tdd_data_transfer.h"
 
+#define ATTEST_LEAST_MALLOC_LEN 2
+
 static size_t AttestGetMallocLen(const char* input)
 {
     size_t totalFlag = 0;
     char *indexInput = (char *)input;
     while (*indexInput != '\0') {
+        if (indexInput >= MAX_ATTEST_MALLOC_BUFF_SIZE || totalFlag >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+            totalFlag = 0;
+            break;
+        }
         if (*indexInput == ',') {
             totalFlag++;
         }
@@ -40,7 +46,7 @@ int32_t AttestSeriaToBinary(const char* input, uint8_t** buf, size_t len)
         return ATTEST_ERR;
     }
     size_t mollocLen = AttestGetMallocLen(input);
-    if (mollocLen > ATTEST_MAX_TLS_LEN) {
+    if (mollocLen <= ATTEST_LEAST_MALLOC_LEN || mollocLen > ATTEST_MAX_TLS_LEN) {
         return ATTEST_ERR;
     }
     uint8_t *temp = (uint8_t *)malloc(mollocLen);
@@ -50,21 +56,29 @@ int32_t AttestSeriaToBinary(const char* input, uint8_t** buf, size_t len)
     memset_s(temp, mollocLen, 0, mollocLen);
 
     char *indexInput = (char *)input;
+    size_t inputLen = strlen(input);
+    size_t tempLen = 0;
     unsigned char *indexTemp = (unsigned char*)temp;
     unsigned char total = 0;
-    ATTEST_LOG_INFO("[AttestSeriaToBinary] begin print ");
-    while (true) {
-        if ((*indexInput == ',') || (*indexInput == '\0')) {
+    int32_t ret = ATTEST_OK;
+    while ((tempLen <= inputLen) && (*indexInput != '\0')) {
+        if (*indexInput == ',') {
             *indexTemp++ = total;
             total = 0;
-        } else {
+        } else if (isdigit(*indexInput)) {
             total = total * ATTEST_DECIMAL + (*indexInput - ATTEST_ZERO_CHAR);
-        }
-        if (*indexInput == '\0') {
+        } else {
+            ret = ATTEST_ERR;
             break;
         }
+        tempLen++;
         indexInput++;
     }
+    if (ret != ATTEST_OK) {
+        free(temp);
+        return ATTEST_ERR;
+    }
+
     if (memcpy_s(*buf, len, temp, len) != 0) {
         free(temp);
         return ATTEST_ERR;

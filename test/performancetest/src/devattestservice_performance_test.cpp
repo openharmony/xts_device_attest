@@ -98,6 +98,9 @@ HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest001, TestSize.Leve
         datasForWritingtoken.WriteInterfaceToken(DevAttestServiceStub::GetDescriptor());
     }
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTimeForWritingtoken = (endTime - startTime);
 
     startTime = GetSysTime();
@@ -107,6 +110,9 @@ HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest001, TestSize.Leve
             DevAttestInterface::GET_AUTH_RESULT, datas, reply, option);
     }
     endTime = GetSysTime();
+    if ((endTime < startTime) || ((endTime - startTime) < diffTimeForWritingtoken)) {
+        return;
+    }
     long long diffTime = ((endTime - startTime) - diffTimeForWritingtoken);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_STUB, diffTime);
@@ -127,6 +133,9 @@ HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest002, TestSize.Leve
         ret = DelayedSingleton<DevAttestService>::GetInstance()->GetAttestStatus(attestResultInfo);
     }
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_SERVICE, diffTime);
@@ -157,6 +166,9 @@ HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest003, TestSize.Leve
         }
     }
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_CORE, diffTime);

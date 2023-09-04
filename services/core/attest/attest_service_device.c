@@ -187,11 +187,17 @@ char* GetRandomUuid(void)
 
 static int32_t MergePcid(char *osPcid, int32_t osPcidLen, char *privatePcid, int32_t privatePcidLen, char **output)
 {
+    // privatePcidLen may be zero
     if (output == NULL || osPcid == NULL || osPcidLen == 0) {
         ATTEST_LOG_ERROR("[MergePcid] Invalid parameter.");
         return ATTEST_ERR;
     }
 
+    if ((osPcidLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) || (privatePcidLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (osPcidLen + privatePcidLen) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        ATTEST_LOG_ERROR("[MergePcid] Invalid length.");
+        return ATTEST_ERR;
+    }
     int32_t pcidLen = osPcidLen + privatePcidLen;
     char *pcidBuff = (char *)ATTEST_MEM_MALLOC(pcidLen);
     if (pcidBuff == NULL) {

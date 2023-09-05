@@ -26,27 +26,8 @@ using namespace std;
 
 namespace OHOS {
     const int32_t FUZZ_ATTEST_OK = 0;
-    const uint8_t *g_baseFuzzData = nullptr;
-    size_t g_baseFuzzSize = 0;
-    size_t g_baseFuzzPos;
 
-    template <class T>
-    T GetData()
-    {
-        T object {};
-        size_t objectSize = sizeof(object);
-        if (g_baseFuzzData == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
-            return object;
-        }
-        errno_t ret = memcpy_s(&object, objectSize, g_baseFuzzData + g_baseFuzzPos, objectSize);
-        if (ret != EOK) {
-            return {};
-        }
-        g_baseFuzzPos += objectSize;
-        return object;
-    }
-
-    static void ParseRespImpl(char* msgData, uint32_t type)
+    static void ParseRespImpl(char* msgData)
     {
         if (msgData == nullptr) {
             return;
@@ -56,24 +37,6 @@ namespace OHOS {
         if (ret != FUZZ_ATTEST_OK || outputStr == nullptr) {
             return;
         }
-        AuthResult *authResult = nullptr;
-        switch (type) {
-            case ATTEST_ACTION_CHALLENGE:
-                break;
-            case ATTEST_ACTION_RESET:
-                ret = ParseResetResult(outputStr);
-                break;
-            case ATTEST_ACTION_AUTHORIZE:
-                authResult = CreateAuthResult();
-                ret = ParseAuthResultResp(outputStr, authResult);
-                DestroyAuthResult(&authResult);
-                break;
-            case ATTEST_ACTION_ACTIVATE:
-                ret = ParseActiveResult(outputStr);
-                break;
-            default:
-                break;
-        }
         free(outputStr);
         outputStr = nullptr;
         return;
@@ -81,15 +44,10 @@ namespace OHOS {
 
     static void ParseResp(const uint8_t* data, size_t size)
     {
-        g_baseFuzzData = data;
-        g_baseFuzzSize = size;
-        g_baseFuzzPos = 0;
         if (data == nullptr) {
             return;
         }
-
-        uint32_t type  = (GetData<uint32_t>() % ATTEST_ACTION_MAX);
-        uint32_t msgDataSize = size - g_baseFuzzPos + 1;
+        size_t msgDataSize = size + 1;
         char* msgData = (char*)malloc(msgDataSize);
         if (msgData == nullptr) {
             return;
@@ -100,13 +58,13 @@ namespace OHOS {
             msgData = nullptr;
             return;
         }
-        ret = memcpy_s(msgData, msgDataSize, data + g_baseFuzzPos, size - g_baseFuzzPos);
+        ret = memcpy_s(msgData, msgDataSize, data, size);
         if (ret != FUZZ_ATTEST_OK) {
             free(msgData);
             msgData = nullptr;
             return;
         }
-        ParseRespImpl(msgData, type);
+        ParseRespImpl(msgData);
         free(msgData);
         msgData = nullptr;
         return;

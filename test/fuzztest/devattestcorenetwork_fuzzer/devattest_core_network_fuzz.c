@@ -44,22 +44,12 @@ static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
     if (value == NULL || len <= 0 || intPara == NULL) {
         return ATTEST_FUZZTEST_ERR;
     }
-
-    char *httpValue = (char *)malloc(len + 1);
-    if (httpValue == NULL) {
-        return ATTEST_FUZZTEST_ERR;
+    int sum = 0;
+    int base = 10;
+    for (int i = 0; i < len; i++) {
+        sum = (sum * base) + (value[i] - '0');
     }
-    memset_s(httpValue, len + 1, 0, len + 1);
-    int32_t ret = memcpy_s(httpValue, len + 1, value, len);
-    if (ret != ATTEST_FUZZTEST_OK) {
-        free(httpValue);
-        httpValue = NULL;
-        return ATTEST_FUZZTEST_ERR;
-    }
-
-    *intPara = atoi(httpValue);
-    free(httpValue);
-    httpValue = NULL;
+    *intPara = (int32_t)sum;
     return ATTEST_FUZZTEST_OK;
 }
 
@@ -120,7 +110,7 @@ int32_t ParseHttpsResp(char *respMsg, char **outBody)
 
     int32_t contentLen = 0;
     retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESLEN, &contentLen);
-    if (retCode != ATTEST_FUZZTEST_OK || contentLen <= 0) {
+    if (retCode != ATTEST_FUZZTEST_OK || contentLen <= 0 || contentLen >= strlen(respMsg)) {
         return ATTEST_FUZZTEST_ERR;
     }
 

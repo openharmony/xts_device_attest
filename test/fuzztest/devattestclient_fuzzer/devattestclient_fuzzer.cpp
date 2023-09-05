@@ -55,12 +55,9 @@ namespace OHOS {
             attestResultInfo.softwareResultDetail_[i] = GetData<int32_t>();
         }
 
-        int32_t len = GetData<int32_t>();
-        int32_t remainSize = size - g_baseFuzzPos;
-        attestResultInfo.ticketLength_ = (len > remainSize) ? remainSize : len;
-
+        attestResultInfo.ticketLength_ = GetData<int32_t>();
         attestResultInfo.ticket_ = std::string(g_baseFuzzData + g_baseFuzzPos,
-            g_baseFuzzData + attestResultInfo.ticketLength_);
+            g_baseFuzzData + size);
         DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
     }
 

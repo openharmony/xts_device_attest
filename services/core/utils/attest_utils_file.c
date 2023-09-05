@@ -179,10 +179,14 @@ int32_t CreateFile(const char* path, const char* fileName)
     if (path == NULL || fileName == NULL) {
         return ATTEST_ERR;
     }
-
     char* formatPath = realpath(path, NULL);
     if (formatPath == NULL) {
         ATTEST_LOG_ERROR("[CreateFile] Invalid path of %s or file %s not exist", path, fileName);
+        return ATTEST_ERR;
+    }
+    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         return ATTEST_ERR;
     }
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;
@@ -257,7 +261,10 @@ int32_t ReadFileBuffer(const char* path, const char* fileName, char** outStr)
     }
     
     uint32_t fileSize = 0;
-    if (GetFileSize(path, fileName, &fileSize) != 0 || fileSize == 0) {
+    if (GetFileSize(path, fileName, &fileSize) != 0) {
+        return ATTEST_ERR;
+    }
+    if (fileSize == 0 || fileSize > MAX_ATTEST_MALLOC_BUFF_SIZE) {
         return ATTEST_ERR;
     }
     uint32_t bufferSize = fileSize + 1;

@@ -192,7 +192,7 @@ static int32_t SetSocketTracekId(char *clientId, char* randomUuid, char **outTra
         ATTEST_LOG_ERROR("[SetSocketTracekId] Invalid parameter");
         return ATTEST_ERR;
     }
-    
+
     int32_t traceIdLen = strlen(randomUuid) + clientIdLastLen + 2; // traceid拼写规则:clientId后10位+'_'+randomUuid+'\0'(2字符)
     char *tracekId = (char *)ATTEST_MEM_MALLOC(traceIdLen);
     if (tracekId == NULL) {
@@ -806,6 +806,10 @@ static int32_t BuildHttpsMsg(char *header, char *body, char **outMsg)
         return ATTEST_ERR;
     }
     
+    if ((headerLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) || (bodyLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (headerLen + bodyLen) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        return ATTEST_ERR;
+    }
     uint32_t msgLen = headerLen + bodyLen + 1;
     char *msg = (char *)ATTEST_MEM_MALLOC(msgLen);
     if (msg == NULL) {
@@ -922,10 +926,12 @@ static int32_t SendHttpsMsg(const char *postData, char **respData)
 
 static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
 {
-    if (value == NULL || len <= 0 || intPara == NULL) {
+    if (value == NULL || intPara == NULL) {
         return ATTEST_ERR;
     }
-
+    if (len <= 0 || len >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        return ATTEST_ERR;
+    }
     char *httpValue = (char *)ATTEST_MEM_MALLOC(len + 1);
     if (httpValue == NULL) {
         return ATTEST_ERR;
@@ -942,13 +948,36 @@ static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
     return ATTEST_OK;
 }
 
+static const char* SkipBlank(const char* appearAddr, size_t offsetLen)
+{
+    if (appearAddr == NULL || offsetLen == 0 || offsetLen > MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        ATTEST_LOG_ERROR("[SkipBlank] Invalid parameter.");
+        return NULL;
+    }
+    int32_t blankLen = 0;
+    while ((appearAddr + offsetLen + blankLen) != NULL) {
+        if (appearAddr[offsetLen + blankLen] != ' ') {
+            break;
+        }
+        if (blankLen > ATTEST_MAX_INT32_BIT) {
+            blankLen = -1;
+            break;
+        }
+        blankLen++;
+    }
+    if (blankLen < 0) {
+        ATTEST_LOG_ERROR("[SkipBlank] blankLen too large.");
+        return NULL;
+    }
+    return (appearAddr + offsetLen + blankLen);
+}
+
 static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *intPara)
 {
     if (respMsg == NULL || intPara == NULL || httpType >= ATTEST_HTTPS_MAX) {
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] Invalid parameter.");
         return ATTEST_ERR;
     }
-
     const char *httpTypeStr = g_httpHeaderName[httpType];
     if (httpTypeStr == NULL) {
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] get http header name fail.");
@@ -959,18 +988,12 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara]Find httpName in response msg fail, httpName = %s.", httpTypeStr);
         return ATTEST_ERR;
     }
-    int32_t offsetLen = strlen(httpTypeStr);
-    while ((appearAddr + offsetLen) != NULL) {
-        if (appearAddr[offsetLen] != ' ') {
-            break;
-        }
-        offsetLen++;
-    }
-    const char *httpValueAddr = appearAddr + offsetLen;
+
+    const char *httpValueAddr = SkipBlank(appearAddr, strlen(httpTypeStr));
     if (httpValueAddr == NULL || *httpValueAddr == '\0') {
+        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] SkipBlank failed");
         return ATTEST_ERR;
     }
-
     int32_t len = 0;
     while ((httpValueAddr + len) != NULL) {
         if (isdigit(httpValueAddr[len])) {
@@ -984,6 +1007,7 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
         }
     }
     if (len <= 0) {
+        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] get digit failed");
         return ATTEST_ERR;
     }
     return StringToInt32(httpValueAddr, len, intPara);
@@ -1003,7 +1027,7 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
 
     int32_t contentLen = 0;
     retCode = ParseHttpsRespIntPara(respMsg, ATTEST_HTTPS_RESLEN, &contentLen);
-    if (retCode != ATTEST_OK || contentLen <= 0) {
+    if (retCode != ATTEST_OK || contentLen <= 0 || contentLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         ATTEST_LOG_ERROR("[ParseHttpsResp] Parse content length failed, ret = %d, length =  %d.", retCode, contentLen);
         return ATTEST_ERR;
     }
@@ -1014,11 +1038,14 @@ static int32_t ParseHttpsResp(char *respMsg, char **outBody)
         return ATTEST_ERR;
     }
     (void)memset_s(body, contentLen + 1, 0, contentLen + 1);
+    if (strlen(respMsg) <= (uint32_t)contentLen) {
+        return ATTEST_ERR;
+    }
     uint32_t headerLen = strlen(respMsg) - contentLen;
     retCode = memcpy_s(body, contentLen + 1, respMsg + headerLen, contentLen);
     if (retCode != ATTEST_OK) {
         ATTEST_MEM_FREE(body);
-        ATTEST_LOG_ERROR("[ParseHttpsResp] respMsg + headerLen memcpy_s fail.");
+        ATTEST_LOG_ERROR("[ParseHttpsResp] memcpy_s fail.");
         return ATTEST_ERR;
     }
     *outBody = body;
@@ -1222,6 +1249,12 @@ static int32_t MergeDomain(char* hostName, char* port, char** resultDomain)
     int32_t ret = ATTEST_OK;
     char* newDomain = NULL;
     do {
+        if ((strlen(hostName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+            (strlen(port) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+            (strlen(CONNECTOR) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+            (strlen(hostName) + strlen(port) + strlen(CONNECTOR)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+            return ATTEST_ERR;
+        }
         int newDomainSize = strlen(hostName) + strlen(port) + strlen(CONNECTOR) + 1;
         newDomain = (char *)ATTEST_MEM_MALLOC(newDomainSize);
         if (newDomain == NULL) {

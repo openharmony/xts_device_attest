@@ -304,6 +304,12 @@ int32_t ProcAttest(void)
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[ProcAttest] InitNetworkServerInfo failed, ret = %d.", ret);
     }
+
+    ret = CheckNetworkConnectted();
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[ProcAttest] Network does not connetted, ret = %d.", ret);
+        return ret;
+    }
     // 主流程
     ret = ProcAttestImpl();
     if (ret != ATTEST_OK) {

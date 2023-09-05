@@ -58,7 +58,7 @@ namespace OHOS {
             msgData = nullptr;
             return;
         }
-        ret = memcpy_s(msgData, size, data, size);
+        ret = memcpy_s(msgData, msgDataSize, data, size);
         if (ret != FUZZ_ATTEST_OK) {
             free(msgData);
             msgData = nullptr;

@@ -76,15 +76,17 @@ char* AttestStrdup(const char* input)
     if (input == NULL) {
         return NULL;
     }
-    size_t len = strlen(input) + 1;
-    if (len <= 1) {
+    size_t inputLen = strlen(input);
+    if (inputLen == 0 || inputLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         return NULL;
     }
-    char* out = ATTEST_MEM_MALLOC(len);
+
+    size_t outputLen = inputLen + 1;
+    char* out = ATTEST_MEM_MALLOC(outputLen);
     if (out == NULL) {
         return NULL;
     }
-    if (memcpy_s(out, len, input, strlen(input)) != 0) {
+    if (memcpy_s(out, outputLen, input, inputLen) != 0) {
         ATTEST_MEM_FREE(out);
         return NULL;
     }
@@ -94,12 +96,15 @@ char* AttestStrdup(const char* input)
 void URLSafeBase64ToBase64(const char* input, size_t inputLen, uint8_t** output, size_t* outputLen)
 {
     uint8_t tempInputLen = 4;
-    if (input == NULL || inputLen == 0 || output == NULL || outputLen == NULL) {
+    if (input == NULL || output == NULL || outputLen == NULL) {
         ATTEST_LOG_ERROR("[URLSafeBase64ToBase64] Invalid parameter");
         return;
     }
+    if (inputLen == 0 || inputLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        return;
+    }
     *outputLen = inputLen + ((inputLen % tempInputLen == 0) ? 0 : (tempInputLen - inputLen % tempInputLen));
-    if (*outputLen == 0) {
+    if (*outputLen == 0 || *outputLen >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         return;
     }
     *output = (uint8_t *)ATTEST_MEM_MALLOC(*outputLen + 1);

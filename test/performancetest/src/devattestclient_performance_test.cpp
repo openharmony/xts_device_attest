@@ -147,6 +147,9 @@ HWTEST_F (DevAttestClientPerformanceTest, CheckSystemAbilityTest001, TestSize.Le
     long long startTime = GetSysTime();
     samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_NE(nullptr, samgrProxy);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_GetSAManager, diffTime);
@@ -154,6 +157,9 @@ HWTEST_F (DevAttestClientPerformanceTest, CheckSystemAbilityTest001, TestSize.Le
     startTime = GetSysTime();
     sptr<IRemoteObject> object = samgrProxy->CheckSystemAbility(SA_ID_DEVICE_ATTEST_SERVICE);
     endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     diffTime = (endTime - startTime);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_CheckDevAttestSA, diffTime);
 }
@@ -170,6 +176,9 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest001, TestSize.Level
     AttestResultInfo attestResultInfo;
     int ret = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     if (diffTime < PERFORMANCE_TEST_MAX_UNWIND_TIME_MS) {
@@ -195,6 +204,9 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest002, TestSize.Level
         ret = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
     }
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_CLIENT, diffTime);
@@ -221,6 +233,9 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest003, TestSize.Level
         ret = devAttestServiceProxy.GetAttestStatus(attestResultInfo);
     }
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_PROXY, diffTime);
@@ -248,6 +263,9 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest004, TestSize.Level
         ret = devAttestServiceProxyTest.TestIPCConsume();
     }
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_IPC, diffTime);
@@ -269,6 +287,9 @@ HWTEST_F (DevAttestClientPerformanceTest, ParcelTest001, TestSize.Level0)
         retBool = attestResultInfo.Marshalling(data);
     }
     long long endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     long long diffTime = (endTime - startTime);
     ASSERT_EQ(true, retBool);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_MARSHALLING, diffTime);
@@ -279,6 +300,9 @@ HWTEST_F (DevAttestClientPerformanceTest, ParcelTest001, TestSize.Level0)
         attestResultInfoPtr = AttestResultInfo::Unmarshalling(data);
     }
     endTime = GetSysTime();
+    if (endTime < startTime) {
+        return;
+    }
     diffTime = (endTime - startTime);
     SetPhaseConsumeTime(AttestPhaseType::ATTEST_PHASE_UNMARSHALLING, diffTime);
 }

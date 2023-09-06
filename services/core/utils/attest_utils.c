@@ -95,7 +95,7 @@ char* AttestStrdup(const char* input)
 
 void URLSafeBase64ToBase64(const char* input, size_t inputLen, uint8_t** output, size_t* outputLen)
 {
-    uint8_t tempInputLen = 4;
+    const uint8_t tempInputLen = 4;
     if (input == NULL || output == NULL || outputLen == NULL) {
         ATTEST_LOG_ERROR("[URLSafeBase64ToBase64] Invalid parameter");
         return;
@@ -150,7 +150,7 @@ int32_t AnonymiseStr(char* str)
     if (strLen <= tempLen) {
         ret = memset_s((void*)str, strLen, '*', strLen);
     } else {
-        uint32_t halfLen = 2;
+        const uint32_t halfLen = 2;
         int32_t unAnonyStrLen = CalUnAnonyStrLen(strLen);
         int32_t endpointLen = unAnonyStrLen / halfLen;
         ret = memset_s((void*)(str + endpointLen), (strLen - unAnonyStrLen), '*', (strLen - unAnonyStrLen));
@@ -256,8 +256,13 @@ int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
         ATTEST_LOG_ERROR("[CharToAscii] Str is NUll");
         return ATTEST_ERR;
     }
-    uint8_t outStr[OUT_STR_LEN_MAX] = {0};
-    for (int i = 0, j = 0; i < len; i++) {
+
+    const uint32_t tempLen = OUT_STR_LEN_MAX - 2;
+    char outStr[OUT_STR_LEN_MAX + 1] = {0};
+    for (uint32_t i = 0, j = 0; i < len; i++) {
+        if (j > tempLen) {
+            break;
+        }
         if ((str[i] > 'A' && str[i] < 'Z') || (str[i] > 'f' && str[i] < 'z')) {
             outStr[j++] = (str[i] - '0') / DECIMAL_BASE + '0';
             outStr[j++] = (str[i] - '0') % DECIMAL_BASE + '0';
@@ -265,9 +270,14 @@ int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
             outStr[j++] = str[i];
         }
     }
-    int32_t outStrLen = strlen((const char*)outStr);
+
+    if (strnlen(outStr, OUT_STR_LEN_MAX) == OUT_STR_LEN_MAX) {
+        ATTEST_LOG_ERROR("[CharToAscii] Out of the OUT_STR_LEN_MAX");
+        return ATTEST_ERR;
+    }
+    int32_t outStrLen = strlen(outStr);
     if (outStrLen >= outputLen) {
-        ATTEST_LOG_ERROR("[CharToAscii] out of the len");
+        ATTEST_LOG_ERROR("[CharToAscii] Out of the outputLen");
         return ATTEST_ERR;
     }
     if (memcpy_s(outputStr, outputLen, outStr, outStrLen) != 0) {

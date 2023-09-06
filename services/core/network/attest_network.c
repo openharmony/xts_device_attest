@@ -187,7 +187,7 @@ static int32_t SetSocketCliented(char* udid, char **outClientId)
 
 static int32_t SetSocketTracekId(char *clientId, char* randomUuid, char **outTracekId)
 {
-    int clientIdLastLen = 10; // clientid后10位;
+    const int clientIdLastLen = 10; // clientid后10位;
     if (clientId == NULL || randomUuid == NULL || outTracekId == NULL) {
         ATTEST_LOG_ERROR("[SetSocketTracekId] Invalid parameter");
         return ATTEST_ERR;

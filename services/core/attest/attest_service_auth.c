@@ -275,7 +275,7 @@ static int32_t ParseAuthType(const cJSON* root, AuthStatus* authStatus)
         return ATTEST_ERR;
     }
     uint32_t len = strlen(temp);
-    if (len == 0 || len > MAX_ATTEST_BUFF_LEN) {
+    if (len == 0 || len >= MAX_ATTEST_BUFF_LEN) {
         ATTEST_LOG_ERROR("[ParseAuthType] authType length out of range");
         return ATTEST_ERR;
     }
@@ -305,7 +305,7 @@ static int32_t ParseVersionId(const cJSON* root, AuthStatus* authStatus)
         return ATTEST_ERR;
     }
     uint32_t len = strlen(temp);
-    if (len == 0 || len > MAX_ATTEST_BUFF_LEN) {
+    if (len == 0 || len >= MAX_ATTEST_BUFF_LEN) {
         ATTEST_LOG_ERROR("[ParseVersionId] versionId length out of range");
         return ATTEST_ERR;
     }

@@ -30,6 +30,7 @@
 #include "attest_network.h"
 #include "attest_adapter.h"
 #include "devattest_errno.h"
+#include "attest_utils.h"
 #include "attest_tdd_mock_property.h"
 #include "attest_tdd_mock_hal.h"
 #include "attest_tdd_test.h"
@@ -425,6 +426,62 @@ HWTEST_F(AttestTddTest, TestQueryAttestStatus001, TestSize.Level1)
         return;
     }
     EXPECT_TRUE(strcmp(attestResultInfo.ticket_.c_str(), ATTEST_TICKET) == 0);
+}
+
+/*
+ * @tc.name: CharToAscii001
+ * @tc.desc: Test input param of CharToAscii.
+ * @tc.type: FUNC
+ */
+HWTEST_F(AttestTddTest, CharToAscii001, TestSize.Level1)
+{
+    char invaildStr[] = "";
+    char str[] = "123DFGH";
+    uint32_t maxLen = OUT_STR_LEN_MAX + 1;
+    uint8_t* resultArray = (uint8_t* )malloc(maxLen);
+    if (resultArray == nullptr) {
+        return;
+    }
+    (void)memset_s(resultArray, maxLen, 0, maxLen);
+    int32_t ret = CharToAscii(invaildStr, strlen(invaildStr), resultArray, maxLen);
+    EXPECT_EQ(ret, ATTEST_ERR);
+
+    ret = CharToAscii(invaildStr, maxLen, resultArray, maxLen);
+    EXPECT_EQ(ret, ATTEST_ERR);
+
+    ret = CharToAscii(str, maxLen, resultArray, maxLen);
+    EXPECT_EQ(ret, ATTEST_ERR);
+
+    ret = CharToAscii(str, strlen(str), resultArray, maxLen);
+    EXPECT_EQ(ret, ATTEST_OK);
+    free(resultArray);
+    resultArray = nullptr;
+}
+
+/*
+ * @tc.name: CharToAscii002
+ * @tc.desc: Test memory leakage and out of range problems.
+ * @tc.type: FUNC
+ */
+HWTEST_F(AttestTddTest, CharToAscii002, TestSize.Level1)
+{
+    char invaildStr[] = "123456789012345678901234567890123456789012345678901234567890\
+1234567890123456789012345678901234567890123456789012345678901234567A";
+    char str[] = "123456789012345678901234567890123456789012345678901234567890\
+123456789012345678901234567890123456789012345678901234567890123456B";
+    uint32_t maxLen = OUT_STR_LEN_MAX + 1;
+    uint8_t* resultArray = (uint8_t* )malloc(maxLen);
+    if (resultArray == nullptr) {
+        return;
+    }
+    (void)memset_s(resultArray, maxLen, 0, maxLen);
+    int32_t ret = CharToAscii(invaildStr, strlen(invaildStr), resultArray, maxLen);
+    EXPECT_EQ(ret, ATTEST_ERR);
+
+    ret = CharToAscii(str, strlen(str), resultArray, maxLen);
+    EXPECT_EQ(ret, ATTEST_OK);
+    free(resultArray);
+    resultArray = nullptr;
 }
 }
 }

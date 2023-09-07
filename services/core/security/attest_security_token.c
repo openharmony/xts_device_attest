@@ -38,7 +38,8 @@ static int32_t GetTokenIdSpecial(uint8_t* tokenId, uint8_t tokenIdLen)
 {
     char *sn = AttestGetSerial();
     size_t snLen = strlen(sn);
-    int32_t ret = CharToAscii(sn, snLen, tokenId, tokenIdLen);
+    uint32_t tokenIdLength = tokenIdLen;
+    int32_t ret = CharToAscii(sn, snLen, tokenId, tokenIdLength);
     ATTEST_MEM_FREE(sn);
     return ret;
 }

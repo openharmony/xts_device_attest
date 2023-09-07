@@ -250,20 +250,27 @@ void AttestMemFree(void **point)
     *point = NULL;
 }
 
-int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
+int32_t CharToAscii(const char* str, uint32_t len, uint8_t* outputStr, uint32_t outputLen)
 {
-    if (str == NULL || outputStr == NULL) {
-        ATTEST_LOG_ERROR("[CharToAscii] Str is NUll");
+    // tokenId {a-f,0-9,-}
+    if (str == NULL || len == 0 || outputStr == NULL || outputLen == 0) {
+        ATTEST_LOG_ERROR("[CharToAscii] Invaild paramter");
+        return ATTEST_ERR;
+    }
+    if (strlen(str) < len) {
+        ATTEST_LOG_ERROR("[CharToAscii] Invaild len");
         return ATTEST_ERR;
     }
 
-    const uint32_t tempLen = OUT_STR_LEN_MAX - 2;
-    char outStr[OUT_STR_LEN_MAX + 1] = {0};
+    // Max length of outStr is OUT_STR_LEN_MAX, but if the last char of str need to conver 2 char,
+    // outStr should reserve one more size.
+    const uint32_t outStrLenMax = OUT_STR_LEN_MAX + 1;
+    char outStr[OUT_STR_LEN_MAX + 2] = {0};
     for (uint32_t i = 0, j = 0; i < len; i++) {
-        if (j > tempLen) {
+        if (j >= outStrLenMax) {
             break;
         }
-        if ((str[i] > 'A' && str[i] < 'Z') || (str[i] > 'f' && str[i] < 'z')) {
+        if ((str[i] >= 'A' && str[i] <= 'Z') || (str[i] >= 'g' && str[i] <= 'z')) {
             outStr[j++] = (str[i] - '0') / DECIMAL_BASE + '0';
             outStr[j++] = (str[i] - '0') % DECIMAL_BASE + '0';
         } else {
@@ -271,11 +278,11 @@ int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
         }
     }
 
-    if (strnlen(outStr, OUT_STR_LEN_MAX) == OUT_STR_LEN_MAX) {
-        ATTEST_LOG_ERROR("[CharToAscii] Out of the OUT_STR_LEN_MAX");
+    if (strnlen(outStr, outStrLenMax) == outStrLenMax) {
+        ATTEST_LOG_ERROR("[CharToAscii] Out of the outStrLenMax");
         return ATTEST_ERR;
     }
-    int32_t outStrLen = strlen(outStr);
+    uint32_t outStrLen = strlen(outStr);
     if (outStrLen >= outputLen) {
         ATTEST_LOG_ERROR("[CharToAscii] Out of the outputLen");
         return ATTEST_ERR;
@@ -285,4 +292,3 @@ int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
     }
     return ATTEST_OK;
 }
-

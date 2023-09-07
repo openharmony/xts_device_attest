@@ -141,8 +141,10 @@ int32_t Base64Encode(const uint8_t* srcData, size_t srcDataLen, uint8_t* base64E
     ret = memcpy_s(base64Encode, base64EncodeLen, base64Data, outLen);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[Base64Encode] memcpy_s base64Data fail");
+        (void)memset_s(base64Data, sizeof(base64Data), 0, sizeof(base64Data));
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
+    (void)memset_s(base64Data, sizeof(base64Data), 0, sizeof(base64Data));
     return ATTEST_OK;
 }
 
@@ -203,6 +205,7 @@ static int32_t GetPsk(uint8_t psk[], size_t pskLen)
     for (size_t i = 0; i < pskLen; i++) {
         psk[i] = base64Psk[i] ^ base64PskKey[i];
     }
+    (void)memset_s(base64Psk, sizeof(base64Psk), 0, sizeof(base64Psk));
     return ATTEST_OK;
 }
 
@@ -228,6 +231,7 @@ static int32_t GetProductInfo(const char* version, SecurityParam* productInfoPar
             ATTEST_LOG_ERROR("[GetProductInfo] Copy product id failed");
             return ERR_ATTEST_SECURITY_MEM_MEMCPY;
         }
+        (void)memset_s(productId, PRODUCT_ID_LEN, 0, PRODUCT_ID_LEN);
     } else if (strcmp(version, TOKEN_VER1_0) == 0) { // productInfo = Manufacturekey
         productInfoParam->paramLen = MANUFACTUREKEY_LEN;
     }
@@ -361,6 +365,7 @@ int32_t GetAesKey(const SecurityParam* salt, const VersionData* versionData,  co
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetAesKey] HKDF derive key failed, ret = -0x%x", -ret);
     }
+    memset_s(psk, PSK_LEN, 0, PSK_LEN);
     return ret;
 }
 
@@ -591,6 +596,7 @@ int32_t Encrypt(uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
         ATTEST_LOG_ERROR("[Encrypt] Encrypt memcpy_s failed, ret = %d", ret);
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
+    (void)memset_s(base64Data, ENCRYPT_LEN, 0, ENCRYPT_LEN);
     return ATTEST_OK;
 }
 
@@ -627,5 +633,6 @@ int32_t Decrypt(const uint8_t* inputData, size_t inputDataLen, const uint8_t* ae
         ATTEST_LOG_ERROR("[Decrypt] memcpy_s decryptData fail");
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
+    (void)memset_s(decryptData, ENCRYPT_LEN, 0, ENCRYPT_LEN);
     return ATTEST_OK;
 }

@@ -205,17 +205,22 @@ int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
     mbedtls_sha256_update_ret(&context, src, srcLen);
     mbedtls_sha256_finish_ret(&context, hash);
 
+    int32_t ret = ATTEST_OK;
     for (size_t i = 0; i < HASH_LENGTH; i++) {
         unsigned char value = hash[i];
         (void)memset_s(buf, DEV_BUF_LENGTH, 0, DEV_BUF_LENGTH);
         if (sprintf_s(buf, sizeof(buf), "%02X", value) < 0) {
-            return ATTEST_ERR;
+            ret = ATTEST_ERR;
+            break;
         }
         if (strcat_s(dest, destLen, buf) != 0) {
-            return ATTEST_ERR;
+            ret = ATTEST_ERR;
+            break;
         }
     }
-    return ATTEST_OK;
+    (void)memset_s(buf, DEV_BUF_LENGTH, 0, DEV_BUF_LENGTH);
+    (void)memset_s(hash, HASH_LENGTH, 0, HASH_LENGTH);
+    return ret;
 }
 
 void *AttestMemAlloc(uint32_t size, const char* file, uint32_t line, const char* func)
@@ -261,7 +266,6 @@ int32_t CharToAscii(const char* str, uint32_t len, uint8_t* outputStr, uint32_t 
         ATTEST_LOG_ERROR("[CharToAscii] Invaild len");
         return ATTEST_ERR;
     }
-
     // Max length of outStr is OUT_STR_LEN_MAX, but if the last char of str need to conver 2 char,
     // outStr should reserve one more size.
     const uint32_t outStrLenMax = OUT_STR_LEN_MAX + 1;
@@ -277,18 +281,24 @@ int32_t CharToAscii(const char* str, uint32_t len, uint8_t* outputStr, uint32_t 
             outStr[j++] = str[i];
         }
     }
-
-    if (strnlen(outStr, outStrLenMax) == outStrLenMax) {
-        ATTEST_LOG_ERROR("[CharToAscii] Out of the outStrLenMax");
-        return ATTEST_ERR;
-    }
-    uint32_t outStrLen = strlen(outStr);
-    if (outStrLen >= outputLen) {
-        ATTEST_LOG_ERROR("[CharToAscii] Out of the outputLen");
-        return ATTEST_ERR;
-    }
-    if (memcpy_s(outputStr, outputLen, outStr, outStrLen) != 0) {
-        return ATTEST_ERR;
-    }
-    return ATTEST_OK;
+    int32_t ret = ATTEST_OK;
+    do {
+        if (strnlen(outStr, outStrLenMax) == outStrLenMax) {
+            ATTEST_LOG_ERROR("[CharToAscii] Out of the outStrLenMax");
+            ret = ATTEST_ERR;
+            break;
+        }
+        uint32_t outStrLen = strlen(outStr);
+        if (outStrLen >= outputLen) {
+            ATTEST_LOG_ERROR("[CharToAscii] Out of the outputLen");
+            ret = ATTEST_ERR;
+            break;
+        }
+        if (memcpy_s(outputStr, outputLen, outStr, outStrLen) != 0) {
+            ret = ATTEST_ERR;
+            break;
+        }
+    } while (0);
+    (void)memset_s(outStr, OUT_STR_LEN_MAX + 2, 0, OUT_STR_LEN_MAX + 2);
+    return ret;
 }

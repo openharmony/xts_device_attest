@@ -127,6 +127,7 @@ void DestroySysData(void)
     }
 
     for (int32_t i = 0; i < SYS_DEV_MAX; i++) {
+        (void)memset_s(g_devSysInfos[i], strlen(g_devSysInfos[i]), 0, strlen(g_devSysInfos[i]));
         ATTEST_MEM_FREE(g_devSysInfos[i]);
     }
 }
@@ -264,6 +265,12 @@ char* GetPcid(void)
     // Merge OsSyscap and PrivateSyscap
     char *pcidBuff = NULL;
     int32_t ret = MergePcid(osSyscaps, PCID_MAIN_BYTES, privateSyscaps, privatePcidLen, &pcidBuff);
+    (void)memset_s(osSyscaps, PCID_MAIN_BYTES, 0, PCID_MAIN_BYTES);
+    if (privateSyscaps != NULL) {
+        (void)memset_s(privateSyscaps, privatePcidLen, 0, privatePcidLen);
+        free(privateSyscaps);
+        privateSyscaps = NULL;
+    }
     if (ret != ATTEST_OK || pcidBuff == NULL) {
         ATTEST_LOG_ERROR("[GetPcid] Failed to merge Pcid.");
         return NULL;
@@ -277,7 +284,7 @@ char* GetPcid(void)
         ATTEST_MEM_FREE(pcidBuff);
         return NULL;
     }
-
+    (void)memset_s(pcidBuff, PCID_MAIN_BYTES + privatePcidLen, 0, PCID_MAIN_BYTES + privatePcidLen);
     ATTEST_MEM_FREE(pcidBuff);
     return pcidSha256;
 }

@@ -61,20 +61,31 @@ char* OsGetSerial(void)
 
 char* OsGetUdid(void)
 {
-    char udid[UDID_STRING_LEN + 1] = {0};
-    if (memset_s(udid, sizeof(udid), 0, sizeof(udid)) != 0) {
+    char* udid = (char*)ATTEST_MEM_MALLOC(UDID_STRING_LEN + 1);
+    if (udid == NULL) {
         return NULL;
     }
-    char *devUdid = udid;
-    int32_t ret = GetDevUdid(devUdid, sizeof(udid));
+    (void)memset_s(udid, UDID_STRING_LEN + 1, 0, UDID_STRING_LEN + 1);
+    int32_t ret = ATTEST_ERR;
+    do {
+        ret = GetDevUdid(udid, UDID_STRING_LEN + 1);
+        if (ret != ATTEST_OK) {
+            break;
+        }
+        ret = ToLowerStr(udid, UDID_STRING_LEN + 1);
+        if (ret != ATTEST_OK) {
+            break;
+        }
+    } while (0);
     if (ret != ATTEST_OK) {
+        (void)memset_s(udid, UDID_STRING_LEN + 1, 0, UDID_STRING_LEN + 1);
+        ATTEST_MEM_FREE(udid);
         return NULL;
     }
-    ret = ToLowerStr(devUdid, sizeof(udid));
-    if (ret != ATTEST_OK) {
-        return NULL;
-    }
-    return AttestStrdup(devUdid);
+    char* outputStr = AttestStrdup(udid);
+    (void)memset_s(udid, UDID_STRING_LEN + 1, 0, UDID_STRING_LEN + 1);
+    ATTEST_MEM_FREE(udid);
+    return outputStr;
 }
 
 int32_t OsSetParameter(const char *key, const char *value)

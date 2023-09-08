@@ -95,7 +95,7 @@ char* AttestStrdup(const char* input)
 
 void URLSafeBase64ToBase64(const char* input, size_t inputLen, uint8_t** output, size_t* outputLen)
 {
-    uint8_t tempInputLen = 4;
+    const uint8_t tempInputLen = 4;
     if (input == NULL || output == NULL || outputLen == NULL) {
         ATTEST_LOG_ERROR("[URLSafeBase64ToBase64] Invalid parameter");
         return;
@@ -150,7 +150,7 @@ int32_t AnonymiseStr(char* str)
     if (strLen <= tempLen) {
         ret = memset_s((void*)str, strLen, '*', strLen);
     } else {
-        uint32_t halfLen = 2;
+        const uint32_t halfLen = 2;
         int32_t unAnonyStrLen = CalUnAnonyStrLen(strLen);
         int32_t endpointLen = unAnonyStrLen / halfLen;
         ret = memset_s((void*)(str + endpointLen), (strLen - unAnonyStrLen), '*', (strLen - unAnonyStrLen));
@@ -205,17 +205,22 @@ int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
     mbedtls_sha256_update_ret(&context, src, srcLen);
     mbedtls_sha256_finish_ret(&context, hash);
 
+    int32_t ret = ATTEST_OK;
     for (size_t i = 0; i < HASH_LENGTH; i++) {
         unsigned char value = hash[i];
         (void)memset_s(buf, DEV_BUF_LENGTH, 0, DEV_BUF_LENGTH);
         if (sprintf_s(buf, sizeof(buf), "%02X", value) < 0) {
-            return ATTEST_ERR;
+            ret = ATTEST_ERR;
+            break;
         }
         if (strcat_s(dest, destLen, buf) != 0) {
-            return ATTEST_ERR;
+            ret = ATTEST_ERR;
+            break;
         }
     }
-    return ATTEST_OK;
+    (void)memset_s(buf, DEV_BUF_LENGTH, 0, DEV_BUF_LENGTH);
+    (void)memset_s(hash, HASH_LENGTH, 0, HASH_LENGTH);
+    return ret;
 }
 
 void *AttestMemAlloc(uint32_t size, const char* file, uint32_t line, const char* func)
@@ -250,29 +255,50 @@ void AttestMemFree(void **point)
     *point = NULL;
 }
 
-int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
+int32_t CharToAscii(const char* str, uint32_t len, uint8_t* outputStr, uint32_t outputLen)
 {
-    if (str == NULL || outputStr == NULL) {
-        ATTEST_LOG_ERROR("[CharToAscii] Str is NUll");
+    // tokenId {a-f,0-9,-}
+    if (str == NULL || len == 0 || outputStr == NULL || outputLen == 0) {
+        ATTEST_LOG_ERROR("[CharToAscii] Invaild paramter");
         return ATTEST_ERR;
     }
-    uint8_t outStr[OUT_STR_LEN_MAX] = {0};
-    for (int i = 0, j = 0; i < len; i++) {
-        if ((str[i] > 'A' && str[i] < 'Z') || (str[i] > 'f' && str[i] < 'z')) {
+    if (strlen(str) < len) {
+        ATTEST_LOG_ERROR("[CharToAscii] Invaild len");
+        return ATTEST_ERR;
+    }
+    // Max length of outStr is OUT_STR_LEN_MAX, but if the last char of str need to conver 2 char,
+    // outStr should reserve one more size.
+    const uint32_t outStrLenMax = OUT_STR_LEN_MAX + 1;
+    char outStr[OUT_STR_LEN_MAX + 2] = {0};
+    for (uint32_t i = 0, j = 0; i < len; i++) {
+        if (j >= outStrLenMax) {
+            break;
+        }
+        if ((str[i] >= 'A' && str[i] <= 'Z') || (str[i] >= 'g' && str[i] <= 'z')) {
             outStr[j++] = (str[i] - '0') / DECIMAL_BASE + '0';
             outStr[j++] = (str[i] - '0') % DECIMAL_BASE + '0';
         } else {
             outStr[j++] = str[i];
         }
     }
-    int32_t outStrLen = strlen((const char*)outStr);
-    if (outStrLen >= outputLen) {
-        ATTEST_LOG_ERROR("[CharToAscii] out of the len");
-        return ATTEST_ERR;
-    }
-    if (memcpy_s(outputStr, outputLen, outStr, outStrLen) != 0) {
-        return ATTEST_ERR;
-    }
-    return ATTEST_OK;
+    int32_t ret = ATTEST_OK;
+    do {
+        if (strnlen(outStr, outStrLenMax) == outStrLenMax) {
+            ATTEST_LOG_ERROR("[CharToAscii] Out of the outStrLenMax");
+            ret = ATTEST_ERR;
+            break;
+        }
+        uint32_t outStrLen = strlen(outStr);
+        if (outStrLen >= outputLen) {
+            ATTEST_LOG_ERROR("[CharToAscii] Out of the outputLen");
+            ret = ATTEST_ERR;
+            break;
+        }
+        if (memcpy_s(outputStr, outputLen, outStr, outStrLen) != 0) {
+            ret = ATTEST_ERR;
+            break;
+        }
+    } while (0);
+    (void)memset_s(outStr, outStrLenMax + 1, 0, outStrLenMax + 1);
+    return ret;
 }
-

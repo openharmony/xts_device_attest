@@ -151,7 +151,7 @@ static int32_t Sha256Udid(char *udid, char *outStr)
         curLen += snprintf_s((char *)&outStr[i << 1], (uint32_t)(HTTPS_NETWORK_SHA256_LEN - curLen),
             (uint32_t)(HTTPS_NETWORK_SHA256_LEN - curLen) - 1, "%02x", hash[i]);
     }
-
+    (void)memset_s(hash, HTTPS_NETWORK_SHA256_LEN, 0, HTTPS_NETWORK_SHA256_LEN);
     ATTEST_LOG_DEBUG_ANONY("[Sha256Udid] udid = %s", udid);
     ATTEST_LOG_DEBUG_ANONY("[Sha256Udid] SHA(udid)=%s", outStr);
     return ATTEST_OK;
@@ -187,7 +187,7 @@ static int32_t SetSocketCliented(char* udid, char **outClientId)
 
 static int32_t SetSocketTracekId(char *clientId, char* randomUuid, char **outTracekId)
 {
-    int clientIdLastLen = 10; // clientid后10位;
+    const int clientIdLastLen = 10; // clientid后10位;
     if (clientId == NULL || randomUuid == NULL || outTracekId == NULL) {
         ATTEST_LOG_ERROR("[SetSocketTracekId] Invalid parameter");
         return ATTEST_ERR;
@@ -209,6 +209,7 @@ static int32_t SetSocketTracekId(char *clientId, char* randomUuid, char **outTra
 
     retCode = sprintf_s(tracekId, traceIdLen, "%s_%s", tracekId, randomUuid);
     if (retCode < 0) {
+        (void)memset_s(tracekId, traceIdLen, 0, traceIdLen);
         ATTEST_MEM_FREE(tracekId);
         ATTEST_LOG_ERROR("[SetSocketTracekId] sprintf_s tracekId failed");
         return ATTEST_ERR;
@@ -463,6 +464,7 @@ static int32_t RecvSSL(SSL *socketSSL, char **outMsg)
     }
 
     ATTEST_LOG_ERROR("[RecvSSL]RecvSSL fail, retCode=%d \n", retCode);
+    (void)memset_s(respData, HTTPS_NETWORK_RESPONSE_MAXLEN, 0, HTTPS_NETWORK_RESPONSE_MAXLEN);
     ATTEST_MEM_FREE(respData);
     return ATTEST_ERR;
 }

@@ -579,6 +579,7 @@ int32_t Encrypt(uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
     }
 
     size_t outputLen = 0;
+    const uint32_t base64DataLen = BASE64_LEN + 1;
     uint8_t base64Data[BASE64_LEN + 1] = {0};
     ret = mbedtls_base64_encode(base64Data, sizeof(base64Data), &outputLen,
                                 (const uint8_t*)encryptedData, aesOutLen);
@@ -596,7 +597,7 @@ int32_t Encrypt(uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
         ATTEST_LOG_ERROR("[Encrypt] Encrypt memcpy_s failed, ret = %d", ret);
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
-    (void)memset_s(base64Data, ENCRYPT_LEN, 0, ENCRYPT_LEN);
+    (void)memset_s(base64Data, base64DataLen, 0, base64DataLen);
     return ATTEST_OK;
 }
 

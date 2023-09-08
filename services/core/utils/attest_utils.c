@@ -299,6 +299,6 @@ int32_t CharToAscii(const char* str, uint32_t len, uint8_t* outputStr, uint32_t 
             break;
         }
     } while (0);
-    (void)memset_s(outStr, OUT_STR_LEN_MAX + 2, 0, OUT_STR_LEN_MAX + 2);
+    (void)memset_s(outStr, outStrLenMax + 1, 0, outStrLenMax + 1);
     return ret;
 }

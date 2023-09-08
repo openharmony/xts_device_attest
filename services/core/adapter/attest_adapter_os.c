@@ -62,6 +62,9 @@ char* OsGetSerial(void)
 char* OsGetUdid(void)
 {
     char* udid = (char*)ATTEST_MEM_MALLOC(UDID_STRING_LEN + 1);
+    if (udid == NULL) {
+        return NULL;
+    }
     (void)memset_s(udid, UDID_STRING_LEN + 1, 0, UDID_STRING_LEN + 1);
     int32_t ret = ATTEST_ERR;
     do {
@@ -74,6 +77,11 @@ char* OsGetUdid(void)
             break;
         }
     } while (0);
+    if (ret != ATTEST_OK) {
+        (void)memset_s(udid, UDID_STRING_LEN + 1, 0, UDID_STRING_LEN + 1);
+        ATTEST_MEM_FREE(udid);
+        return NULL;
+    }
     char* outputStr = AttestStrdup(udid);
     (void)memset_s(udid, UDID_STRING_LEN + 1, 0, UDID_STRING_LEN + 1);
     ATTEST_MEM_FREE(udid);

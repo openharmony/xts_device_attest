@@ -438,7 +438,7 @@ HWTEST_F(AttestTddTest, CharToAscii001, TestSize.Level1)
     char invaildStr[] = "";
     char str[] = "123DFGH";
     uint32_t maxLen = OUT_STR_LEN_MAX + 1;
-    uint8_t* resultArray = (uint8_t* )malloc(maxLen);
+    uint8_t* resultArray = (uint8_t *)malloc(maxLen);
     if (resultArray == nullptr) {
         return;
     }
@@ -470,7 +470,7 @@ HWTEST_F(AttestTddTest, CharToAscii002, TestSize.Level1)
     char str[] = "123456789012345678901234567890123456789012345678901234567890\
 123456789012345678901234567890123456789012345678901234567890123456B";
     uint32_t maxLen = OUT_STR_LEN_MAX + 1;
-    uint8_t* resultArray = (uint8_t* )malloc(maxLen);
+    uint8_t* resultArray = (uint8_t *)malloc(maxLen);
     if (resultArray == nullptr) {
         return;
     }

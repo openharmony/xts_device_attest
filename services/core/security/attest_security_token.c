@@ -30,6 +30,7 @@ static int32_t GetTokenValueSpecial(uint8_t* tokenValue, uint8_t tokenValueLen)
     char *sn = AttestGetSerial();
     size_t snLen = strlen(sn);
     (void)memcpy_s(tokenValue, tokenValueLen, sn, snLen);
+    (void)memset_s(sn, strlen(sn), 0, strlen(sn));
     ATTEST_MEM_FREE(sn);
     return ATTEST_OK;
 }
@@ -38,7 +39,9 @@ static int32_t GetTokenIdSpecial(uint8_t* tokenId, uint8_t tokenIdLen)
 {
     char *sn = AttestGetSerial();
     size_t snLen = strlen(sn);
-    int32_t ret = CharToAscii(sn, snLen, tokenId, tokenIdLen);
+    uint32_t tokenIdLength = tokenIdLen;
+    int32_t ret = CharToAscii(sn, snLen, tokenId, tokenIdLength);
+    (void)memset_s(sn, strlen(sn), 0, strlen(sn));
     ATTEST_MEM_FREE(sn);
     return ret;
 }
@@ -246,6 +249,7 @@ static int32_t GetTokenInfo(const char* tokenValue, uint8_t tokenValueLen,
         return ret;
     }
     ret = EncryptTokenValueToTokenInfo(tokenValue, tokenValueLen, aesKey, tokenInfo);
+    (void)memset_s(aesKey, AES_KEY_LEN, 0, AES_KEY_LEN);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenInfo] Encrypt TokenValue To TokenInfo failed");
         return ret;
@@ -304,6 +308,7 @@ static int32_t GetTokenValueDecrypted(uint8_t* tokenValue, uint8_t tokenValueLen
     }
 
     ret = GetDecryptedTokenValue(&tokenInfo, tokenValue, tokenValueLen);
+    (void)memset_s(&tokenInfo, sizeof(TokenInfo), 0, sizeof(TokenInfo));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueDecrypted] Get decrypted token value failed, ret = %d", ret);
         return ATTEST_ERR;
@@ -328,12 +333,14 @@ int32_t GetTokenValueHmac(const char* challenge, uint8_t* tokenValueHmac, uint8_
 
     uint8_t hmac[HMAC_SHA256_CIPHER_LEN] = {0};
     ret = EncryptHmac(challenge, (const uint8_t*)tokenValue, strlen((const char *)tokenValue), hmac, sizeof(hmac));
+    (void)memset_s(tokenValue, TOKEN_VALUE_LEN + 1, 0, TOKEN_VALUE_LEN + 1);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueHmac] Encrypt token value hmac failed, ret = %d", ret);
         return ret;
     }
     
     ret = Base64Encode(hmac, sizeof(hmac), tokenValueHmac, tokenValueHmacLen);
+    (void)memset_s(hmac, HMAC_SHA256_CIPHER_LEN, 0, HMAC_SHA256_CIPHER_LEN);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueHmac] Encrypt token value base64 encode failed, ret = %d", ret);
     }
@@ -356,6 +363,7 @@ int32_t GetTokenId(uint8_t* tokenId, uint8_t tokenIdLen)
         return ATTEST_ERR;
     }
     ret = GetTokenIdDecrypted(&tokenInfo, tokenId, tokenIdLen);
+    (void)memset_s(&tokenInfo, sizeof(TokenInfo), 0, sizeof(TokenInfo));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenId] Get decrypted token id failed");
         return ATTEST_ERR;
@@ -382,6 +390,7 @@ static int32_t WriteToken(const char* tokenValue, uint8_t tokenValueLen,
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[WriteToken] Write token info failed, ret = %d", ret);
     }
+    (void)memset_s(&tokenInfo, sizeof(TokenInfo), 0, sizeof(TokenInfo));
     return ret;
 }
 

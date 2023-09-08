@@ -124,8 +124,10 @@ int32_t Base64Encode(const uint8_t* srcData, size_t srcDataLen, uint8_t* base64E
     }
 
     size_t outLen = 0;
+    const size_t base64EncodeMaxLen = base64EncodeLen + 1;
     int32_t ret = mbedtls_base64_encode(NULL, 0, &outLen, srcData, srcDataLen);
-    if ((outLen == 0) || (outLen > (size_t)(base64EncodeLen + 1))) {
+
+    if ((outLen == 0) || (outLen > base64EncodeMaxLen)) {
         ATTEST_LOG_ERROR("[Base64Encode] Base64 encode get outLen failed, outLen = %u, ret = -0x00%x", outLen, -ret);
         return ERR_ATTEST_SECURITY_BASE64_ENCODE;
     }
@@ -139,8 +141,10 @@ int32_t Base64Encode(const uint8_t* srcData, size_t srcDataLen, uint8_t* base64E
     ret = memcpy_s(base64Encode, base64EncodeLen, base64Data, outLen);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[Base64Encode] memcpy_s base64Data fail");
+        (void)memset_s(base64Data, sizeof(base64Data), 0, sizeof(base64Data));
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
+    (void)memset_s(base64Data, sizeof(base64Data), 0, sizeof(base64Data));
     return ATTEST_OK;
 }
 
@@ -201,6 +205,7 @@ static int32_t GetPsk(uint8_t psk[], size_t pskLen)
     for (size_t i = 0; i < pskLen; i++) {
         psk[i] = base64Psk[i] ^ base64PskKey[i];
     }
+    (void)memset_s(base64Psk, sizeof(base64Psk), 0, sizeof(base64Psk));
     return ATTEST_OK;
 }
 
@@ -226,6 +231,7 @@ static int32_t GetProductInfo(const char* version, SecurityParam* productInfoPar
             ATTEST_LOG_ERROR("[GetProductInfo] Copy product id failed");
             return ERR_ATTEST_SECURITY_MEM_MEMCPY;
         }
+        (void)memset_s(productId, PRODUCT_ID_LEN, 0, PRODUCT_ID_LEN);
     } else if (strcmp(version, TOKEN_VER1_0) == 0) { // productInfo = Manufacturekey
         productInfoParam->paramLen = MANUFACTUREKEY_LEN;
     }
@@ -234,6 +240,10 @@ static int32_t GetProductInfo(const char* version, SecurityParam* productInfoPar
 
 static int32_t InitHksParamSet(struct HksParamSet** paramSet, const struct HksParam *params, uint32_t paramcount)
 {
+    if (paramSet == NULL || params == NULL || paramcount == 0) {
+        ATTEST_LOG_ERROR("[InitHksParamSet] Invaild param");
+        return ATTEST_ERR;
+    }
     int32_t ret = HksInitParamSet(paramSet);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[InitHksParamSet] HksInitParamSet failed");
@@ -259,6 +269,10 @@ static int32_t InitHksParamSet(struct HksParamSet** paramSet, const struct HksPa
 static int32_t DecryptHksImpl(struct HksBlob *cipherText, uint8_t *outputData, size_t outputDataLen)
 {
     struct HksParamSet *decryptParamSet = NULL;
+    if (sizeof(struct HksParam) == 0) {
+        ATTEST_LOG_ERROR("[DecryptHksImpl] Invaild size");
+        return ATTEST_ERR;
+    }
     int32_t ret = InitHksParamSet(&decryptParamSet, g_decryptParams, sizeof(g_decryptParams) / sizeof(struct HksParam));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHksImpl] InitHksParamSet g_decryptParams failed");
@@ -288,6 +302,10 @@ int32_t DecryptHks(const uint8_t *inputData, size_t inputDataLen, uint8_t *outpu
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
     struct HksParamSet *genParamSetDecrypt = NULL;
+    if (sizeof(struct HksParam) == 0) {
+        ATTEST_LOG_ERROR("[DecryptHks] Invaild size");
+        return ATTEST_ERR;
+    }
     int32_t ret = InitHksParamSet(&genParamSetDecrypt, g_genParams, sizeof(g_genParams) / sizeof(struct HksParam));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[DecryptHks] InitHksParamSet g_genParams failed");
@@ -347,6 +365,7 @@ int32_t GetAesKey(const SecurityParam* salt, const VersionData* versionData,  co
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetAesKey] HKDF derive key failed, ret = -0x%x", -ret);
     }
+    memset_s(psk, PSK_LEN, 0, PSK_LEN);
     return ret;
 }
 
@@ -409,6 +428,10 @@ static int32_t DecryptAesCbc(AesCryptBufferDatas* datas, const uint8_t* aesKey,
 static int32_t EncryptHksImpl(struct HksBlob *inData, uint8_t* outputData, size_t outputDataLen)
 {
     struct HksParamSet *encryptParamSet = NULL;
+    if (sizeof(struct HksParam) == 0) {
+        ATTEST_LOG_ERROR("[EncryptHksImpl] Invaild size");
+        return ATTEST_ERR;
+    }
     int32_t ret = InitHksParamSet(&encryptParamSet, g_encryptParams, sizeof(g_encryptParams) / sizeof(struct HksParam));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHksImpl] InitHksParamSet g_encryptParams failed");
@@ -452,6 +475,10 @@ int32_t EncryptHks(uint8_t* inputData, size_t inputDataLen, uint8_t* outputData,
         return ERR_ATTEST_SECURITY_INVALID_ARG;
     }
     struct HksParamSet *genParamSetEncrypt = NULL;
+    if (sizeof(struct HksParam) == 0) {
+        ATTEST_LOG_ERROR("[EncryptHks] Invaild size");
+        return ATTEST_ERR;
+    }
     int32_t ret = InitHksParamSet(&genParamSetEncrypt, g_genParams, sizeof(g_genParams) / sizeof(struct HksParam));
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[EncryptHks] InitHksParamSet g_genParams failed");
@@ -569,6 +596,7 @@ int32_t Encrypt(uint8_t* inputData, size_t inputDataLen, const uint8_t* aesKey,
         ATTEST_LOG_ERROR("[Encrypt] Encrypt memcpy_s failed, ret = %d", ret);
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
+    (void)memset_s(base64Data, BASE64_LEN + 1, 0, BASE64_LEN + 1);
     return ATTEST_OK;
 }
 
@@ -605,5 +633,6 @@ int32_t Decrypt(const uint8_t* inputData, size_t inputDataLen, const uint8_t* ae
         ATTEST_LOG_ERROR("[Decrypt] memcpy_s decryptData fail");
         return ERR_ATTEST_SECURITY_MEM_MEMCPY;
     }
+    (void)memset_s(decryptData, ENCRYPT_LEN, 0, ENCRYPT_LEN);
     return ATTEST_OK;
 }

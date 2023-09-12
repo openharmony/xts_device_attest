@@ -15,11 +15,9 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
-module_output_path = "devattest/devattest_ability"
-
 ##############################fuzztest##########################################
 ohos_fuzztest("DevattestCoreNetworkFuzzTest") {
-  module_out_path = module_output_path
+  module_out_path = devattest_fuzz_module_path
 
   fuzz_config_file = "."
 

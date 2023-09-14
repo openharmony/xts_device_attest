@@ -74,6 +74,8 @@ extern "C" {
 // 最大限制长度
 #define MAX_ATTEST_MALLOC_BUFF_SIZE 1024
 
+#define SHA256_OUTPUT_SIZE 32
+
 // 认证接口返回值，与json结构一一对应
 typedef struct {
     int32_t errorCode;

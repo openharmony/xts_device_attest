@@ -137,7 +137,7 @@ static int32_t Sha256Udid(char *udid, char *outStr)
     SHA256_Final(hash, &sha256);
     
     uint32_t curLen = 0;
-    for (uint32_t i = 0; i < strlen((char *)hash); i++) {
+    for (uint32_t i = 0; i < SHA256_OUTPUT_SIZE; i++) {
         if (curLen > (HTTPS_NETWORK_SHA256_LEN - 1)) {
             ATTEST_LOG_ERROR("[Sha256Udid] CurLen(%d) is more than maxLen(%d).", curLen, HTTPS_NETWORK_SHA256_LEN);
             return ATTEST_OK;

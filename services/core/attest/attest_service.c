@@ -317,7 +317,7 @@ int32_t ProcAttest(void)
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);
         }
-    } while(0);
+    }while (0);
     if (ATTEST_DEBUG_MEMORY_LEAK) {
         PrintMemNodeList();
         retValue = DestroyMemNodeList();

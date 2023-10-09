@@ -295,30 +295,33 @@ int32_t ProcAttest(void)
     pthread_mutex_lock(&g_mtxAttest);
     PrintCurrentTime();
     int32_t ret;
+    int32_t retValue;
     if (ATTEST_DEBUG_MEMORY_LEAK) {
-        ret = InitMemNodeList();
-        ATTEST_LOG_INFO("[ProcAttest] Init mem node list, ret = %d.", ret);
+        retValue = InitMemNodeList();
+        ATTEST_LOG_INFO("[ProcAttest] Init mem node list, retValue = %d.", retValue);
     }
-    // init network server info
-    ret = InitNetworkServerInfo();
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[ProcAttest] InitNetworkServerInfo failed, ret = %d.", ret);
-    }
+    do {
+        // init network server info
+        ret = InitNetworkServerInfo();
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ProcAttest] InitNetworkServerInfo failed, ret = %d.", ret);
+        }
 
-    ret = CheckNetworkConnectted();
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[ProcAttest] Network does not connetted, ret = %d.", ret);
-        return ret;
-    }
-    // 主流程
-    ret = ProcAttestImpl();
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);
-    }
+        ret = CheckNetworkConnectted();
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ProcAttest] Network does not connetted, ret = %d.", ret);
+            break;
+        }
+        // 主流程
+        ret = ProcAttestImpl();
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);
+        }
+    } while(0);
     if (ATTEST_DEBUG_MEMORY_LEAK) {
         PrintMemNodeList();
-        ret = DestroyMemNodeList();
-        ATTEST_LOG_INFO("[ProcAttest] Destroy mem node list,  ret = %d.", ret);
+        retValue = DestroyMemNodeList();
+        ATTEST_LOG_INFO("[ProcAttest] Destroy mem node list,  retValue = %d.", retValue);
     }
     PrintCurrentTime();
     pthread_mutex_unlock(&g_mtxAttest);

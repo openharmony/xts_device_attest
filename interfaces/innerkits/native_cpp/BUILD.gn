@@ -33,7 +33,7 @@ ohos_shared_library("devattest_sdk") {
     "src/devattest_service_proxy.cpp",
   ]
 
-  configs = [ ":devattest_sdk_config" ]
+  public_configs = [ ":devattest_sdk_config" ]
 
   external_deps = [
     "c_utils:utils",

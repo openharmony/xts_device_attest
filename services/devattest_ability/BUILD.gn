@@ -30,6 +30,15 @@ config("devattest_service_config") {
 
 ohos_shared_library("devattest_service") {
   version_script = "libdevattest_service.map"
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "${devattest_path}/common/permission/src/permission.cpp",
     "src/attest_result_info.cpp",

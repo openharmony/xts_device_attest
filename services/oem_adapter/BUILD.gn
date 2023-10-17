@@ -22,6 +22,15 @@ config("device_attest_oem_adapter_config") {
 
 ohos_shared_library("device_attest_oem_adapter") {
   version_script = "libdevattest_oem.map"
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/device_attest_oem_adapter.c",
     "src/device_attest_oem_file.c",

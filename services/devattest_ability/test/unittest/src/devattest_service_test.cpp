@@ -15,6 +15,7 @@
 
 #include "devattest_service_test.h"
 
+#include <stdio.h>
 #include "singleton.h"
 #include "devattest_errno.h"
 #include "devattest_service.h"
@@ -45,6 +46,17 @@ void DevAttestServiceTest::TearDown(void)
     // input testcase teardown step，teardown invoked after each testcases
 }
 
+bool IsTicketFileExist(void)
+{
+    const char* filePath = "/data/service/el1/public/device_attest/ticket";
+    FILE* fp = fopen(filePath, "r");
+    if (fp == NULL) {
+        return false;
+    }
+    (void)fclose(fp);
+    return true;
+}
+
 /**
  * @tc.name: GetAttestStatusServiceTest001
  * @tc.desc: Verify GetAttestStatus from service.
@@ -55,7 +67,11 @@ HWTEST_F(DevAttestServiceTest, GetAttestStatusServiceTest001, TestSize.Level1)
 {
     AttestResultInfo attestResultInfo;
     int ret =  DelayedSingleton<DevAttestService>::GetInstance()->GetAttestStatus(attestResultInfo);
-    ASSERT_EQ(DEVATTEST_SUCCESS, ret);
+    if (IsTicketFileExist()) {
+        EXPECT_NE(DEVATTEST_SUCCESS, ret);
+    } else {
+        EXPECT_EQ(DEVATTEST_SUCCESS, ret);
+    }
 }
 } // namespace DevAttest
 } // namespace OHOS

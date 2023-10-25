@@ -15,7 +15,7 @@
 
 #include "devattest_service_test.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include "singleton.h"
 #include "devattest_errno.h"
 #include "devattest_service.h"
@@ -50,7 +50,7 @@ bool IsTicketFileExist(void)
 {
     const char* filePath = "/data/service/el1/public/device_attest/ticket";
     FILE* fp = fopen(filePath, "r");
-    if (fp == NULL) {
+    if (fp == nullptr) {
         return false;
     }
     (void)fclose(fp);

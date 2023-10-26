@@ -51,7 +51,7 @@ private:
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     bool registerToSa_ = false;
     int32_t CopyAttestResult(int32_t *resultArray, AttestResultInfo &attestResultInfo);
-    std::shared_ptr<AppExecFwk::EventHandler> unloadHandler_;
+    std::shared_ptr<AppExecFwk::EventHandler> unloadHandler_ = nullptr;
 };
 } // end of DevAttest
 } // end of OHOS

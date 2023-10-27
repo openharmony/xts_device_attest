@@ -71,6 +71,8 @@ extern "C" {
 #define APP_ID_LEN 9
 #define UDID_STRING_LEN 64
 
+#define SHA256_OUTPUT_SIZE 32
+
 // 认证接口返回值，与json结构一一对应
 typedef struct {
     int32_t errorCode;

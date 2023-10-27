@@ -253,7 +253,7 @@ int32_t CharToAscii(const char* str, int len, uint8_t* outputStr, int outputLen)
     }
     uint8_t outStr[OUT_STR_LEN_MAX] = {0};
     for (int i = 0, j = 0; i < len; i++) {
-        if ((str[i] > 'A' && str[i] < 'Z') || (str[i] > 'f' && str[i] < 'z')) {
+        if ((str[i] >= 'A' && str[i] <= 'Z') || (str[i] >= 'g' && str[i] <= 'z')) {
             outStr[j++] = (str[i] - '0') / DECIMAL_BASE + '0';
             outStr[j++] = (str[i] - '0') % DECIMAL_BASE + '0';
         } else {

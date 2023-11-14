@@ -31,7 +31,7 @@ char* OsGetBuildRootHash(void)
 
 char* OsGetDisplayVersion(void)
 {
-    return AttestStrdup(GetOSFullName());
+    return AttestStrdup(GetDisplayVersion());
 }
 
 char* OsGetManufacture(void)

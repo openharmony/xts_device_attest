@@ -14,14 +14,15 @@
 import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
-config("devattest_sdk_config") {
-  visibility = [ ":*" ]
-  cflags = [ "-Wall" ]
+config("devattest_sdk_private_config") {
   include_dirs = [
-    "include",
     "${devattest_path}/common",
     "${devattest_path}/common/log",
   ]
+}
+
+config("devattest_sdk_public_config") {
+  include_dirs = [ "${devattest_innerkit_path}/native_cpp/include" ]
 }
 
 ohos_shared_library("devattest_sdk") {
@@ -33,7 +34,9 @@ ohos_shared_library("devattest_sdk") {
     "src/devattest_service_proxy.cpp",
   ]
 
-  configs = [ ":devattest_sdk_config" ]
+  configs = [ ":devattest_sdk_private_config" ]
+
+  public_configs = [ ":devattest_sdk_public_config" ]
 
   external_deps = [
     "c_utils:utils",

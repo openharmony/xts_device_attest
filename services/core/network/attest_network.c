@@ -365,7 +365,6 @@ static int32_t InitSocketClient(int32_t *socketFd)
 
 static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
 {
-    int32_t retCode;
     int32_t ret = ATTEST_ERR;
     char *caFile = "/etc/ssl/certs/cacert.pem";
     SSL_library_init();
@@ -380,7 +379,7 @@ static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
     do {
         /* 设置根证书检验 */
         SSL_CTX_set_verify(socketCTX, SSL_VERIFY_PEER, NULL);
-        retCode = SSL_CTX_load_verify_locations(socketCTX, caFile, NULL);
+        int32_t retCode = SSL_CTX_load_verify_locations(socketCTX, caFile, NULL);
         if (retCode != SSL_OK) {
             ATTEST_LOG_ERROR("[InitSSLSocket] InitSSL load_verify fail \n");
             ret = ATTEST_ERR;

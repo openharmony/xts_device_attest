@@ -337,16 +337,19 @@ static int32_t InitSocketClient(int32_t *socketFd)
     /* 设置socket连接的一些属性，超时时间，发送缓冲区Buffer等 */
     if (setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)) < 0) {
         ATTEST_LOG_ERROR("[InitSocketClient] Setsockopt send timeout fail");
+        close(sockfd);
         return ATTEST_ERR;
     }
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, (const char *)&bufLen, 4) < 0) {
         ATTEST_LOG_ERROR("[InitSocketClient] Setsockopt sendbuffer fail");
+        close(sockfd);
         return ATTEST_ERR;
     }
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)) < 0) {
         ATTEST_LOG_ERROR("[InitSocketClient] Setsockopt rcv fail");
+        close(sockfd);
         return ATTEST_ERR;
     }
 
@@ -356,9 +359,8 @@ static int32_t InitSocketClient(int32_t *socketFd)
 
 static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
 {
-    int32_t retCode;
+    int32_t ret = ATTEST_ERR;
     char *caFile = "/etc/ssl/certs/cacert.pem";
-
     SSL_library_init();
     OpenSSL_add_ssl_algorithms();
     SSL_load_error_strings();
@@ -368,13 +370,13 @@ static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
         ATTEST_LOG_ERROR("[InitSSLSocket] SSL CTX create failed");
         return ATTEST_ERR;
     }
-
     do {
         /* 设置根证书检验 */
         SSL_CTX_set_verify(socketCTX, SSL_VERIFY_PEER, NULL);
-        retCode = SSL_CTX_load_verify_locations(socketCTX, caFile, NULL);
+        int32_t retCode = SSL_CTX_load_verify_locations(socketCTX, caFile, NULL);
         if (retCode != SSL_OK) {
             ATTEST_LOG_ERROR("[InitSSLSocket] InitSSL load_verify fail \n");
+            ret = ATTEST_ERR;
             break;
         }
         /* 设置和服务器端进行协商的算法套件 */
@@ -382,23 +384,27 @@ static int32_t InitSSLSocket(int32_t socketFd, SSL **socketSSL)
         SSL_CTX_set_mode(socketCTX, SSL_MODE_AUTO_RETRY);
         *socketSSL = SSL_new(socketCTX);
         if (*socketSSL == NULL) {
+            ret = ATTEST_ERR;
             break;
         }
+        retCode = SSL_set_fd(*socketSSL, socketFd);
+        if (retCode != SSL_OK) {
+            ATTEST_LOG_ERROR("[InitSSLSocket] InitSSL SSL_set_fd fail, retCode=%d \n", retCode);
+            ret = ATTEST_ERR;
+            break;
+        }
+        retCode = SSL_connect(*socketSSL);
+        if (retCode != SSL_OK) {
+            ATTEST_LOG_ERROR("[InitSSLSocket] InitSSL SSL_connect fail, retCode=%d \n", retCode);
+            ret = ATTEST_ERR;
+            break;
+        }
+        ret = ATTEST_OK;
     } while (0);
     SSL_CTX_free(socketCTX);
-
-    retCode = SSL_set_fd(*socketSSL, socketFd);
-    if (retCode != SSL_OK) {
-        ATTEST_LOG_ERROR("[InitSSLSocket] InitSSL SSL_set_fd fail, retCode=%d \n", retCode);
+    if (ret != ATTEST_OK) {
         return ATTEST_ERR;
     }
-
-    retCode = SSL_connect(*socketSSL);
-    if (retCode != SSL_OK) {
-        ATTEST_LOG_ERROR("[InitSSLSocket] InitSSL SSL_connect fail, retCode=%d \n", retCode);
-        return ATTEST_ERR;
-    }
-
     return ATTEST_OK;
 }
 

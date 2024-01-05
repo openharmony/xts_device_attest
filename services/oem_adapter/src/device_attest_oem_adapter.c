@@ -221,7 +221,7 @@ int32_t OEMGetProductKey(char* productKey, uint32_t len)
     if ((productKey == NULL) || (len == 0)) {
         return DEVICE_ATTEST_OEM_ERR;
     }
-    const char productKeyBuf[] = "test";
+    const char productKeyBuf[] = "487b5cad9ec14539a4bed6f7a92f17db";
     uint32_t productKeyLen = sizeof(productKeyBuf);
     if (len < productKeyLen) {
         return DEVICE_ATTEST_OEM_ERR;

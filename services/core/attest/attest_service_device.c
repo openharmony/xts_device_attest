@@ -100,6 +100,28 @@ static void PrintDevSysInfo(void)
     ATTEST_LOG_INFO("--------------------------");
 }
 
+void VerifyUDID(void)
+{
+    char *udidSrc = AttestGetUdid();
+    if (udidSrc == NULL) {
+        ATTEST_LOG_ERROR("[VerifyUDID] Failed to get udidSrc");
+        return;
+    }
+    char *udidDest = (char *)GetUdidForVerification();
+    if (udidDest == NULL) {
+        ATTEST_LOG_ERROR("[VerifyUDID] Failed to get udidSrc");
+        ATTEST_MEM_FREE(udidSrc);
+        return;
+    }
+
+    if (strcmp(udidSrc, udidDest) != 0) {
+        ATTEST_LOG_ERROR("[VerifyUDID] udid is invalid");
+    }
+    ATTEST_MEM_FREE(udidSrc);
+    ATTEST_MEM_FREE(udidDest);
+    return;
+}
+
 int32_t InitSysData(void)
 {
     ATTEST_LOG_DEBUG("[InitSysData] Begin.");
@@ -116,6 +138,7 @@ int32_t InitSysData(void)
         }
     }
     PrintDevSysInfo();
+    VerifyUDID();
     ATTEST_LOG_DEBUG("[InitSysData] End.");
     return ATTEST_OK;
 }
@@ -287,4 +310,102 @@ char* GetPcid(void)
     (void)memset_s(pcidBuff, PCID_MAIN_BYTES + privatePcidLen, 0, PCID_MAIN_BYTES + privatePcidLen);
     ATTEST_MEM_FREE(pcidBuff);
     return pcidSha256;
+}
+
+static unsigned char* GetUdidDecrypted(void)
+{
+    char *enShortName = AttestGetManufacture();
+    if (enShortName == NULL) {
+        return NULL;
+    }
+    if (strlen(enShortName) > MAX_ATTEST_MANUFACTURE_LEN) {
+        ATTEST_MEM_FREE(enShortName);
+        return NULL;
+    }
+
+    char *model = AttestGetProductModel();
+    if (model == NULL) {
+        return NULL;
+    }
+    if (strlen(model) > MAX_ATTEST_MODEL_LEN) {
+        ATTEST_MEM_FREE(model);
+        return NULL;
+    }
+
+    char *sn = AttestGetSerial();
+    if (sn == NULL) {
+        return NULL;
+    }
+    if (strlen(sn) > MAX_ATTEST_SERIAL_LEN) {
+        ATTEST_MEM_FREE(sn);
+        return NULL;
+    }
+
+    int32_t enShortNameLen = strlen(enShortName);
+    int32_t modelLen = strlen(model);
+    int32_t snLen = strlen(sn);
+
+    int32_t udidSize = enShortNameLen + modelLen + snLen + 1;
+    unsigned char *udid = NULL;
+    int32_t ret = ATTEST_ERR;
+    do {
+        udid = (unsigned char *)ATTEST_MEM_MALLOC(udidSize);
+        if (udid == NULL) {
+            ATTEST_LOG_ERROR("[GetUdidDecrypted] Failed to malloc udid");
+            break;
+        }
+        (void)memset_s(udid, udidSize, 0, udidSize);
+        if ((memcpy_s(udid, udidSize, enShortName, enShortNameLen) != 0) || \
+            (memcpy_s(udid + enShortNameLen, udidSize, model, modelLen) != 0) || \
+            (memcpy_s(udid + enShortNameLen + modelLen, udidSize, sn, snLen) != 0)) {
+            ATTEST_LOG_ERROR("[GetUdidDecrypted] Failed to merge udid");
+            ATTEST_MEM_FREE(udid);
+            break;
+        }
+        ret = ATTEST_OK;
+    } while (0);
+    ATTEST_MEM_FREE(enShortName);
+    ATTEST_MEM_FREE(model);
+    ATTEST_MEM_FREE(sn);
+    if (ret != ATTEST_OK) {
+        return NULL;
+    }
+    return udid;
+}
+
+uint8_t* GetUdidForVerification(void)
+{
+    unsigned char *udid = GetUdidDecrypted();
+    if (udid == NULL) {
+        ATTEST_LOG_ERROR("[GetUdidForVerification] Failed to get udid");
+        return NULL;
+    }
+    uint8_t *udidSha256 = (uint8_t *)ATTEST_MEM_MALLOC(UDID_STRING_LEN + 1);
+    if (udidSha256 == NULL) {
+        ATTEST_LOG_ERROR("[GetUdidForVerification] Failed to malloc udidSha256");
+        ATTEST_MEM_FREE(udid);
+        return NULL;
+    }
+
+    int32_t ret = ATTEST_ERR;
+    do {
+        ret = Sha256Value(udid, strlen((const char *)udid), (char*)udidSha256, UDID_STRING_LEN + 1);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[GetUdidForVerification] failed to Sha256");
+            break;
+        }
+
+        ret = ToLowerStr((char*)udidSha256, UDID_STRING_LEN + 1);
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[GetUdidForVerification] failed to lower udid");
+            break;
+        }
+        ret = ATTEST_OK;
+    } while (0);
+    ATTEST_MEM_FREE(udid);
+    if (ret != ATTEST_OK) {
+        ATTEST_MEM_FREE(udidSha256);
+        return NULL;
+    }
+    return udidSha256;
 }

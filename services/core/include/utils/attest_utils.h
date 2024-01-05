@@ -25,6 +25,12 @@
 #endif
 #endif /* __cplusplus */
 
+#define OCTADIC_BASE 8
+#define DECIMAL_BASE 10
+#define HEXADECIMAL_BASE 16
+#define DEV_BUF_LENGTH   3
+#define HASH_LENGTH      32
+
 void AttestMemFree(void **point);
 
 #define ATTEST_MEM_FREE(pointer) AttestMemFree((void **)&(pointer))

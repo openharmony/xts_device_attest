@@ -38,10 +38,6 @@ int32_t GetTokenId(uint8_t* tokenId, uint8_t tokenIdLen);
 
 int32_t FlushToken(AuthResult* authResult);
 
-int32_t GetTokenValueSpecial(uint8_t* tokenValueHmac, uint8_t tokenValueHmacLen);
-
-int32_t GetTokenIdSpecial(uint8_t* tokenId, uint8_t tokenIdLen);
-
 #ifdef __cplusplus
 #if __cplusplus
 }

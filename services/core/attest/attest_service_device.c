@@ -100,7 +100,7 @@ static void PrintDevSysInfo(void)
     ATTEST_LOG_INFO("--------------------------");
 }
 
-void VerifyUDID(void)
+static void VerifyUDID(void)
 {
     char *udidSrc = AttestGetUdid();
     if (udidSrc == NULL) {
@@ -318,37 +318,29 @@ static unsigned char* GetUdidDecrypted(void)
     if (enShortName == NULL) {
         return NULL;
     }
-    if (strlen(enShortName) > MAX_ATTEST_MANUFACTURE_LEN) {
+    char *model = AttestGetProductModel();
+    if (model == NULL) {
         ATTEST_MEM_FREE(enShortName);
         return NULL;
     }
-
-    char *model = AttestGetProductModel();
-    if (model == NULL) {
-        return NULL;
-    }
-    if (strlen(model) > MAX_ATTEST_MODEL_LEN) {
+    char *sn = AttestGetSerial();
+    if (sn == NULL) {
+        ATTEST_MEM_FREE(enShortName);
         ATTEST_MEM_FREE(model);
         return NULL;
     }
-
-    char *sn = AttestGetSerial();
-    if (sn == NULL) {
-        return NULL;
-    }
-    if (strlen(sn) > MAX_ATTEST_SERIAL_LEN) {
-        ATTEST_MEM_FREE(sn);
-        return NULL;
-    }
-
     int32_t enShortNameLen = strlen(enShortName);
     int32_t modelLen = strlen(model);
     int32_t snLen = strlen(sn);
-
-    int32_t udidSize = enShortNameLen + modelLen + snLen + 1;
     unsigned char *udid = NULL;
     int32_t ret = ATTEST_ERR;
     do {
+        if ((strlen(enShortName) > MAX_ATTEST_MANUFACTURE_LEN) || \
+            (strlen(model) > MAX_ATTEST_MODEL_LEN) || \
+            (strlen(sn) > MAX_ATTEST_SERIAL_LEN)) {
+            break;
+        }
+        int32_t udidSize = enShortNameLen + modelLen + snLen + 1;
         udid = (unsigned char *)ATTEST_MEM_MALLOC(udidSize);
         if (udid == NULL) {
             ATTEST_LOG_ERROR("[GetUdidDecrypted] Failed to malloc udid");

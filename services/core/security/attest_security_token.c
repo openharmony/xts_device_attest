@@ -22,29 +22,9 @@
 #include "attest_utils_log.h"
 #include "attest_security.h"
 #include "attest_security_token.h"
+#include "attest_service_device.h"
 
 char g_tokenVersion[VERSION_ENCRYPT_LEN + 1] = TOKEN_VER0_0;
-
-static int32_t GetTokenValueSpecial(uint8_t* tokenValue, uint8_t tokenValueLen)
-{
-    char *sn = AttestGetSerial();
-    size_t snLen = strlen(sn);
-    (void)memcpy_s(tokenValue, tokenValueLen, sn, snLen);
-    (void)memset_s(sn, strlen(sn), 0, strlen(sn));
-    ATTEST_MEM_FREE(sn);
-    return ATTEST_OK;
-}
-
-static int32_t GetTokenIdSpecial(uint8_t* tokenId, uint8_t tokenIdLen)
-{
-    char *sn = AttestGetSerial();
-    size_t snLen = strlen(sn);
-    uint32_t tokenIdLength = tokenIdLen;
-    int32_t ret = CharToAscii(sn, snLen, tokenId, tokenIdLength);
-    (void)memset_s(sn, strlen(sn), 0, strlen(sn));
-    ATTEST_MEM_FREE(sn);
-    return ret;
-}
 
 static int32_t TransTokenVersion(const char* tokenVersion, uint8_t tokenVersionLen)
 {
@@ -338,7 +318,7 @@ int32_t GetTokenValueHmac(const char* challenge, uint8_t* tokenValueHmac, uint8_
         ATTEST_LOG_ERROR("[GetTokenValueHmac] Encrypt token value hmac failed, ret = %d", ret);
         return ret;
     }
-    
+
     ret = Base64Encode(hmac, sizeof(hmac), tokenValueHmac, tokenValueHmacLen);
     (void)memset_s(hmac, HMAC_SHA256_CIPHER_LEN, 0, HMAC_SHA256_CIPHER_LEN);
     if (ret != ATTEST_OK) {
@@ -413,4 +393,195 @@ int32_t FlushToken(AuthResult* authResult)
     }
     ATTEST_LOG_DEBUG("[FlushToken] End.");
     return ret;
+}
+
+static uint8_t *GetIKM(void)
+{
+    uint8_t *ikm = NULL;
+    uint8_t productKey[PRODUCT_KEY_LEN + 1] = {0};
+    if (AttestGetProductKey(productKey, PRODUCT_KEY_LEN) != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetIKM] Failed to get productKey");
+        return NULL;
+    }
+
+    uint8_t productId[PRODUCT_ID_LEN + 1] = {0};
+    if (AttestGetProductId(productId, PRODUCT_ID_LEN) != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetIKM] Failed to get productId");
+        return NULL;
+    }
+
+    int32_t productKeyLen = strlen((const char *)productKey);
+    int32_t productIdLen = strlen((const char *)productId);
+    if ((productKeyLen > PRODUCT_KEY_LEN) || (productIdLen > PRODUCT_ID_LEN)) {
+        ATTEST_LOG_ERROR("[GetIKM] Illegal length");
+        return NULL;
+    }
+
+    int32_t ikmSize = productKeyLen + productIdLen + 1;
+    ikm = (uint8_t *)ATTEST_MEM_MALLOC(ikmSize);
+    if (ikm == NULL) {
+        ATTEST_LOG_ERROR("[GetIKM] Failed to malloc");
+        return NULL;
+    }
+
+    (void)memset_s(ikm, ikmSize, 0, ikmSize);
+    if ((memcpy_s(ikm, ikmSize, productKey, productKeyLen) != 0) || \
+        (memcpy_s(ikm + productKeyLen, ikmSize, productId, productIdLen) != 0)) {
+        ATTEST_LOG_ERROR("[GetIKM] Failed to merge ikm");
+        ATTEST_MEM_FREE(ikm);
+        return NULL;
+    }
+
+    (void)memset_s(productKey, PRODUCT_KEY_LEN + 1, 0, PRODUCT_KEY_LEN + 1);
+    (void)memset_s(productId, PRODUCT_ID_LEN + 1, 0, PRODUCT_ID_LEN + 1);
+
+    return ikm;
+}
+
+static int32_t EncryptHmacIterative(const char *challenge, const uint8_t *tokenValue, size_t tokenValueLen,
+                                     uint8_t *hmac, uint8_t hmacLen)
+{
+    char endingFlag[DEV_BUF_LENGTH] = {1, 0, 0};
+    int32_t endingFlagLen = strlen((const char*)endingFlag);
+
+    int32_t contentSize = tokenValueLen + endingFlagLen + 1;
+    char *content = (char *)ATTEST_MEM_MALLOC(contentSize);
+    if (content == NULL) {
+        ATTEST_LOG_ERROR("[EncryptHmacIterative] Failed to malloc");
+        return ATTEST_ERR;
+    }
+    (void)memset_s(content, contentSize, 0, contentSize);
+
+    if ((memcpy_s(content, contentSize, tokenValue, tokenValueLen) != 0) || \
+        (memcpy_s(content + tokenValueLen, contentSize, endingFlag, endingFlagLen) != 0)) {
+        ATTEST_LOG_ERROR("[EncryptHmacIterative] Failed to memcpy");
+        ATTEST_MEM_FREE(content);
+        return ATTEST_ERR;
+    }
+
+    int32_t ret = EncryptHmac(challenge, (const uint8_t*)content, strlen(content), hmac, hmacLen);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[EncryptHmacIterative] Failed to encrypt, ret = %d", ret);
+        ATTEST_MEM_FREE(content);
+        return ret;
+    }
+
+    ATTEST_MEM_FREE(content);
+    return ATTEST_OK;
+}
+
+int32_t GetTokenValueSpecial(uint8_t* tokenValueHmac, uint8_t tokenValueHmacLen)
+{
+    uint8_t *ikm = GetIKM();
+    if (ikm == NULL) {
+        ATTEST_LOG_ERROR("[GetTokenValueSpecial] Failed to get ikm");
+        return ATTEST_ERR;
+    }
+
+    const char * salt = "OpenHarmony/salt";
+    uint8_t prk[HMAC_SHA256_CIPHER_LEN] = {0};
+    int32_t ret = EncryptHmac(salt, ikm, strlen((const char *)ikm), prk, sizeof(prk));
+
+    ATTEST_MEM_FREE(ikm);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetTokenValueSpecial] Failed to encry ikm, ret = %d", ret);
+        return ret;
+    }
+
+    uint8_t *udidSha256 = GetUdidForVerification();
+    if (udidSha256 == NULL) {
+        ATTEST_LOG_ERROR("[GetTokenValueSpecial] Failed to get udidSha256");
+        return ATTEST_ERR;
+    }
+
+    uint8_t okm[HMAC_SHA256_CIPHER_LEN] = {0};
+    ret = EncryptHmacIterative((const char*)prk, udidSha256, strlen((const char*)udidSha256), okm, HMAC_SHA256_CIPHER_LEN);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetTokenValueSpecial] Failed to encry ikm, ret = %d", ret);
+        return ret;
+    }
+    ATTEST_MEM_FREE(udidSha256);
+
+    uint8_t *okmCopy = ATTEST_MEM_MALLOC(OKM_INPUT_LEN + 1);
+    if (okmCopy == NULL) {
+        ATTEST_LOG_ERROR("[GetTokenValueSpecial] Failed to malloc okmCopy");
+        return ATTEST_ERR;
+    }
+    (void)memset_s(okmCopy, OKM_INPUT_LEN + 1, 0, OKM_INPUT_LEN + 1);
+    if (memcpy_s(okmCopy, OKM_INPUT_LEN, okm, OKM_INPUT_LEN) != 0) {
+        ATTEST_LOG_ERROR("[GetTokenValueSpecial] Failed to copy okm");
+        return ATTEST_ERR;
+    }
+
+    ret = Base64Encode(okmCopy, OKM_INPUT_LEN, tokenValueHmac, tokenValueHmacLen);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetTokenValueSpecial] Base64 encode symbol info failed, ret = -0x00%x", -ret);
+        return ret;
+    }
+    return ATTEST_OK;
+}
+
+static int32_t FormatUUID(uint8_t *inputData, int32_t inputLen, uint8_t *outputData, int32_t outputLen)
+{
+    if ((inputData == NULL) || (outputData == NULL) || \
+        (inputLen == 0) || (outputLen == 0)) {
+        ATTEST_LOG_ERROR("[FormatUUID] Invalid parameter");
+        return ATTEST_ERR;
+    }
+
+    if (outputLen < (inputLen + UUID_FORMAT_SYMBOL_NUM)) {
+        ATTEST_LOG_ERROR("[FormatUUID] The output length is too small");
+        return ATTEST_ERR;
+    }
+
+    int32_t outputIndex = 0;
+    for (int32_t i = 0; i < inputLen; i++) {
+        if (i == UUID_FORMAT_INDEX_1 || \
+            i == UUID_FORMAT_INDEX_2 || \
+            i == UUID_FORMAT_INDEX_3 || \
+            i == UUID_FORMAT_INDEX_4) {
+            outputData[outputIndex++] = '-';
+        }
+        outputData[outputIndex++] = inputData[i];
+    }
+
+    return ATTEST_OK;
+}
+
+int32_t GetTokenIdSpecial(uint8_t* tokenId, uint8_t tokenIdLen)
+{
+    if (tokenId == NULL || tokenIdLen == 0) {
+        ATTEST_LOG_ERROR("[GetTokenIdSpecial] Invalid parameter");
+        return ATTEST_ERR; 
+    }
+
+    uint8_t *udidSha256 = GetUdidForVerification();
+    if (udidSha256 == NULL) {
+        ATTEST_LOG_ERROR("[GetTokenIdSpecial] Failed to get udidSha256");
+        return ATTEST_ERR;
+    }
+
+    uint8_t *udidMD5 = (unsigned char *)ATTEST_MEM_MALLOC(MD5_HEX_LEN + 1);
+    if (udidMD5 == NULL) {
+        ATTEST_LOG_ERROR("[GetTokenIdSpecial] Failed to malloc");
+        ATTEST_MEM_FREE(udidSha256);
+        return ATTEST_ERR;
+    }
+    (void)memset_s(udidMD5, MD5_HEX_LEN + 1, 0, MD5_HEX_LEN + 1);
+
+    int32_t ret = MD5Encode(udidSha256, strlen((const char*)udidSha256), udidMD5, MD5_HEX_LEN + 1);
+    ATTEST_MEM_FREE(udidSha256);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetTokenIdSpecial] Failed to MD5Encode");
+        return ATTEST_ERR;
+    }
+
+    ret = FormatUUID(udidMD5, MD5_HEX_LEN, tokenId, tokenIdLen);
+    ATTEST_MEM_FREE(udidMD5);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetTokenIdSpecial] Failed to change to HEX");
+        return ATTEST_ERR;
+    }
+
+    return ATTEST_OK;
 }

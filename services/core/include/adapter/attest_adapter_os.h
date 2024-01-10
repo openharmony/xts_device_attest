@@ -44,7 +44,6 @@ int32_t OsSetParameter(const char *key, const char *value);
 
 int32_t OsGetParameter(const char *key, const char *def, char *value, uint32_t len);
 
-
 #ifdef __cplusplus
 #if __cplusplus
 }

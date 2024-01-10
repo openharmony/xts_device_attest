@@ -151,11 +151,11 @@ static int32_t GetTokenValueSpecial(uint8_t* tokenValueHmac, uint8_t tokenValueH
     uint8_t okm[HMAC_SHA256_CIPHER_LEN] = {0};
     ret = EncryptHmacIterative((const char*)prk, udidSha256, strlen((const char*)udidSha256),
         okm, HMAC_SHA256_CIPHER_LEN);
+    ATTEST_MEM_FREE(udidSha256);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueSpecial] Failed to encry ikm, ret = %d", ret);
         return ret;
     }
-    ATTEST_MEM_FREE(udidSha256);
 
     uint8_t *okmCopy = ATTEST_MEM_MALLOC(OKM_INPUT_LEN + 1);
     if (okmCopy == NULL) {

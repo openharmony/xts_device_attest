@@ -109,7 +109,7 @@ static void VerifyUDID(void)
     }
     char *udidDest = (char *)GetUdidForVerification();
     if (udidDest == NULL) {
-        ATTEST_LOG_ERROR("[VerifyUDID] Failed to get udidSrc");
+        ATTEST_LOG_ERROR("[VerifyUDID] Failed to get udidDest");
         ATTEST_MEM_FREE(udidSrc);
         return;
     }

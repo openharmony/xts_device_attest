@@ -205,7 +205,8 @@ int32_t OEMGetProductId(char* productId, uint32_t len)
     if ((productId == NULL) || (len == 0)) {
         return DEVICE_ATTEST_OEM_ERR;
     }
-    const char productIdBuf[] = "OH00000D";
+    // Please fill in the actual value
+    const char productIdBuf[] = "";
     uint32_t productIdLen = strlen(productIdBuf);
     if (len < productIdLen) {
         return DEVICE_ATTEST_OEM_ERR;
@@ -215,13 +216,13 @@ int32_t OEMGetProductId(char* productId, uint32_t len)
     return ret;
 }
 
-/* It is temporarily useless */
 int32_t OEMGetProductKey(char* productKey, uint32_t len)
 {
     if ((productKey == NULL) || (len == 0)) {
         return DEVICE_ATTEST_OEM_ERR;
     }
-    const char productKeyBuf[] = "487b5cad9ec14539a4bed6f7a92f17db";
+    // Please fill in the actual value
+    const char productKeyBuf[] = "";
     uint32_t productKeyLen = sizeof(productKeyBuf);
     if (len < productKeyLen) {
         return DEVICE_ATTEST_OEM_ERR;

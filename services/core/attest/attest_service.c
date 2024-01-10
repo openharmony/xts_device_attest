@@ -330,7 +330,10 @@ int32_t ProcAttest(void)
 
 static int32_t AttestStatusTrans(int32_t attestStatus)
 {
-    return (attestStatus == 0) ? 0 : -1;
+    if (attestStatus == DEVICE_ATTEST_INIT) {
+        return DEVICE_ATTEST_INIT;
+    }
+    return (attestStatus == DEVICE_ATTEST_PASS) ? DEVICE_ATTEST_PASS : DEVICE_ATTEST_FAIL;
 }
 
 static int32_t CopyResultArray(AuthStatus* authStatus, int32_t** resultArray)

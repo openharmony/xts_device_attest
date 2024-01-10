@@ -370,7 +370,7 @@ static int32_t UnpackAuthStatusResp(const char* decodedAuthStatus, AuthStatus* a
             break;
         }
         if ((ret = ParseSoftwareResultDetail(root, authStatus)) != 0) {
-            ATTEST_LOG_ERROR("[UnpackAuthStatusResp] Parse software status failed");
+            ATTEST_LOG_ERROR("[UnpackAuthStatusResp] Parse softwareDetail status failed");
             break;
         }
         if ((ret = ParseAuthType(root, authStatus)) != 0) {

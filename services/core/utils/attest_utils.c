@@ -24,9 +24,6 @@
 #include "attest_utils_memleak.h"
 #include "attest_utils.h"
 
-#define DEV_BUF_LENGTH   3
-#define HASH_LENGTH      32
-#define DECIMAL_BASE     10
 #define PER_BYTE_BITS    8
 #define RANDOM_BYTES     4
 

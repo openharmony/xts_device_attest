@@ -30,10 +30,6 @@ int32_t ProcAttest(void);
 
 int32_t QueryAttestStatus(int32_t** resultArray, int32_t arraySize, char** ticket, int32_t* ticketLength);
 
-int32_t QueryAttestPublishableImpl(int32_t* publishable);
-
-int32_t AttestPublishCompleteImpl(void);
-
 int32_t AttestWaitTaskOverImpl(void);
 #ifdef __cplusplus
 #if __cplusplus

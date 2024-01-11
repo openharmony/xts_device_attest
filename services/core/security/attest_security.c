@@ -20,6 +20,7 @@
 #include "mbedtls/aes.h"
 #include "mbedtls/hkdf.h"
 #include "mbedtls/md.h"
+#include "mbedtls/md5.h"
 #include "attest_adapter.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"
@@ -635,4 +636,42 @@ int32_t Decrypt(const uint8_t* inputData, size_t inputDataLen, const uint8_t* ae
     }
     (void)memset_s(decryptData, ENCRYPT_LEN, 0, ENCRYPT_LEN);
     return ATTEST_OK;
+}
+
+int32_t MD5Encode(const uint8_t* srcData, size_t srcDataLen, uint8_t* outputStr, int outputLen)
+{
+    if (srcData == NULL || srcDataLen == 0 || outputStr == NULL) {
+        ATTEST_LOG_ERROR("[MD5Encode] Invalid parameter");
+        return ATTEST_ERR;
+    }
+
+    uint8_t hash[MD5_LEN] = {0};
+    char buf[DEV_BUF_LENGTH] = {0};
+
+    mbedtls_md5_context md5_ctx;
+    mbedtls_md5_init(&md5_ctx);
+    mbedtls_md5_starts(&md5_ctx);
+    mbedtls_md5_update(&md5_ctx, srcData, srcDataLen);
+    mbedtls_md5_finish(&md5_ctx, hash);
+    mbedtls_md5_free(&md5_ctx);
+
+    int32_t ret = ATTEST_OK;
+    for (size_t i = 0; i < MD5_LEN; i++) {
+        uint8_t value = hash[i];
+        (void)memset_s(buf, DEV_BUF_LENGTH, 0, DEV_BUF_LENGTH);
+        if (sprintf_s(buf, sizeof(buf), "%02x", value) < 0) {
+            ATTEST_LOG_ERROR("[MD5Encode] Failed to sprintf");
+            ret = ATTEST_ERR;
+            break;
+        }
+
+        if (strcat_s((char*)outputStr, outputLen, buf) != 0) {
+            ATTEST_LOG_ERROR("[MD5Encode] Failed to strcat");
+            ret = ATTEST_ERR;
+            break;
+        }
+    }
+    (void)memset_s(buf, DEV_BUF_LENGTH, 0, DEV_BUF_LENGTH);
+    (void)memset_s(hash, MD5_LEN, 0, MD5_LEN);
+    return ret;
 }

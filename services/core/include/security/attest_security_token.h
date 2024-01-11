@@ -25,6 +25,12 @@ extern "C" {
 #endif /* End of #ifdef __cplusplus */
 
 #define HMAC_SHA256_CIPHER_LEN 32
+#define OKM_INPUT_LEN 24
+#define UUID_FORMAT_SYMBOL_NUM 4
+#define UUID_FORMAT_INDEX_1 8
+#define UUID_FORMAT_INDEX_2 12
+#define UUID_FORMAT_INDEX_3 16
+#define UUID_FORMAT_INDEX_4 20
 
 int32_t GetTokenValueHmac(const char* challenge, uint8_t* tokenValueHmac, uint8_t tokenValueHmacLen);
 

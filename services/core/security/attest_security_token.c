@@ -176,7 +176,7 @@ static int32_t GetTokenValueSpecial(uint8_t* tokenValueHmac, uint8_t tokenValueH
     return ATTEST_OK;
 }
 
-static int32_t FormatUUID(uint8_t *inputData, int32_t inputLen, uint8_t *outputData, int32_t outputLen)
+static int32_t FormatUUID(const uint8_t *inputData, int32_t inputLen, uint8_t *outputData, int32_t outputLen)
 {
     if ((inputData == NULL) || (outputData == NULL) || \
         (inputLen == 0) || (outputLen == 0)) {

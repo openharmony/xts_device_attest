@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace DevAttest {
-static constexpr OHOS::HiviewDFX::HiLogLabel DEVATTEST_LABEL = {LOG_CORE, 0xD001810, "DEVATTEST"};
+static constexpr OHOS::HiviewDFX::HiLogLabel DEVATTEST_LABEL = {LOG_CORE, 0xD005D00, "DEVATTEST"};
 
 #define HILOGF(...) (void)OHOS::HiviewDFX::HiLog::Fatal(DEVATTEST_LABEL, ##__VA_ARGS__)
 #define HILOGE(...) (void)OHOS::HiviewDFX::HiLog::Error(DEVATTEST_LABEL, ##__VA_ARGS__)

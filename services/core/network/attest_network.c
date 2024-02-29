@@ -699,7 +699,7 @@ char* BuildHttpsResetBody(DevicePacket *postValue)
     char *bodyData = cJSON_Print(postData);
     cJSON_Delete(postData);
     if (ATTEST_NETWORK_DEBUG_LOG_FLAG) {
-        ATTEST_LOG_DEBUG("[BuildHttpsResetBody] ResetBody [%u]\n%s\n", strlen(bodyData), bodyData);
+        ATTEST_LOG_DEBUG("[BuildHttpsResetBody] ResetBody [%zu]\n%s\n", strlen(bodyData), bodyData);
     }
     ATTEST_LOG_DEBUG("[BuildHttpsResetBody] End.");
     return bodyData;
@@ -745,7 +745,7 @@ char* BuildHttpsAuthBody(DevicePacket *postValue)
     char *bodyData = cJSON_Print(postData);
     cJSON_Delete(postData);
     if (ATTEST_NETWORK_DEBUG_LOG_FLAG) {
-        ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] AuthBody [%u]\n%s\n", strlen(bodyData), bodyData);
+        ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] AuthBody [%zu]\n%s\n", strlen(bodyData), bodyData);
     }
     ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] End.");
     return bodyData;
@@ -786,7 +786,7 @@ char* BuildHttpsActiveBody(DevicePacket *postValue)
     char *bodyData = cJSON_Print(postData);
     cJSON_Delete(postData);
     if (ATTEST_NETWORK_DEBUG_LOG_FLAG) {
-        ATTEST_LOG_DEBUG("[BuildHttpsActiveBody] ActiBody [%u]\n%s\n", strlen(bodyData), bodyData);
+        ATTEST_LOG_DEBUG("[BuildHttpsActiveBody] ActiBody [%zu]\n%s\n", strlen(bodyData), bodyData);
     }
     ATTEST_LOG_DEBUG("[BuildHttpsActiveBody] End.");
     return bodyData;

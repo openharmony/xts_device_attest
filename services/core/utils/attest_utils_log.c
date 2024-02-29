@@ -22,44 +22,26 @@
 
 static void AttestLogPrint(AttestLogLevel logLevel, const char *logBuf)
 {
-    LogLevel hiLogLevel = LOG_INFO;
     switch (logLevel) {
         case ATTEST_LOG_LEVEL_DEBUG:
-            hiLogLevel = LOG_DEBUG;
+            ATTEST_LOG_DEBUG("%{public}s", logBuf);
             break;
         case ATTEST_LOG_LEVEL_INFO:
-            hiLogLevel = LOG_INFO;
+            ATTEST_LOG_INFO("%{public}s", logBuf);
             break;
         case ATTEST_LOG_LEVEL_WARN:
-            hiLogLevel = LOG_WARN;
+            ATTEST_LOG_WARN("%{public}s", logBuf);
             break;
         case ATTEST_LOG_LEVEL_ERROR:
-            hiLogLevel = LOG_ERROR;
+            ATTEST_LOG_ERROR("%{public}s", logBuf);
             break;
         case ATTEST_LOG_LEVEL_FATAL:
-            hiLogLevel = LOG_FATAL;
+            ATTEST_LOG_FATAL("%{public}s", logBuf);
             break;
         default:
             break;
     }
-    (void)HiLogPrint(LOG_CORE, hiLogLevel, 0xD005D00, ATTESTLOG_LABEL, "%{public}s", logBuf);
-}
-
-void AttestLog(AttestLogLevel logLevel, const char* fmt, ...)
-{
-    if (logLevel < ATTEST_HILOG_LEVEL) {
-        return;
-    }
-    char outStr[ATTEST_LOG_STR_LEM] = {0};
-    va_list arg;
-    va_start(arg, fmt);
-    int32_t ret = vsprintf_s(outStr, sizeof(outStr), fmt, arg);
-    va_end(arg);
-    if (ret < 0) {
-        AttestLogPrint(logLevel, "log length error.");
-        return;
-    }
-    AttestLogPrint(logLevel, outStr);
+    return;
 }
 
 void AttestLogAnonyStr(AttestLogLevel logLevel, const char* fmt, const char* str)

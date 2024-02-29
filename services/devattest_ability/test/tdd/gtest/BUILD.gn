@@ -16,7 +16,7 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 import("//test/xts/device_attest/services/core/attestsource.gni")
 
 ohos_unittest("device_attest_tdd") {
-  module_out_path = "devattest/devattest_ability"
+  module_out_path = devattest_unittest_module_path
   cflags = [ "-Wall" ]
   defines = [ "ATTEST_HILOG_LEVEL = 1" ]
   defines += [ "MBEDTLS_ALLOW_PRIVATE_ACCESS" ]

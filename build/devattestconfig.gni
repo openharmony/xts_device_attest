@@ -19,6 +19,8 @@ devattest_kits_path = "${devattest_path}/interfaces/kits/napi"
 
 devattest_fuzz_module_path = "device_attest/device_attest"
 
+devattest_unittest_module_path = "device_attest/device_attest"
+
 # 支持构建种类
 declare_args() {
   attest_release = "attest_release"

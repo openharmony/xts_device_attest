@@ -34,15 +34,17 @@ typedef enum {
 
 #define ATTEST_LOG_STR_LEM 1024
 
-#define ATTESTLOG_LABEL "DEVATTEST"
+#undef LOG_TAG
+#define LOG_TAG "DEVATTEST"
 
-void AttestLog(AttestLogLevel logLevel, const char* fmt, ...);
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD005D00
 
-#define ATTEST_LOG_DEBUG(d_fmt, d_args...) AttestLog(ATTEST_LOG_LEVEL_DEBUG, d_fmt, ##d_args)
-#define ATTEST_LOG_INFO(d_fmt, d_args...) AttestLog(ATTEST_LOG_LEVEL_INFO, d_fmt, ##d_args)
-#define ATTEST_LOG_WARN(d_fmt, d_args...) AttestLog(ATTEST_LOG_LEVEL_WARN, d_fmt, ##d_args)
-#define ATTEST_LOG_ERROR(d_fmt, d_args...) AttestLog(ATTEST_LOG_LEVEL_ERROR, d_fmt, ##d_args)
-#define ATTEST_LOG_FATAL(d_fmt, d_args...) AttestLog(ATTEST_LOG_LEVEL_FATAL, d_fmt, ##d_args)
+#define ATTEST_LOG_DEBUG(fmt, ...) HILOG_DEBUG(LOG_CORE, fmt, ##__VA_ARGS__)
+#define ATTEST_LOG_INFO(fmt, ...) HILOG_INFO(LOG_CORE, fmt, ##__VA_ARGS__)
+#define ATTEST_LOG_WARN(fmt, ...) HILOG_WARN(LOG_CORE, fmt, ##__VA_ARGS__)
+#define ATTEST_LOG_ERROR(fmt, ...) HILOG_ERROR(LOG_CORE, fmt, ##__VA_ARGS__)
+#define ATTEST_LOG_FATAL(fmt, ...) HILOG_FATAL(LOG_CORE, fmt, ##__VA_ARGS__)
 
 void AttestLogAnonyStr(AttestLogLevel logLevel, const char* fmt, const char* str);
 

@@ -17,18 +17,21 @@
 #define DEVATTEST_LOG_H
 
 #include <string>
-
 #include "hilog/log.h"
+
+#undef LOG_TAG
+#define LOG_TAG "DEVATTEST"
+
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD005D00
 
 namespace OHOS {
 namespace DevAttest {
-static constexpr OHOS::HiviewDFX::HiLogLabel DEVATTEST_LABEL = {LOG_CORE, 0xD005D00, "DEVATTEST"};
-
-#define HILOGF(...) (void)OHOS::HiviewDFX::HiLog::Fatal(DEVATTEST_LABEL, ##__VA_ARGS__)
-#define HILOGE(...) (void)OHOS::HiviewDFX::HiLog::Error(DEVATTEST_LABEL, ##__VA_ARGS__)
-#define HILOGW(...) (void)OHOS::HiviewDFX::HiLog::Warn(DEVATTEST_LABEL, ##__VA_ARGS__)
-#define HILOGI(...) (void)OHOS::HiviewDFX::HiLog::Info(DEVATTEST_LABEL, ##__VA_ARGS__)
-#define HILOGD(...) (void)OHOS::HiviewDFX::HiLog::Debug(DEVATTEST_LABEL, ##__VA_ARGS__)
+#define HILOGF(fmt, ...) HILOG_FATAL(LOG_CORE, fmt, ##__VA_ARGS__)
+#define HILOGE(fmt, ...) HILOG_ERROR(LOG_CORE, fmt, ##__VA_ARGS__)
+#define HILOGW(fmt, ...) HILOG_WARN(LOG_CORE, fmt, ##__VA_ARGS__)
+#define HILOGI(fmt, ...) HILOG_INFO(LOG_CORE, fmt, ##__VA_ARGS__)
+#define HILOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, fmt, ##__VA_ARGS__)
 } // end of DevAttest
 } // end of OHOS
 #endif

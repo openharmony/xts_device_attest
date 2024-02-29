@@ -124,7 +124,7 @@ int32_t AttestStartTimerTask(AttestTimerType isOnce, uint32_t milliseconds,
     if (*timerHandle != NULL) {
         AttestTimerInfo *tmpTimerInfo = (AttestTimerInfo *)timerHandle;
         if (tmpTimerInfo->timerId != 0) {
-            ATTEST_LOG_ERROR("[AttestStartTimerTask] timerId[%d] already exists", tmpTimerInfo->timerId);
+            ATTEST_LOG_ERROR("[AttestStartTimerTask] timerId already exists");
             return ATTEST_ERR;
         }
     }

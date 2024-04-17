@@ -836,9 +836,9 @@ int32_t GenAuthMsg(ChallengeResult* challengeResult, DevicePacket** devPacket)
     
     uint8_t tokenValueHmac[TOKEN_VALUE_HMAC_LEN + 1] = {0};
     uint8_t tokenId[TOKEN_ID_LEN + 1] = {0};
-    if (GetTokenValueHmac(challengeResult->challenge, tokenValueHmac, TOKEN_VALUE_HMAC_LEN) != 0 ||
-        GetTokenId(tokenId, TOKEN_ID_LEN) != 0) {
-        ATTEST_LOG_ERROR("[GenAuthMsg] Get TokenId or TokenValueHmac failed");
+    int32_t ret = GetTokenValueAndId(challengeResult->challenge, tokenValueHmac, TOKEN_VALUE_HMAC_LEN,\
+        tokenId, TOKEN_ID_LEN);
+    if (ret != ATTEST_OK) {
         return ATTEST_ERR;
     }
 
@@ -854,7 +854,7 @@ int32_t GenAuthMsg(ChallengeResult* challengeResult, DevicePacket** devPacket)
     devicePacket->tokenInfo.uuid = AttestStrdup((char*)tokenId);
     devicePacket->tokenInfo.token = AttestStrdup((char*)tokenValueHmac);
     devicePacket->pcid = StrdupDevInfo(PCID);
-    int32_t ret = PackProductInfo(&devicePacket->productInfo);
+    ret = PackProductInfo(&devicePacket->productInfo);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GenAuthMsg] Pack ProductInfo failed.");
         FREE_DEVICE_PACKET(devicePacket);

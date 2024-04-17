@@ -174,7 +174,7 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest001, TestSize.Level
 {
     long long startTime = GetSysTime();
     AttestResultInfo attestResultInfo;
-    int ret = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
+    int ret = DevAttestClient::GetInstance().GetAttestStatus(attestResultInfo);
     long long endTime = GetSysTime();
     if (endTime < startTime) {
         return;
@@ -201,7 +201,7 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest002, TestSize.Level
     AttestResultInfo attestResultInfo;
     int ret = 0;
     for (int i = 0; i < PERFORMANCE_TEST_REPEAT_TIMES; i++) {
-        ret = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
+        ret = DevAttestClient::GetInstance().GetAttestStatus(attestResultInfo);
     }
     long long endTime = GetSysTime();
     if (endTime < startTime) {

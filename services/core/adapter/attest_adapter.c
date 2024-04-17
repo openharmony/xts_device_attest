@@ -22,7 +22,17 @@
 // 是否存在重置标记
 bool AttestIsResetFlagExist(void)
 {
-    return OEMIsFlagExist(OEM_FLAG_RESET);
+    bool isExist = OEMIsFlagExist(OEM_FLAG_RESET);
+    if (!isExist) {
+        return false;
+    }
+#if !defined(__ATTEST_ENABLE_PRESET_TOKEN__)
+    TokenInfo tokenInfo;
+    if (AttestReadToken(&tokenInfo) == TOKEN_UNPRESET) {
+        return false;
+    }
+#endif
+    return true;
 }
 
 // 创建重置标记

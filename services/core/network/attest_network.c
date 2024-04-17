@@ -592,6 +592,7 @@ static int32_t BuildSoftware(DevicePacket *postValue, cJSON **postData)
     return ATTEST_OK;
 }
 
+#ifndef __ATTEST_DISABLE_SITE__
 static int32_t BuildHttpsChallServerInfo(cJSON **postData)
 {
     if (postData == NULL) {
@@ -631,6 +632,7 @@ static int32_t BuildHttpsChallServerInfo(cJSON **postData)
     }
     return ATTEST_OK;
 }
+#endif
 
 char* BuildHttpsChallBody(DevicePacket *postValue)
 {
@@ -650,11 +652,14 @@ char* BuildHttpsChallBody(DevicePacket *postValue)
             ATTEST_LOG_ERROR("[BuildHttpsChallBody] postData  AddStringToObject fail");
             break;
         }
+#ifndef __ATTEST_DISABLE_SITE__
         ret = BuildHttpsChallServerInfo(&postData);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[BuildHttpsChallBody] BuildHttpsChallServerInfo fail");
             break;
         }
+#endif
+        ret = ATTEST_OK;
     } while (0);
     if (ret != ATTEST_OK) {
         cJSON_Delete(postData);

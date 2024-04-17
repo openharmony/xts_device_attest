@@ -85,14 +85,18 @@ int32_t OEMReadToken(char *token, uint32_t len)
     int32_t retA = ReadTokenWithFlag(TOKEN_ADDR, TOKEN_A_ADDR, tokenWithFlagA, TOKEN_WITH_FLAG_SIZE);
     int32_t retB = ReadTokenWithFlag(TOKEN_ADDR, TOKEN_B_ADDR, tokenWithFlagB, TOKEN_WITH_FLAG_SIZE);
     if ((retA != DEVICE_ATTEST_OEM_OK) && (retB != DEVICE_ATTEST_OEM_OK)) {
+        // Files tokenA and tokenB do not exist
         return DEVICE_ATTEST_OEM_UNPRESET;
     } else if ((retA == DEVICE_ATTEST_OEM_OK) && (retB != DEVICE_ATTEST_OEM_OK)) {
+        // File tokenA exist, and file tokenB does not exist
         (void)memcpy_s(token, len, tokenWithFlagA, len);
         return DEVICE_ATTEST_OEM_OK;
     } else if ((retA != DEVICE_ATTEST_OEM_OK) && (retB == DEVICE_ATTEST_OEM_OK)) {
+        // File tokenB exist, and file tokenA does not exist
         (void)memcpy_s(token, len, tokenWithFlagB, len);
         return DEVICE_ATTEST_OEM_OK;
     } else {
+        // Both files tokenA and tokenB exist, use the one with the highest number of flags
         uint32_t flagA = GetTokenFlag(tokenWithFlagA);
         uint32_t flagB = GetTokenFlag(tokenWithFlagB);
         if (flagA > flagB) {

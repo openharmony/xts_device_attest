@@ -15,6 +15,12 @@ import("//build/ohos.gni")
 import("//test/xts/device_attest/build/devattestconfig.gni")
 
 ohos_executable("attesttestclient") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [ "devattest_main_client.cpp" ]
 
   include_dirs = [

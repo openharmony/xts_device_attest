@@ -184,16 +184,13 @@ int32_t ToLowerStr(char* str, int len)
     return ATTEST_OK;
 }
 
-/**
- * @brief Encrypt string with sha256 algorithm, and generate uppercase string.
- *
- */
-int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
+int Sha256ValueToAscii(const unsigned char *src, int srcLen, char *dest, int destLen)
 {
-    if (src == NULL) {
+    if (src == NULL || srcLen <= 0 || dest == NULL || destLen <= 0) {
+        ATTEST_LOG_ERROR("[Sha256ValueToAscii] Invalid parameter");
         return ATTEST_ERR;
     }
-    char buf[DEV_BUF_LENGTH] = {0};
+
     unsigned char hash[HASH_LENGTH] = {0};
 
     mbedtls_sha256_context context;
@@ -202,11 +199,38 @@ int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
     mbedtls_sha256_update_ret(&context, src, srcLen);
     mbedtls_sha256_finish_ret(&context, hash);
 
-    int32_t ret = ATTEST_OK;
-    for (size_t i = 0; i < HASH_LENGTH; i++) {
-        unsigned char value = hash[i];
+    int ret = ATTEST_OK;
+    if (memcpy_s(dest, destLen, hash, HASH_LENGTH) != 0) {
+        ATTEST_LOG_ERROR("[Sha256ValueToAscii] Failed to memcpy");
+        ret = ATTEST_ERR;
+    }
+    (void)memset_s(hash, HASH_LENGTH, 0, HASH_LENGTH);
+    return ret;
+}
+
+/**
+ * @brief Encrypt string with sha256 algorithm, and generate uppercase string.
+ *
+ */
+int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
+{
+    if (src == NULL || srcLen <= 0 || dest == NULL || destLen <= 0) {
+        ATTEST_LOG_ERROR("[Sha256ValueToAscii] Invalid parameter");
+        return ATTEST_ERR;
+    }
+    char buf[DEV_BUF_LENGTH] = {0};
+    char hash[HASH_LENGTH] = {0};
+
+
+    int32_t ret = Sha256ValueToAscii(src, srcLen, hash, HASH_LENGTH);
+    if (ret != ATTEST_OK) {
+        return ATTEST_ERR;
+    }
+
+    for (int i = 0; i < HASH_LENGTH; i++) {
         (void)memset_s(buf, DEV_BUF_LENGTH, 0, DEV_BUF_LENGTH);
-        if (sprintf_s(buf, sizeof(buf), "%02X", value) < 0) {
+        // generate uppercase string
+        if (sprintf_s(buf, sizeof(buf), "%02X", hash[i]) < 0) {
             ret = ATTEST_ERR;
             break;
         }
@@ -297,5 +321,49 @@ int32_t CharToAscii(const char* str, uint32_t len, uint8_t* outputStr, uint32_t 
         }
     } while (0);
     (void)memset_s(outStr, outStrLenMax + 1, 0, outStrLenMax + 1);
+    return ret;
+}
+
+static int32_t HexToNumber(char inputChr)
+{
+    int retNumber = 0;
+    if (inputChr >= '0' && inputChr <= '9') {
+        retNumber = inputChr - '0';
+    } else if (inputChr >= 'a' && inputChr <= 'f') {
+        retNumber = DECIMAL_BASE + inputChr - 'a';
+    } else if (inputChr >= 'A' && inputChr <= 'F') {
+        retNumber = DECIMAL_BASE + inputChr - 'A';
+    } else {
+        retNumber = ATTEST_ERR;
+    }
+    return retNumber;
+}
+
+int32_t HEXStringToAscii(const char* input, int32_t inputLen, char* output, int32_t outputLen)
+{
+    if (input == NULL || inputLen <= 0 || output == NULL || (inputLen % ATTEST_EVEN_NUMBER == 1)) {
+        ATTEST_LOG_ERROR("[HEXStringToAscii] Invaild paramter");
+        return ATTEST_ERR;
+    }
+
+    if (outputLen < (inputLen / ATTEST_EVEN_NUMBER)) {
+        ATTEST_LOG_ERROR("[HEXStringToAscii] outputLen is shorter than required");
+        return ATTEST_ERR;
+    }
+
+    int tempLen = 0;
+    int highNumber = 0;
+    int lowNumber = 0;
+    int32_t ret = ATTEST_OK;
+    for(int i = 0; i < inputLen;) {
+        highNumber = HexToNumber(input[i]);
+        lowNumber = HexToNumber(input[i + 1]);
+        if (highNumber == ATTEST_ERR || lowNumber == ATTEST_ERR) {
+            ret = ATTEST_ERR;
+            break;
+        }
+        output[tempLen++] = highNumber * HEXADECIMAL_BASE + lowNumber;
+        i += ATTEST_EVEN_NUMBER;
+    }
     return ret;
 }

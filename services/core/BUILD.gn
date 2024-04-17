@@ -49,6 +49,12 @@ config("devattest_core_config") {
   if (enable_attest_network_debug_log) {
     defines += [ "__ATTEST_NETWORK_DEBUG_LOG__" ]
   }
+  if (disable_attest_active_site) {
+    defines += [ "__ATTEST_DISABLE_SITE__" ]
+  }
+  if (enable_attest_preset_token) {
+    defines += [ "__ATTEST_ENABLE_PRESET_TOKEN__" ]
+  }
 
   defines += [ "MBEDTLS_ALLOW_PRIVATE_ACCESS" ]
   defines += [ "OPENSSL_SUPPRESS_DEPRECATED" ]

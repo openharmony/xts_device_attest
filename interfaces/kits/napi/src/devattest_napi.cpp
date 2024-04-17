@@ -99,7 +99,7 @@ static void Execute(napi_env env, void* data)
         return;
     }
     DevAttestAsyncContext *asyncContext = static_cast<DevAttestAsyncContext*>(data);
-    int32_t ret = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(asyncContext->value);
+    int32_t ret = DevAttestClient::GetInstance().GetAttestStatus(asyncContext->value);
     if (ret == DEVATTEST_FAIL) {
         asyncContext->ret = DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION;
     } else {
@@ -192,7 +192,7 @@ napi_value DevAttestNapi::GetAttestResultInfo(napi_env env, napi_callback_info i
 napi_value DevAttestNapi::GetAttestResultInfoSync(napi_env env, napi_callback_info info)
 {
     AttestResultInfo attestResultInfo;
-    int32_t errCode = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
+    int32_t errCode = DevAttestClient::GetInstance().GetAttestStatus(attestResultInfo);
     if (errCode != DEVATTEST_SUCCESS) {
         HILOGE("[GetAttestResultInfoSync] GetAttestStatus failed errCode:%{public}d", errCode);
         napi_throw(env, GenerateBusinessError(env, errCode));

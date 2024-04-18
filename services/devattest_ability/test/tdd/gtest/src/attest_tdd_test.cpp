@@ -215,10 +215,6 @@ static AuthResult *GetAuthResult()
     return authResult;
 }
 
-/**
- * @brief GenResetMsg, GenAuthMsg, GenActiveMsg
- * 
- */
 static DevicePacket* TddGenMsg(int input)
 {
     DevicePacket* reqMsg = nullptr;

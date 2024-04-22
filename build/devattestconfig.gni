@@ -49,6 +49,12 @@ declare_args() {
 
   # 控制DFX开关。 true:开启dfx
   enable_attest_debug_dfx = false
+
+  # 域名增强关闭
+  disable_attest_active_site = false
+
+  # token预置方案
+  enable_attest_preset_token = false
 }
 
 # 声明通用全局宏

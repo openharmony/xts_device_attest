@@ -25,11 +25,16 @@
 #endif
 #endif /* __cplusplus */
 
+// 进制数
 #define OCTADIC_BASE 8
 #define DECIMAL_BASE 10
 #define HEXADECIMAL_BASE 16
+
 #define DEV_BUF_LENGTH   3
 #define HASH_LENGTH      32
+
+// 奇偶数
+#define ATTEST_EVEN_NUMBER 2
 
 void AttestMemFree(void **point);
 
@@ -51,11 +56,15 @@ void PrintCurrentTime(void);
 
 int32_t ToLowerStr(char* str, int len);
 
+int Sha256ValueToAscii(const unsigned char *src, int srcLen, char *dest, int destLen);
+
 int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen);
 
 int32_t AnonymiseStr(char* str);
 
 int32_t CharToAscii(const char* str, uint32_t len, uint8_t* outputStr, uint32_t outLen);
+
+int32_t HEXStringToAscii(const char* input, int32_t inputLen, char* output, int32_t outputLen);
 
 #ifdef __cplusplus
 #if __cplusplus

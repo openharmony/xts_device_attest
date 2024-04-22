@@ -23,7 +23,7 @@
 #define PCID_STRING_LEN 64
 
 char* g_devSysInfos[SYS_DEV_MAX] = {NULL};
-const char* g_devSysInfosStr[] = {
+const char* g_devSysInfosStr[SYS_DEV_MAX] = {
     "VERSION_ID",
     "ROOT_HASH",
     "DISPLAY_VERSION",
@@ -38,7 +38,7 @@ const char* g_devSysInfosStr[] = {
     "PCID",
 };
 
-SetDataFunc g_setDataFunc[] = {
+SetDataFunc g_setDataFunc[SYS_DEV_MAX] = {
     &AttestGetVersionId,
     &AttestGetBuildRootHash,
     &AttestGetDisplayVersion,
@@ -52,6 +52,35 @@ SetDataFunc g_setDataFunc[] = {
     &GetTenantId,
     &GetPcid,
 };
+
+size_t g_devSysInfosMaxLen[SYS_DEV_MAX] = {
+    MAX_ATTEST_VERSION_ID_LEN,
+    MAX_ATTEST_DEFAULT_LEN,
+    MAX_ATTEST_DISPLAY_VERSION_LEN,
+    MAX_ATTEST_MANUFACTURE_LEN,
+    MAX_ATTEST_MODEL_LEN,
+    MAX_ATTEST_BRAND_LEN,
+    MAX_ATTEST_PATCH_LEN,
+    MAX_ATTEST_DEFAULT_LEN,
+    MAX_ATTEST_DEFAULT_LEN,
+    MAX_ATTEST_DEFAULT_LEN,
+    MAX_ATTEST_DEFAULT_LEN,
+    MAX_ATTEST_DEFAULT_LEN,
+};
+
+/* 根据PCS表检查长度 */
+static int32_t CheckSysInfosLength(SYS_DEV_TYPE_E type, size_t sysInfosLength)
+{
+    if (type == ROOT_HASH || type == UDID || type == RANDOM_UUID ||\
+        type == APP_ID || type == TENANT_ID || type == PCID) {
+        return ATTEST_OK;
+    }
+    if (sysInfosLength > g_devSysInfosMaxLen[type]) {
+        ATTEST_LOG_ERROR("[CheckSysInfosLength] The length of sysInfo type %d exceeds limit", type);
+        return ATTEST_ERR;
+    }
+    return ATTEST_OK;
+}
 
 static int32_t SetSysData(SYS_DEV_TYPE_E type)
 {
@@ -67,6 +96,10 @@ static int32_t SetSysData(SYS_DEV_TYPE_E type)
     char* value = setDataFunc();
     if (value == NULL) {
         ATTEST_LOG_ERROR("[SetSysData] set Data failed");
+        return ATTEST_ERR;
+    }
+
+    if (CheckSysInfosLength(type, strlen(value)) != ATTEST_OK) {
         return ATTEST_ERR;
     }
 
@@ -145,14 +178,13 @@ int32_t InitSysData(void)
 
 void DestroySysData(void)
 {
-    if (IsSysDataEmpty()) {
-        return;
-    }
-
     for (int32_t i = 0; i < SYS_DEV_MAX; i++) {
-        (void)memset_s(g_devSysInfos[i], strlen(g_devSysInfos[i]), 0, strlen(g_devSysInfos[i]));
-        ATTEST_MEM_FREE(g_devSysInfos[i]);
+        if (g_devSysInfos[i] != NULL) {
+            (void)memset_s(g_devSysInfos[i], strlen(g_devSysInfos[i]), 0, strlen(g_devSysInfos[i]));
+            ATTEST_MEM_FREE(g_devSysInfos[i]);
+        }
     }
+    return;
 }
 
 // StrdupDevInfo 涉及申请内存，需要外部释放
@@ -314,11 +346,11 @@ char* GetPcid(void)
 
 static unsigned char* GetUdidDecrypted(void)
 {
-    char *enShortName = AttestGetManufacture();
+    char *enShortName = StrdupDevInfo(MANU_FACTURE);
     if (enShortName == NULL) {
         return NULL;
     }
-    char *model = AttestGetProductModel();
+    char *model = StrdupDevInfo(PRODUCT_MODEL);
     if (model == NULL) {
         ATTEST_MEM_FREE(enShortName);
         return NULL;
@@ -335,9 +367,7 @@ static unsigned char* GetUdidDecrypted(void)
     unsigned char *udid = NULL;
     int32_t ret = ATTEST_ERR;
     do {
-        if ((strlen(enShortName) > MAX_ATTEST_MANUFACTURE_LEN) || \
-            (strlen(model) > MAX_ATTEST_MODEL_LEN) || \
-            (strlen(sn) > MAX_ATTEST_SERIAL_LEN)) {
+        if (strlen(sn) > MAX_ATTEST_SERIAL_LEN) {
             break;
         }
         int32_t udidSize = enShortNameLen + modelLen + snLen + 1;

@@ -67,6 +67,8 @@ char* OsGetBrandStub(void);
 
 char* OsGetSecurityPatchTagStub(void);
 
+char* OsGetSerialStub(void);
+
 char* OsGetUdidStub(void);
 
 int OsGetAcKeyStub(char *acKey, unsigned int len);

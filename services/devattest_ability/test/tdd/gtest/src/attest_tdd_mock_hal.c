@@ -13,156 +13,96 @@
  * limitations under the License.
  */
 #include <securec.h>
-#include "attest_utils_log.h"
-#include "attest_adapter_mock.h"
+#include <stdbool.h>
 #include "attest_type.h"
-#include "attest_tdd_data_transfer.h"
 #include "attest_tdd_test.h"
 #include "attest_tdd_mock_hal.h"
+#include "attest_utils.h"
+#include "attest_utils_log.h"
 
-static bool g_isFirstToken = true;
+static int g_readTokenRet = ATTEST_OK;
 
-static const char* ATTEST_FIRST_TOKENID =  "57,65,104,109,101,122,89,84,112,99,50,88,56,57,114,71,48,66,54,66,52,73,\
-111,109,103,119,104,75,82,69,114,76,102,78,109,89,121,89,110,113,106,72,109,71,80,102,102,79,87,55,43,113,75,89,55,\
-117,47,85,67,68,114,119,103,106,89,49,73,87,90,56,105,81,79,52,73,78,113,79,105,105,102,78,89,52,100,101,71,54,113,77,\
-49,106,113,78,107,50,43,85,52,55,54,83,76,77,105,98,121,109,121,55,112,102,78,68,84,80,43,104,83,106,72,120,72,65,\
-101,70,86,65,65,81,54,53,76,109,101,98,56,118,43,51,111,108,83,108,49,48,48,48,0";
-static const char* ATTEST_FIRST_TOKEVALUE = "89,49,73,87,90,56,105,81,79,52,73,78,113,79,105,105,102,78,89,52,100,101,\
-71,54,113,77,49,106,113,78,107,50,43,85,52,55,54,83,76,77,105,98,121,109,121,55,112,102,78,68,84,80,43,104,83,106,72,\
-120,72,65,101,70,86,65,65,81,54,53,76,109,101,98,56,118,43,51,111,108,83,108,49,48,48,48,0";
-static const char* ATTEST_FIRST_SALT = "65,81,54,53,76,109,101,98,56,118,43,51,111,108,83,108,49,48,48,48,0";
-static const char* ATTEST_FIRST_VERSION = "49,48,48,48,0";
+void AttestSetMockReadTokenRet(int value)
+{
+    g_readTokenRet = value;
+}
 
-static const char* ATTEST_SECOND_TOKENID = "74,106,77,70,108,84,79,90,73,84,104,54,119,115,121,108,50,87,72,55,86,113,\
-111,43,65,102,102,114,48,108,57,52,120,48,70,111,78,100,49,111,71,82,48,113,49,73,121,67,50,84,82,122,112,55,118,\
-104,107,103,74,48,110,83,75,77,87,89,88,108,73,43,84,73,111,118,48,65,109,89,117,66,66,99,117,101,120,102,48,78,\
-102,76,66,90,98,72,53,106,114,47,98,99,113,81,85,80,107,54,53,98,57,86,50,82,48,107,108,82,121,72,118,113,101,54,\
-108,70,107,79,122,108,130,1,1,1,44,1,1,1,65,1,1,1,217,1,1,1,49,48,48,48,0";
-static const char* ATTEST_SECOND_TOKEVALUE = "87,89,88,108,73,43,84,73,111,118,48,65,109,89,117,66,66,99,117,101,120,\
-102,48,78,102,76,66,90,98,72,53,106,114,47,98,99,113,81,85,80,107,54,53,98,57,86,50,82,48,107,108,82,121,72,118,113,\
-101,54,108,70,107,79,122,108,130,1,1,1,44,1,1,1,65,1,1,1,217,1,1,1,49,48,48,48,0";
-static const char* ATTEST_SECOND_SALT = "130,1,1,1,44,1,1,1,65,1,1,1,217,1,1,1,49,48,48,48,0";
-static const char* ATTEST_SECOND_VERSION = "49,48,48,48,0";
-
-
-// 读取Manufacturekey
 int32_t AttestGetManufacturekey(uint8_t manufacturekey[], uint32_t len)
 {
-    return OsGetAcKeyStub((char*)manufacturekey, len);
+    return HEXStringToAscii((const char *)ATTEST_MOCK_HAL_MANU_KEY, ATTEST_MOCK_HAL_MANU_KEY_LEN,\
+        (char*)manufacturekey, len);
 }
 
-// 读取ProductId
 int32_t AttestGetProductId(uint8_t productId[], uint32_t len)
 {
-    if ((productId == NULL) || (len == 0)) {
-        return ATTEST_ERR;
-    }
-    const char productIdBuf[] = "OH00004O";
-    uint32_t productIdLen = strlen(productIdBuf);
-    if (len < productIdLen) {
-        return ATTEST_ERR;
-    }
-
-    int ret = memcpy_s(productId, len, productIdBuf, productIdLen);
-    return ret;
+    return memcpy_s(productId, len, ATTEST_MOCK_HAL_PRO_ID, ATTEST_MOCK_HAL_PRO_ID_LEN);
 }
 
-// 读取ProductKey
 int32_t AttestGetProductKey(uint8_t productKey[], uint32_t len)
 {
-    return OsGetProdKeyStub((char*)productKey, len);
+    return memcpy_s(productKey, len, ATTEST_MOCK_HAL_PRO_KEY, strlen(ATTEST_MOCK_HAL_PRO_KEY));
 }
 
 int32_t AttestWriteToken(TokenInfo* tokenInfo)
 {
+    (void)tokenInfo;
     return ATTEST_OK;
 }
 
 int32_t AttestReadToken(TokenInfo* tokenInfo)
 {
-    ATTEST_LOG_INFO("[AttestTdd] In AttestReadToken.");
     if (tokenInfo == NULL) {
         return ATTEST_ERR;
     }
-    int ret = -1;
-    uint8_t *out = (uint8_t *)tokenInfo->tokenId;
-    const char *tokenId = g_isFirstToken ? ATTEST_FIRST_TOKENID : ATTEST_SECOND_TOKENID;
-    ret = AttestSeriaToBinary(tokenId, &out, TOKEN_ID_ENCRYPT_LEN);
-    if (ret != ATTEST_OK) {
-        return ret;
-    }
 
-    out = (uint8_t *)tokenInfo->tokenValue;
-    const char *tokenValue = g_isFirstToken ? ATTEST_FIRST_TOKEVALUE : ATTEST_SECOND_TOKEVALUE;
-    ret = AttestSeriaToBinary(tokenValue, &out, TOKEN_VALUE_ENCRYPT_LEN);
-    if (ret != ATTEST_OK) {
-        return ret;
-    }
-
-    out = (uint8_t *)tokenInfo->salt;
-    const char *salt = g_isFirstToken ? ATTEST_FIRST_SALT : ATTEST_SECOND_SALT;
-    ret = AttestSeriaToBinary(salt, &out, SALT_ENCRYPT_LEN);
-    if (ret != ATTEST_OK) {
-        return ret;
-    }
-
-    out = (uint8_t *)tokenInfo->version;
-    const char *version = g_isFirstToken ? ATTEST_FIRST_VERSION : ATTEST_SECOND_VERSION;
-    ret = AttestSeriaToBinary(version, &out, VERSION_ENCRYPT_LEN);
-    if (ret != ATTEST_OK) {
-        return ret;
-    }
-    ATTEST_LOG_INFO("[AttestTdd] out AttestReadToken.");
-
-    return  ATTEST_OK;
+    memcpy_s(tokenInfo->tokenId, TOKEN_ID_ENCRYPT_LEN, ATTEST_FIRST_TOKENID, TOKEN_ID_ENCRYPT_LEN);
+    memcpy_s(tokenInfo->tokenValue, TOKEN_VALUE_ENCRYPT_LEN, ATTEST_FIRST_TOKEVALUE, TOKEN_VALUE_ENCRYPT_LEN);
+    memcpy_s(tokenInfo->salt, SALT_ENCRYPT_LEN, ATTEST_FIRST_SALT, SALT_ENCRYPT_LEN);
+    memcpy_s(tokenInfo->version, VERSION_ENCRYPT_LEN, ATTEST_FIRST_VERSION, VERSION_ENCRYPT_LEN);
+    return  g_readTokenRet;
 }
 
 int32_t AttestWriteTicket(const TicketInfo* ticketInfo)
 {
+    (void)ticketInfo;
     return ATTEST_OK;
 }
 
 int32_t AttestReadTicket(TicketInfo* ticketInfo)
 {
+    (void)ticketInfo;
     return ATTEST_OK;
 }
 
 int32_t WriteTicketToDevice(const char* ticket, uint8_t len)
 {
+    (void)ticket;
+    (void)len;
     return ATTEST_OK;
 }
 
 int32_t ReadTicketFromDevice(char* ticket, uint8_t ticketLen)
 {
-    int32_t ret = memcpy_s(ticket, ticketLen, ATTEST_TICKET, ticketLen);
+    int32_t ret = memcpy_s(ticket, ticketLen, ATTEST_MOCK_HAL_TICKET, ATTEST_MOCK_HAL_TICKET_LEN);
     return ret;
 }
 
 int32_t AttestWriteAuthStatus(const char* data, uint32_t len)
 {
+    (void)data;
+    (void)len;
     return ATTEST_OK;
 }
 
 int32_t AttestGetAuthStatusFileSize(uint32_t* len)
 {
-    *len = ATTEST_STATUS_LEN;
+    *len = ATTEST_MOCK_HAL_STATUS_LEN;
     return ATTEST_OK;
 }
 
 int32_t AttestReadAuthStatus(char* buffer, uint32_t bufferLen)
 {
-    int32_t ret = memcpy_s(buffer, bufferLen, ATTEST_STATUS, ATTEST_STATUS_LEN);
-    return ret;
-}
-
-int32_t AttestWriteNetworkConfig(const char* buffer, uint32_t bufferLen)
-{
-    return ATTEST_OK;
-}
-
-int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen)
-{
-    int32_t ret = memcpy_s(buffer, bufferLen, ATTEST_NETWORK_CONFIG, ATTEST_NETWORK_CONFIG_LEN);
+    int32_t ret = memcpy_s(buffer, bufferLen, ATTEST_MOCK_HAL_STATUS, ATTEST_MOCK_HAL_STATUS_LEN);
     return ret;
 }
 
@@ -182,8 +122,23 @@ bool AttestNetworkConfigExist(void)
     return false;
 }
 
+int32_t AttestWriteNetworkConfig(const char* buffer, uint32_t bufferLen)
+{
+    (void)buffer;
+    (void)bufferLen;
+    return ATTEST_OK;
+}
+
+int32_t AttestReadNetworkConfig(char* buffer, uint32_t bufferLen)
+{
+    int32_t ret = memcpy_s(buffer, bufferLen, ATTEST_MOCK_HAL_NETWORK_CONFIG, ATTEST_MOCK_HAL_NETWORK_CONFIG_LEN);
+    return ret;
+}
+
 int32_t AttestReadDefaultNetworkConfig(char* buffer, uint32_t bufferLen)
 {
+    (void)buffer;
+    (void)bufferLen;
     return ATTEST_OK;
 }
 

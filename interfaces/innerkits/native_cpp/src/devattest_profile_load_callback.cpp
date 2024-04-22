@@ -24,12 +24,26 @@ namespace DevAttest {
 void DevAttestProfileLoadCallback::OnLoadSystemAbilitySuccess(
     int32_t systemAbilityId, const sptr<OHOS::IRemoteObject> &remoteObject)
 {
-    DelayedSingleton<DevAttestClient>::GetInstance()->LoadSystemAbilitySuccess(remoteObject);
+    HILOGI("OnLoadSystemAbilitySuccess systemAbilityId: %{public}d IRmoteObject result:%{public}s", systemAbilityId,\
+        ((remoteObject != nullptr) ? "true" : "false"));
+    if (systemAbilityId != DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE) {
+        HILOGE("start systemabilityId is not device_attest!");
+        return;
+    }
+    if (remoteObject == nullptr) {
+        HILOGE("remoteObject is null.");
+        return;
+    }
+    DevAttestClient::GetInstance().LoadSystemAbilitySuccess(remoteObject);
 }
 
 void DevAttestProfileLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    DelayedSingleton<DevAttestClient>::GetInstance()->LoadSystemAbilityFail();
+    if (systemAbilityId != DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE) {
+        HILOGE("start systemabilityId is not device_attest!");
+        return;
+    }
+    DevAttestClient::GetInstance().LoadSystemAbilityFail();
     HILOGE("[OnLoadSystemAbilityFail] failed!");
 }
 }

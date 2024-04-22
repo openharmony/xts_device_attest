@@ -32,9 +32,8 @@ extern "C" {
 #define UUID_FORMAT_INDEX_3 16
 #define UUID_FORMAT_INDEX_4 20
 
-int32_t GetTokenValueHmac(const char* challenge, uint8_t* tokenValueHmac, uint8_t tokenValueHmacLen);
-
-int32_t GetTokenId(uint8_t* tokenId, uint8_t tokenIdLen);
+int32_t GetTokenValueAndId(const char* challenge, uint8_t* tokenValueHmac, uint8_t tokenValueHmacLen,\
+    uint8_t* tokenId, uint8_t tokenIdLen);
 
 int32_t FlushToken(AuthResult* authResult);
 

@@ -271,7 +271,7 @@ static int32_t ProcAttestImpl(void)
         DestroySysData();
         return ATTEST_ERR;
     }
-    // 检查本地数据是否修改或过期，进行重新认证
+    // 检查本地数据是否修改或过期，进行重新验证
     if (!IsAuthStatusChg()) {
         ATTEST_LOG_WARN("[ProcAttestImpl] There is no change on auth status.");
         UpdateAuthResultCode(AUTH_SUCCESS);
@@ -284,6 +284,7 @@ static int32_t ProcAttestImpl(void)
         DestroySysData();
         return ATTEST_ERR;
     }
+    // 走授权验证流程
     ret = AttestStartup(authResult);
     DestroySysData();
     DestroyAuthResult(&authResult);
@@ -317,7 +318,7 @@ int32_t ProcAttest(void)
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);
         }
-    }while (0);
+    } while (0);
     if (ATTEST_DEBUG_MEMORY_LEAK) {
         PrintMemNodeList();
         retValue = DestroyMemNodeList();
@@ -440,6 +441,7 @@ static int32_t QueryAttestStatusSwitch(int32_t** resultArray, int32_t arraySize,
         ATTEST_LOG_ERROR("[QueryAttestStatusSwitch] parameter wrong");
         return ATTEST_ERR;
     }
+
     int32_t ret = ATTEST_ERR;
     int32_t authResultCode = GetAuthResultCode();
     switch (authResultCode) {

@@ -22,7 +22,7 @@ namespace DevAttest {
 static const std::unordered_map<uint32_t, std::string> g_errorStringMap = {
     {DEVATTEST_ERR_JS_IS_NOT_SYSTEM_APP,
         "This api is system api, Please use the system application to call this api"},
-    {DEVATTEST_ERR_JS_PARAMETER_ERROR, "Input paramters wrong"},
+    {DEVATTEST_ERR_JS_PARAMETER_ERROR, "Input paramters wrong, the number of parameters is incorrect, or the type of parameters is incorrect"},
     {DEVATTEST_ERR_JS_SYSTEM_SERVICE_EXCEPTION, "System service exception, please try again or reboot your device"},
 };
 

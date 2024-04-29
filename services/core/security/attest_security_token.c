@@ -350,7 +350,6 @@ static int32_t GetProductToken(const char* challenge, uint8_t* tokenValueHmac, u
         return ATTEST_ERR;
     }
 
-
     char ikm[SHA256_OUTPUT_SIZE + 1] = {0};
     ret = GetProductIKM((char *)ikm, SHA256_OUTPUT_SIZE);
     if (ret == ATTEST_ERR) {
@@ -374,7 +373,11 @@ static int32_t GetProductToken(const char* challenge, uint8_t* tokenValueHmac, u
                        (const unsigned char*)ikm, SHA256_OUTPUT_SIZE,
                        (const unsigned char*)info, strlen(info),
                        okm, OKM_INPUT_LEN);
-
+    ATTEST_MEM_FREE(info);
+    if (ret != ATTEST_OK) {
+        ATTEST_LOG_ERROR("[GetProductToken] HKDF derive key failed, ret = -0x%x", -ret);
+        return ATTEST_ERR;
+    }
 
     uint8_t tokenValue[TOKEN_VALUE_LEN + 1] = {0};
     ret = Base64Encode(okm, OKM_INPUT_LEN, tokenValue, TOKEN_VALUE_LEN);
@@ -764,7 +767,7 @@ int32_t GetTokenValueAndId(const char* challenge, uint8_t* tokenValueHmac, uint8
             break;
         }
 #endif
-    } while(0);
+    } while (0);
     if (ret != ATTEST_OK) {
         ATTEST_LOG_ERROR("[GetTokenValueAndId] Get token failed.");
     }

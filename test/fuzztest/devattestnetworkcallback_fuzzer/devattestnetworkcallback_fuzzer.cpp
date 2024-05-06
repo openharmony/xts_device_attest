@@ -27,7 +27,7 @@ namespace OHOS {
     size_t g_baseFuzzSize = 0;
     size_t g_baseFuzzPos;
     std::vector<NetCap> netCaps = {NET_CAPABILITY_MMS, NET_CAPABILITY_NOT_METERED, NET_CAPABILITY_INTERNET,
-                                   NET_CAPABILITY_NOT_VPN, NET_CAPABILITY_CAPTIVE_PORTAL,
+                                   NET_CAPABILITY_NOT_VPN, NET_CAPABILITY_PORTAL,
                                    NET_CAPABILITY_INTERNAL_DEFAULT};
 
     template <class T>

@@ -64,8 +64,8 @@ int32_t DevAttestNetworkCallback::NetCapabilitiesChange(
                 HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_VALIDATED start");
                 (void)AttestTask();
                 break;
-            case NET_CAPABILITY_CAPTIVE_PORTAL:
-                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_CAPTIVE_PORTAL start");
+            case NET_CAPABILITY_PORTAL:
+                HILOGD("[NetCapabilitiesChange] NET_CAPABILITY_PORTAL start");
                 break;
             default:
                 HILOGD("[NetCapabilitiesChange] default start");

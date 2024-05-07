@@ -1369,7 +1369,7 @@ int32_t UpdateNetConfig(char* activeSite, char* standbySite, int32_t* updateFlag
     }
     if (ret != ATTEST_OK) {
         (void)InitNetworkServerInfo();
-        ATTEST_LOG_ERROR("[UpdateNetConfig] update new domain failed");
+        ATTEST_LOG_WARN("[UpdateNetConfig] update new domain failed");
         return ATTEST_ERR;
     }
     *updateFlag = UPDATE_OK;

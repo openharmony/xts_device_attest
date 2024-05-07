@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DevAttest {
 class DevAttestServiceStub : public IRemoteStub<DevAttestInterface> {
 public:
-    DevAttestServiceStub();
+    DevAttestServiceStub(bool serialInvokeFlag = true);
     ~DevAttestServiceStub();
     int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
     virtual void DelayUnloadTask()

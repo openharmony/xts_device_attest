@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace DevAttest {
-DevAttestServiceStub::DevAttestServiceStub()
+DevAttestServiceStub::DevAttestServiceStub(bool serialInvokeFlag) : IRemoteStub(serialInvokeFlag)
 {
     requestFuncMap_[GET_AUTH_RESULT] = &DevAttestServiceStub::GetAttestStatusInner;
 }

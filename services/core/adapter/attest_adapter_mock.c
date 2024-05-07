@@ -284,7 +284,7 @@ int OsGetProdKeyStub(char* productKey, uint32_t len)
     if (productKeyBuf == NULL) {
         return ATTEST_ERR;
     }
-    uint32_t productKeyLen = sizeof(productKeyBuf);
+    uint32_t productKeyLen = strlen(productKeyBuf);
     if (len < productKeyLen) {
         ATTEST_MEM_FREE(productKeyBuf);
         return ATTEST_ERR;

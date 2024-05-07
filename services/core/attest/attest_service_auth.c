@@ -34,7 +34,7 @@ bool IsAuthStatusChg(void)
     ATTEST_LOG_DEBUG("[IsAuthStatusChg] Begin.");
     char* authStatusBase64 = NULL;
     if (GetAuthStatus(&authStatusBase64) != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[IsAuthStatusChg] Load auth status failed or status file not exist");
+        ATTEST_LOG_WARN("[IsAuthStatusChg] Load auth status failed or status file not exist");
         return true;
     }
 

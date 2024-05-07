@@ -221,7 +221,6 @@ int Sha256Value(const unsigned char *src, int srcLen, char *dest, int destLen)
     char buf[DEV_BUF_LENGTH] = {0};
     char hash[HASH_LENGTH] = {0};
 
-
     int32_t ret = Sha256ValueToAscii(src, srcLen, hash, HASH_LENGTH);
     if (ret != ATTEST_OK) {
         return ATTEST_ERR;
@@ -352,12 +351,10 @@ int32_t HEXStringToAscii(const char* input, int32_t inputLen, char* output, int3
     }
 
     int tempLen = 0;
-    int highNumber = 0;
-    int lowNumber = 0;
     int32_t ret = ATTEST_OK;
-    for(int i = 0; i < inputLen;) {
-        highNumber = HexToNumber(input[i]);
-        lowNumber = HexToNumber(input[i + 1]);
+    for(int i = 0; i < inputLen; ) {
+        int highNumber = HexToNumber(input[i]);
+        int lowNumber = HexToNumber(input[i + 1]);
         if (highNumber == ATTEST_ERR || lowNumber == ATTEST_ERR) {
             ret = ATTEST_ERR;
             break;

@@ -30,7 +30,7 @@ using namespace std;
 
 constexpr int32_t COMM_NET_CONN_MANAGER_SA_ID = 1151;
 constexpr int32_t UNLOAD_IMMEDIATELY = 0;
-constexpr int32_t DELAY_TIME = 300000;
+constexpr int32_t DELAY_TIME = 600000;
 const char* ATTEST_UNLOAD_TASK_ID = "attest_unload_task";
 REGISTER_SYSTEM_ABILITY_BY_ID(DevAttestService, DevAttestInterface::SA_ID_DEVICE_ATTEST_SERVICE, false)
 

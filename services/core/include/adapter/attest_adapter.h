@@ -83,6 +83,10 @@ int32_t AttestWriteAuthResultCode(const char* data, uint32_t len);
 
 int32_t AttestReadAuthResultCode(char* buffer, uint32_t bufferLen);
 
+int32_t AttestWriteFullLoadStatus(const char* data, uint32_t len);
+
+int32_t AttestReadFullLoadStatus(char* buffer, uint32_t bufferLen);
+
 #ifdef __cplusplus
 #if __cplusplus
 }

@@ -110,3 +110,13 @@ int32_t AttestReadAuthResultCode(char* buffer, uint32_t bufferLen)
 {
     return OEMReadAuthResultCode(buffer, bufferLen);
 }
+
+int32_t AttestWriteFullLoadStatus(const char* data, uint32_t len)
+{
+    return OEMWriteFullLoadStatus(data, len);
+}
+
+int32_t AttestReadFullLoadStatus(char* buffer, uint32_t bufferLen)
+{
+    return OEMReadFullLoadStatus(buffer, bufferLen);
+}

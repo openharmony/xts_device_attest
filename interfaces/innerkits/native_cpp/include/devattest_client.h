@@ -20,20 +20,18 @@
 #include <shared_mutex>
 #include "iremote_object.h"
 #include "devattest_interface.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace DevAttest {
 class DevAttestClient {
-    DECLARE_DELAYED_SINGLETON(DevAttestClient)
-
 public:
     int GetAttestStatus(AttestResultInfo &attestResultInfo);
-
+    static DevAttestClient &GetInstance();
 public:
     void LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject);
     void LoadSystemAbilityFail();
-
+    DevAttestClient() = default;
+    ~DevAttestClient() = default;
 private:
     DevAttestClient(const DevAttestClient&);
     DevAttestClient& operator=(const DevAttestClient&);

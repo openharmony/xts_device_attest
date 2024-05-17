@@ -64,30 +64,12 @@ void AttestTddTest::TearDownTestCase(void)
 
 void AttestTddTest::SetUp()
 {
+    HILOGI("AttestTddTest SetUp");
 }
 
 void AttestTddTest::TearDown()
 {
-}
-
-static AuthResult *GetAuthResult()
-{
-    AuthResult *authResult = CreateAuthResult();
-    if (authResult == nullptr) {
-        return nullptr;
-    }
-    int32_t ret = ParseAuthResultResp(ATTEST_AUTH_EXPECT_RESULT, authResult);
-    if (ret != DEVATTEST_SUCCESS) {
-        DestroyAuthResult(&authResult);
-        return nullptr;
-    }
-    return authResult;
-}
-
-static void WriteAuthResult(AuthResult *authResult)
-{
-    int32_t ret = FlushToken(authResult);
-    EXPECT_TRUE((ret == DEVATTEST_SUCCESS));
+    HILOGI("AttestTddTest TearDown");
 }
 
 /*
@@ -99,13 +81,14 @@ HWTEST_F(AttestTddTest, TestInitSysData001, TestSize.Level1)
 {
     int32_t ret = InitSysData();
     EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
-    EXPECT_STREQ(StrdupDevInfo(VERSION_ID), ATTEST_NET_VERSIONID);
-    EXPECT_STREQ(StrdupDevInfo(ROOT_HASH), ATTEST_BUILD_ROOT_HASH);
-    EXPECT_STREQ(StrdupDevInfo(DISPLAY_VERSION), ATTEST_SOFTWARE_VERSION);
-    EXPECT_STREQ(StrdupDevInfo(PRODUCT_MODEL), ATTEST_PRODUCT_MODEL);
-    EXPECT_STREQ(StrdupDevInfo(BRAND), ATTEST_BRAND);
-    EXPECT_STREQ(StrdupDevInfo(SECURITY_PATCH_TAG), ATTEST_SECURITY_PATCH);
-    EXPECT_STREQ(StrdupDevInfo(UDID), ATTEST_UDID);
+    EXPECT_STREQ(StrdupDevInfo(VERSION_ID), ATTEST_MOCK_PROPERTY_VERSIONID);
+    EXPECT_STREQ(StrdupDevInfo(ROOT_HASH), ATTEST_MOCK_PROPERTY_HASH);
+    EXPECT_STREQ(StrdupDevInfo(DISPLAY_VERSION), ATTEST_MOCK_PROPERTY_SOFTWARE_VERSION);
+    EXPECT_STREQ(StrdupDevInfo(MANU_FACTURE), ATTEST_MOCK_PROPERTY_MANU);
+    EXPECT_STREQ(StrdupDevInfo(PRODUCT_MODEL), ATTEST_MOCK_PROPERTY_MODEL);
+    EXPECT_STREQ(StrdupDevInfo(BRAND), ATTEST_MOCK_PROPERTY_BRAND);
+    EXPECT_STREQ(StrdupDevInfo(SECURITY_PATCH_TAG), ATTEST_MOCK_PROPERTY_PATCH);
+    EXPECT_STREQ(StrdupDevInfo(UDID), ATTEST_MOCK_PROPERTY_UDID);
     // 恢复环境
     DestroySysData();
     EXPECT_TRUE(StrdupDevInfo(VERSION_ID) == NULL);
@@ -120,7 +103,7 @@ HWTEST_F(AttestTddTest, TestInitNetWork001, TestSize.Level1)
 {
     int ret = InitNetworkServerInfo();
     EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
-    EXPECT_STREQ((const char*)g_attestNetworkList.head->data, ATTEST_NETWORK_RESULT);
+    EXPECT_STREQ((const char*)g_attestNetworkList.head->data, ATTEST_MOCK_HAL_NETWORK_RESULT);
 }
 
 /*
@@ -130,7 +113,7 @@ HWTEST_F(AttestTddTest, TestInitNetWork001, TestSize.Level1)
  */
 HWTEST_F(AttestTddTest, TestGetAuthStatus001, TestSize.Level1)
 {
-    int32_t ret = FlushAuthResult(ATTEST_TICKET, ATTEST_STATUS);
+    int32_t ret = FlushAuthResult(ATTEST_MOCK_HAL_TICKET, ATTEST_MOCK_HAL_STATUS);
     EXPECT_TRUE((ret == DEVATTEST_SUCCESS));
     char *status = nullptr;
     ret = GetAuthStatus(&status);
@@ -139,7 +122,7 @@ HWTEST_F(AttestTddTest, TestGetAuthStatus001, TestSize.Level1)
     if (status == nullptr) {
         return;
     }
-    EXPECT_STREQ(ATTEST_STATUS, status);
+    EXPECT_STREQ(ATTEST_MOCK_HAL_STATUS, status);
     free(status);
 }
 
@@ -218,6 +201,20 @@ HWTEST_F(AttestTddTest, TestCheckAuthResult001, TestSize.Level1)
     free(outStatus);
 }
 
+static AuthResult *GetAuthResult()
+{
+    AuthResult *authResult = CreateAuthResult();
+    if (authResult == nullptr) {
+        return nullptr;
+    }
+    int32_t ret = ParseAuthResultResp(ATTEST_AUTH_EXPECT_RESULT, authResult);
+    if (ret != DEVATTEST_SUCCESS) {
+        DestroyAuthResult(&authResult);
+        return nullptr;
+    }
+    return authResult;
+}
+
 static DevicePacket* TddGenMsg(int input)
 {
     DevicePacket* reqMsg = nullptr;
@@ -254,24 +251,79 @@ static DevicePacket* TddGenMsg(int input)
 
 /*
  * @tc.name: TestGenResetMsg001
- * @tc.desc: Test gen reset msg.
+ * @tc.desc: Test gen reset msg with stored token.
  * @tc.type: FUNC
  */
 HWTEST_F(AttestTddTest, TestGenResetMsg001, TestSize.Level1)
 {
+    AttestSetMockReadTokenRet(ATTEST_OK);
+    // 初始化参数
+    int32_t ret = InitSysData();
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+
     DevicePacket* reqMsg = TddGenMsg(ATTEST_CASE_RESET);
     EXPECT_TRUE((reqMsg != nullptr));
     if (reqMsg == nullptr) {
+        DestroySysData();
         return;
     }
     char *outToken = reqMsg->tokenInfo.token;
     EXPECT_TRUE(outToken != nullptr);
     if (outToken == NULL) {
         FREE_DEVICE_PACKET(reqMsg);
+        DestroySysData();
         return;
     }
     EXPECT_TRUE(strcmp(ATTEST_RESET_GEN_TOKEN, outToken) == 0);
     FREE_DEVICE_PACKET(reqMsg);
+    // 恢复环境
+    DestroySysData();
+}
+
+/*
+ * @tc.name: TestGenResetMsg002
+ * @tc.desc: Test gen reset msg without token.
+ * @tc.type: FUNC
+ */
+HWTEST_F(AttestTddTest, TestGenResetMsg002, TestSize.Level1)
+{
+    AttestSetMockReadTokenRet(TOKEN_UNPRESET);
+    // 初始化参数
+    int32_t ret = InitSysData();
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+
+    DevicePacket* reqMsg = TddGenMsg(ATTEST_CASE_RESET);
+    EXPECT_TRUE((reqMsg != nullptr));
+    if (reqMsg == nullptr) {
+        DestroySysData();
+        return;
+    }
+    char *outToken = reqMsg->tokenInfo.token;
+    EXPECT_TRUE(outToken != nullptr);
+    if (outToken == NULL) {
+        FREE_DEVICE_PACKET(reqMsg);
+        DestroySysData();
+        return;
+    }
+    std::cout << "[TestGenResetMsg002]outToken " << outToken << std::endl;
+#if defined(__ATTEST_ENABLE_PRESET_TOKEN__)
+    EXPECT_TRUE(strcmp(ATTEST_RESET_GEN_ONLINE_TOKEN, outToken) == 0);
+
+    outToken = reqMsg->tokenInfo.uuid;
+    EXPECT_TRUE(outToken != nullptr);
+    if (outToken == NULL) {
+        FREE_DEVICE_PACKET(reqMsg);
+        DestroySysData();
+        return;
+    }
+    std::cout << "[TestGenResetMsg002]outToken " << outToken << std::endl;
+    EXPECT_TRUE(strcmp(ATTEST_RESET_GEN_ONLINE_TOKEN_ID, outToken) == 0);
+#else
+    EXPECT_TRUE(strcmp(ATTEST_RESET_GEN_PRODUCT_TOKEN, outToken) == 0);
+#endif
+    FREE_DEVICE_PACKET(reqMsg);
+    // 恢复环境
+    DestroySysData();
 }
 
 /*
@@ -296,6 +348,11 @@ HWTEST_F(AttestTddTest, TestParseResetResult001, TestSize.Level1)
  */
 HWTEST_F(AttestTddTest, TestGenAuthMsg001, TestSize.Level1)
 {
+    AttestSetMockReadTokenRet(ATTEST_OK);
+    // 初始化参数
+    int32_t ret = InitSysData();
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+
     DevicePacket* reqMsg = TddGenMsg(ATTEST_CASE_AUTH);
     EXPECT_TRUE((reqMsg != nullptr));
     if (reqMsg == NULL) {
@@ -309,6 +366,42 @@ HWTEST_F(AttestTddTest, TestGenAuthMsg001, TestSize.Level1)
     }
     EXPECT_TRUE(strcmp(outToken, ATTEST_AUTH_GEN_TOKEN) == 0);
     FREE_DEVICE_PACKET(reqMsg);
+    // 恢复环境
+    DestroySysData();
+}
+
+/*
+ * @tc.name: TestGenAuthMsg002
+ * @tc.desc: Test gen auth msg without token.
+ * @tc.type: FUNC
+ */
+HWTEST_F(AttestTddTest, TestGenAuthMsg002, TestSize.Level1)
+{
+    AttestSetMockReadTokenRet(TOKEN_UNPRESET);
+    // 初始化参数
+    int32_t ret = InitSysData();
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+
+    DevicePacket* reqMsg = TddGenMsg(ATTEST_CASE_AUTH);
+    EXPECT_TRUE((reqMsg != nullptr));
+    if (reqMsg == nullptr) {
+        return;
+    }
+    char *outToken = reqMsg->tokenInfo.token;
+    EXPECT_TRUE(outToken != nullptr);
+    if (outToken == NULL) {
+        FREE_DEVICE_PACKET(reqMsg);
+        return;
+    }
+    std::cout << "[TestGenAuthMsg002]outToken " << outToken << std::endl;
+#if defined(__ATTEST_ENABLE_PRESET_TOKEN__)
+    EXPECT_TRUE(strcmp(ATTEST_AUTH_GEN_ONLINE_TOKEN, outToken) == 0);
+#else
+    EXPECT_TRUE(strcmp(ATTEST_AUTH_GEN_PRODUCT_TOKEN, outToken) == 0);
+#endif
+    FREE_DEVICE_PACKET(reqMsg);
+    // 恢复环境
+    DestroySysData();
 }
 
 /*
@@ -329,7 +422,7 @@ HWTEST_F(AttestTddTest, TestParseAuthResultResp001, TestSize.Level1)
     EXPECT_TRUE((authResult->ticket != nullptr) && (authResult->tokenValue != nullptr) &&
         (authResult->authStatus != nullptr));
     if (authResult->ticket != nullptr) {
-        EXPECT_TRUE(strcmp(authResult->ticket, ATTEST_TICKET) == 0);
+        EXPECT_TRUE(strcmp(authResult->ticket, ATTEST_MOCK_HAL_TICKET) == 0);
     }
     DestroyAuthResult(&authResult);
 }
@@ -341,6 +434,11 @@ HWTEST_F(AttestTddTest, TestParseAuthResultResp001, TestSize.Level1)
  */
 HWTEST_F(AttestTddTest, TestGenActiveMsg001, TestSize.Level1)
 {
+    AttestSetMockReadTokenRet(ATTEST_OK);
+    // 初始化参数
+    int32_t ret = InitSysData();
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+
     DevicePacket* reqMsg = TddGenMsg(ATTEST_CASE_ACTIVE);
     EXPECT_TRUE((reqMsg != nullptr));
     if (reqMsg == NULL) {
@@ -352,8 +450,44 @@ HWTEST_F(AttestTddTest, TestGenActiveMsg001, TestSize.Level1)
         FREE_DEVICE_PACKET(reqMsg);
         return;
     }
-    EXPECT_TRUE(strcmp(outToken, ATTEST_AUTH_GEN_TOKEN) == 0);
+    EXPECT_TRUE(strcmp(outToken, ATTEST_ACTIVE_GEN_TOKEN) == 0);
     FREE_DEVICE_PACKET(reqMsg);
+    // 恢复环境
+    DestroySysData();
+}
+
+/*
+ * @tc.name: TestGenActiveMsg002
+ * @tc.desc: Test gen auth msg without token.
+ * @tc.type: FUNC
+ */
+HWTEST_F(AttestTddTest, TestGenActiveMsg002, TestSize.Level1)
+{
+    AttestSetMockReadTokenRet(TOKEN_UNPRESET);
+    // 初始化参数
+    int32_t ret = InitSysData();
+    EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
+
+    DevicePacket* reqMsg = TddGenMsg(ATTEST_CASE_ACTIVE);
+    EXPECT_TRUE((reqMsg != nullptr));
+    if (reqMsg == nullptr) {
+        return;
+    }
+    char *outToken = reqMsg->tokenInfo.token;
+    EXPECT_TRUE(outToken != nullptr);
+    if (outToken == NULL) {
+        FREE_DEVICE_PACKET(reqMsg);
+        return;
+    }
+    std::cout << "[TestGenActiveMsg002]outToken " << outToken << std::endl;
+#if defined(__ATTEST_ENABLE_PRESET_TOKEN__)
+    EXPECT_TRUE(strcmp(ATTEST_ACTIVE_GEN_ONLINE_TOKEN, outToken) == 0);
+#else
+    EXPECT_TRUE(strcmp(ATTEST_ACTIVE_GEN_PRODUCT_TOKEN, outToken) == 0);
+#endif
+    FREE_DEVICE_PACKET(reqMsg);
+    // 恢复环境
+    DestroySysData();
 }
 
 /*
@@ -415,17 +549,18 @@ HWTEST_F(AttestTddTest, TestQueryAttestStatus001, TestSize.Level1)
     if (authResult == nullptr) {
         return;
     }
-    WriteAuthResult(authResult);
+    int32_t ret = FlushToken(authResult);
+    EXPECT_TRUE((ret == DEVATTEST_SUCCESS));
     uint8_t authResultCode = ATTEST_RESULT_CODE;
     AttestWriteAuthResultCode((char*)&authResultCode, 1);
     AttestResultInfo attestResultInfo;
-    int32_t ret = GetAttestStatus(attestResultInfo);
+    ret = GetAttestStatus(attestResultInfo);
     EXPECT_TRUE(ret == DEVATTEST_SUCCESS);
     EXPECT_TRUE(!attestResultInfo.ticket_.empty());
     if (attestResultInfo.ticket_.empty()) {
         return;
     }
-    EXPECT_TRUE(strcmp(attestResultInfo.ticket_.c_str(), ATTEST_TICKET) == 0);
+    EXPECT_TRUE(strcmp(attestResultInfo.ticket_.c_str(), ATTEST_MOCK_HAL_TICKET) == 0);
 }
 
 /*

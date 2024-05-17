@@ -592,6 +592,7 @@ static int32_t BuildSoftware(DevicePacket *postValue, cJSON **postData)
     return ATTEST_OK;
 }
 
+#ifndef __ATTEST_DISABLE_SITE__
 static int32_t BuildHttpsChallServerInfo(cJSON **postData)
 {
     if (postData == NULL) {
@@ -631,6 +632,7 @@ static int32_t BuildHttpsChallServerInfo(cJSON **postData)
     }
     return ATTEST_OK;
 }
+#endif
 
 char* BuildHttpsChallBody(DevicePacket *postValue)
 {
@@ -650,11 +652,14 @@ char* BuildHttpsChallBody(DevicePacket *postValue)
             ATTEST_LOG_ERROR("[BuildHttpsChallBody] postData  AddStringToObject fail");
             break;
         }
+#ifndef __ATTEST_DISABLE_SITE__
         ret = BuildHttpsChallServerInfo(&postData);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[BuildHttpsChallBody] BuildHttpsChallServerInfo fail");
             break;
         }
+#endif
+        ret = ATTEST_OK;
     } while (0);
     if (ret != ATTEST_OK) {
         cJSON_Delete(postData);
@@ -699,7 +704,7 @@ char* BuildHttpsResetBody(DevicePacket *postValue)
     char *bodyData = cJSON_Print(postData);
     cJSON_Delete(postData);
     if (ATTEST_NETWORK_DEBUG_LOG_FLAG) {
-        ATTEST_LOG_DEBUG("[BuildHttpsResetBody] ResetBody [%u]\n%s\n", strlen(bodyData), bodyData);
+        ATTEST_LOG_DEBUG("[BuildHttpsResetBody] ResetBody [%zu]\n%s\n", strlen(bodyData), bodyData);
     }
     ATTEST_LOG_DEBUG("[BuildHttpsResetBody] End.");
     return bodyData;
@@ -745,7 +750,7 @@ char* BuildHttpsAuthBody(DevicePacket *postValue)
     char *bodyData = cJSON_Print(postData);
     cJSON_Delete(postData);
     if (ATTEST_NETWORK_DEBUG_LOG_FLAG) {
-        ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] AuthBody [%u]\n%s\n", strlen(bodyData), bodyData);
+        ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] AuthBody [%zu]\n%s\n", strlen(bodyData), bodyData);
     }
     ATTEST_LOG_DEBUG("[BuildHttpsAuthBody] End.");
     return bodyData;
@@ -786,7 +791,7 @@ char* BuildHttpsActiveBody(DevicePacket *postValue)
     char *bodyData = cJSON_Print(postData);
     cJSON_Delete(postData);
     if (ATTEST_NETWORK_DEBUG_LOG_FLAG) {
-        ATTEST_LOG_DEBUG("[BuildHttpsActiveBody] ActiBody [%u]\n%s\n", strlen(bodyData), bodyData);
+        ATTEST_LOG_DEBUG("[BuildHttpsActiveBody] ActiBody [%zu]\n%s\n", strlen(bodyData), bodyData);
     }
     ATTEST_LOG_DEBUG("[BuildHttpsActiveBody] End.");
     return bodyData;
@@ -1364,7 +1369,7 @@ int32_t UpdateNetConfig(char* activeSite, char* standbySite, int32_t* updateFlag
     }
     if (ret != ATTEST_OK) {
         (void)InitNetworkServerInfo();
-        ATTEST_LOG_ERROR("[UpdateNetConfig] update new domain failed");
+        ATTEST_LOG_WARN("[UpdateNetConfig] update new domain failed");
         return ATTEST_ERR;
     }
     *updateFlag = UPDATE_OK;

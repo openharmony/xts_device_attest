@@ -16,7 +16,7 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 
 ##############################test_devattestclient##########################################
 ohos_unittest("test_devattestclient") {
-  module_out_path = "devattest/innerkits"
+  module_out_path = devattest_unittest_module_path
   include_dirs = [
     "include",
     "${devattest_path}/common",
@@ -48,7 +48,7 @@ ohos_unittest("test_devattestclient") {
 
 ##############################test_devattestclient_proxy##########################################
 ohos_unittest("test_devattestclient_proxy") {
-  module_out_path = "devattest/innerkits"
+  module_out_path = devattest_unittest_module_path
   include_dirs = [
     "include",
     "${devattest_path}/common",

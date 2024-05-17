@@ -82,5 +82,8 @@ char* AttestGetUdid(void)
 
 char* AttestGetSerial(void)
 {
+    if (ATTEST_MOCK_DEVICE_STUB_FLAG) {
+        return OsGetSerialStub();
+    }
     return OsGetSerial();
 }

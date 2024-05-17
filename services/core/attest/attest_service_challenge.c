@@ -110,6 +110,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         ATTEST_LOG_ERROR("[ParseChallengeResult] GetObjectItem challenge failed.");
         return ATTEST_ERR;
     }
+#ifndef __ATTEST_DISABLE_SITE__
     char* serverInfo = NULL;
     do {
         ret = GetObjectItemValueObject(jsonStr, "serverInfo", &serverInfo);
@@ -129,6 +130,7 @@ static int32_t ParseChallengeResult(const char* jsonStr, ChallengeResult *challe
         }
     } while (0);
     ATTEST_MEM_FREE(serverInfo);
+#endif
     return ret;
 }
 

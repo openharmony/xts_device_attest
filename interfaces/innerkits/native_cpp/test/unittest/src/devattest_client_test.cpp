@@ -53,7 +53,7 @@ void DevAttestClientTest::TearDown(void)
 HWTEST_F(DevAttestClientTest, GetAttestStatusTest001, TestSize.Level0)
 {
     AttestResultInfo attestResultInfo;
-    int ret = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
+    int ret = DevAttestClient::GetInstance().GetAttestStatus(attestResultInfo);
     ASSERT_EQ(DEVATTEST_SUCCESS, ret);
     ASSERT_TRUE(AttestStatusValid(attestResultInfo));
 }

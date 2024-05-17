@@ -20,45 +20,45 @@
 
 char* AttestGetVersionId(void)
 {
-    return AttestStrdup(ATTEST_NET_VERSIONID);
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_VERSIONID);
 }
 
 char* AttestGetBuildRootHash(void)
 {
-    return AttestStrdup(ATTEST_BUILD_ROOT_HASH);
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_HASH);
 }
 
 char* AttestGetDisplayVersion(void)
 {
-    return AttestStrdup(ATTEST_SOFTWARE_VERSION);
-}
-
-char* AttestGetProductModel(void)
-{
-    return AttestStrdup(ATTEST_PRODUCT_MODEL);
-}
-
-char* AttestGetBrand(void)
-{
-    return AttestStrdup(ATTEST_BRAND);
-}
-
-char* AttestGetSecurityPatchTag(void)
-{
-    return AttestStrdup(ATTEST_SECURITY_PATCH);
-}
-
-char* AttestGetUdid(void)
-{
-    return AttestStrdup(ATTEST_UDID);
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_SOFTWARE_VERSION);
 }
 
 char* AttestGetManufacture(void)
 {
-    return AttestStrdup(OsGetManufacture());
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_MANU);
+}
+
+char* AttestGetProductModel(void)
+{
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_MODEL);
+}
+
+char* AttestGetBrand(void)
+{
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_BRAND);
+}
+
+char* AttestGetSecurityPatchTag(void)
+{
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_PATCH);
+}
+
+char* AttestGetUdid(void)
+{
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_UDID);
 }
 
 char* AttestGetSerial(void)
 {
-    return OsGetSerial();
+    return AttestStrdup(ATTEST_MOCK_PROPERTY_SERIAL);
 }

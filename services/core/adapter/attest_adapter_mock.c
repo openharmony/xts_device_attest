@@ -138,6 +138,11 @@ char* OsGetSecurityPatchTagStub(void)
     return GetDeviceParaStub("securityPatchTag");
 }
 
+char* OsGetSerialStub(void)
+{
+    return GetDeviceParaStub("serial");
+}
+
 static int32_t OsGetUnencryptedUdidStub(char **outputBuff, int32_t *outputSize)
 {
     char* manufacture = NULL;
@@ -175,7 +180,7 @@ static int32_t OsGetUnencryptedUdidStub(char **outputBuff, int32_t *outputSize)
             ret = ATTEST_ERR;
             break;
         }
-        ATTEST_LOG_INFO_ANONY("[OsGetUnencryptedUdidStub] udid = %s", udid);
+        ATTEST_LOG_INFO("[OsGetUnencryptedUdidStub] udid = %s", udid);
     } while (0);
     ATTEST_MEM_FREE(manufacture);
     ATTEST_MEM_FREE(model);
@@ -191,6 +196,10 @@ static int32_t OsGetUnencryptedUdidStub(char **outputBuff, int32_t *outputSize)
 
 char* OsGetUdidStub(void)
 {
+    char *udidStub = GetDeviceParaStub("udid");
+    if (udidStub != NULL) {
+        return udidStub;
+    }
     char *udid = NULL;
     char *udidSha256 = NULL;
     int32_t udidSize = 0;
@@ -209,10 +218,14 @@ char* OsGetUdidStub(void)
             break;
         }
 
-        ret = Sha256Value((const unsigned char *)udid, udidSize, udidSha256, UDID_STRING_LEN + 1);
+        ret = Sha256Value((const unsigned char *)udid, udidSize - 1, udidSha256, UDID_STRING_LEN + 1);
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[OsGetUdidStub] failed to Sha256");
             ATTEST_MEM_FREE(udidSha256);
+            break;
+        }
+        ret = ToLowerStr(udidSha256, UDID_STRING_LEN + 1);
+        if (ret != ATTEST_OK) {
             break;
         }
     } while (0);
@@ -222,7 +235,7 @@ char* OsGetUdidStub(void)
         return NULL;
     }
 
-    ATTEST_LOG_INFO_ANONY("[OsGetUdidStub] Sha256(udid) = %s\n", udidSha256);
+    ATTEST_LOG_INFO("[OsGetUdidStub] Sha256(udid) = %s\n", udidSha256);
     return udidSha256;
 }
 
@@ -231,17 +244,13 @@ int OsGetAcKeyStub(char *acKey, unsigned int len)
     if ((acKey == NULL) || (len == 0)) {
         return ATTEST_ERR;
     }
-    const char manufacturekeyBuf[] = {
-        0x13, 0x42, 0x3F, 0x3F, 0x53, 0x3F, 0x72, 0x30, 0x3F, 0x3F, 0x1C, 0x3F, 0x2F, 0x3F, 0x2E, 0x42,
-        0x3F, 0x08, 0x3F, 0x57, 0x3F, 0x10, 0x3F, 0x3F, 0x29, 0x17, 0x52, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-        0x57, 0x16, 0x3F, 0x7D, 0x4A, 0x0F, 0x3F, 0x3F, 0x3F, 0x30, 0x0C, 0x3F, 0x3F, 0x4C, 0x3F, 0x47
-    };
-    uint32_t manufacturekeyBufLen = sizeof(manufacturekeyBuf);
-    if (len < manufacturekeyBufLen) {
+
+    char *manufacturekeyBuf = GetDeviceParaStub("manuKey");
+    if (manufacturekeyBuf == NULL) {
         return ATTEST_ERR;
     }
-
-    int ret = memcpy_s(acKey, len, manufacturekeyBuf, manufacturekeyBufLen);
+    int ret = HEXStringToAscii(manufacturekeyBuf, strlen(manufacturekeyBuf), acKey, len);
+    ATTEST_MEM_FREE(manufacturekeyBuf);
     return ret;
 }
 
@@ -250,13 +259,18 @@ int OsGetProdIdStub(char* productId, uint32_t len)
     if ((productId == NULL) || (len == 0)) {
         return ATTEST_ERR;
     }
-    const char productIdBuf[] = "OH00000D";
+    char *productIdBuf = GetDeviceParaStub("productId");
+    if (productIdBuf == NULL) {
+        return ATTEST_ERR;
+    }
     uint32_t productIdLen = strlen(productIdBuf);
     if (len < productIdLen) {
+        ATTEST_MEM_FREE(productIdBuf);
         return ATTEST_ERR;
     }
 
     int ret = memcpy_s(productId, len, productIdBuf, productIdLen);
+    ATTEST_MEM_FREE(productIdBuf);
     return ret;
 }
 
@@ -265,13 +279,19 @@ int OsGetProdKeyStub(char* productKey, uint32_t len)
     if ((productKey == NULL) || (len == 0)) {
         return ATTEST_ERR;
     }
-    const char productKeyBuf[] = "test";
-    uint32_t productKeyLen = sizeof(productKeyBuf);
+
+    char *productKeyBuf = GetDeviceParaStub("productKey");
+    if (productKeyBuf == NULL) {
+        return ATTEST_ERR;
+    }
+    uint32_t productKeyLen = strlen(productKeyBuf);
     if (len < productKeyLen) {
+        ATTEST_MEM_FREE(productKeyBuf);
         return ATTEST_ERR;
     }
 
     int ret = memcpy_s(productKey, len, productKeyBuf, productKeyLen);
+    ATTEST_MEM_FREE(productKeyBuf);
     return ret;
 }
 
@@ -281,8 +301,9 @@ int32_t OsReadTokenStub(char* buffer, uint32_t bufferLen)
         return ATTEST_ERR;
     }
     int32_t ret = ReadFile(ATTEST_MOCK_STUB_PATH, ATTEST_MOCK_TOKEN_FILE_NAME, buffer, bufferLen);
-    if (ret != 0) {
-        return ATTEST_ERR;
+    if (ret != ATTEST_OK) {
+        // token file does not exist, shuold return TOKEN_UNPRESET
+        return TOKEN_UNPRESET;
     }
     return ATTEST_OK;
 }

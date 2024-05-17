@@ -16,11 +16,16 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 import("//test/xts/device_attest/services/core/attestsource.gni")
 
 ohos_unittest("device_attest_tdd") {
-  module_out_path = "devattest/devattest_ability"
+  module_out_path = devattest_unittest_module_path
   cflags = [ "-Wall" ]
   defines = [ "ATTEST_HILOG_LEVEL = 1" ]
   defines += [ "MBEDTLS_ALLOW_PRIVATE_ACCESS" ]
   defines += [ "OPENSSL_SUPPRESS_DEPRECATED" ]
+
+  if (enable_attest_preset_token) {
+    defines += [ "__ATTEST_ENABLE_PRESET_TOKEN__" ]
+  }
+
   include_dirs = include_core_dirs
   include_dirs += [
     ".",
@@ -32,7 +37,6 @@ ohos_unittest("device_attest_tdd") {
   ]
   sources = [
     "${devattest_path}/services/devattest_ability/src/attest_result_info.cpp",
-    "./src/attest_tdd_data_transfer.c",
     "./src/attest_tdd_mock_hal.c",
     "./src/attest_tdd_mock_property.c",
     "./src/attest_tdd_test.cpp",

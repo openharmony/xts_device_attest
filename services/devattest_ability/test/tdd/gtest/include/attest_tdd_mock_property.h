@@ -15,13 +15,15 @@
 #ifndef ATTEST_TDD_MOCK_PROPERTY_H
 #define ATTEST_TDD_MOCK_PROPERTY_H
 
-#define ATTEST_NET_VERSIONID "default/hua-wei/kemin/default/OpenHarmony-4.0.3.2(Canary1)/ohos/max/10\
-/OpenHarmony 2.3 beta/debug"
-#define ATTEST_BUILD_ROOT_HASH "test666"
-#define ATTEST_SOFTWARE_VERSION "OpenHarmony 4.0.3.2"
-#define ATTEST_PRODUCT_MODEL "ohos"
-#define ATTEST_BRAND "kemin"
-#define ATTEST_SECURITY_PATCH "2022-09-01"
-#define ATTEST_UDID "81C9445279A3A417D4159FDFC62691BC8DA002E8463C70D23AB4CBF4DF98261C"
+#define ATTEST_MOCK_PROPERTY_VERSIONID "default/mock-manufacture/mock-brand/default\
+/OpenHarmony-4.0.3.2(Canary1)/mock-model/max/10/OpenHarmony 2.3 beta/debug"
+#define ATTEST_MOCK_PROPERTY_HASH "abb"
+#define ATTEST_MOCK_PROPERTY_SOFTWARE_VERSION "mock 1.2.3.4"
+#define ATTEST_MOCK_PROPERTY_MANU "mock-manufacture"
+#define ATTEST_MOCK_PROPERTY_MODEL "mock-model"
+#define ATTEST_MOCK_PROPERTY_BRAND "mock-brand"
+#define ATTEST_MOCK_PROPERTY_PATCH "1234-02-29"
+#define ATTEST_MOCK_PROPERTY_UDID "a6e82fac8dd78484fb0185e1428b40eab8214e04de9e26995feb39333810d161"
+#define ATTEST_MOCK_PROPERTY_SERIAL "MOCK123456789"
 
 #endif

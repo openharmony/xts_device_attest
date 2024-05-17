@@ -136,3 +136,18 @@ int32_t OEMReadAuthResultCode(char* buffer, uint32_t bufferLen)
 {
     return ReadFile(AUTH_RESULT_PATH, AUTH_RESULT_CODE_FILE_NAME, buffer, bufferLen);
 }
+
+// 写入满载情况
+int32_t OEMWriteFullLoadStatus(const char* data, uint32_t len)
+{
+    if (CreateFile(AUTH_RESULT_PATH, FULL_LOAD_STATUS_FILE_NAME) != 0) {
+        return ATTEST_ERR;
+    }
+    return WriteFile(AUTH_RESULT_PATH, FULL_LOAD_STATUS_FILE_NAME, data, len);
+}
+
+// 读取满载情况
+int32_t OEMReadFullLoadStatus(char* buffer, uint32_t bufferLen)
+{
+    return ReadFile(AUTH_RESULT_PATH, FULL_LOAD_STATUS_FILE_NAME, buffer, bufferLen);
+}

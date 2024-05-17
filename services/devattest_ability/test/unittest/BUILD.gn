@@ -16,7 +16,7 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 
 ##############################test_devattestservice##########################################
 ohos_unittest("test_devattestservice") {
-  module_out_path = "devattest/devattest_ability"
+  module_out_path = devattest_unittest_module_path
   include_dirs = [
     "include",
     "${devattest_path}/common",

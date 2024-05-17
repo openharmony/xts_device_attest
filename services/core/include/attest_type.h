@@ -80,6 +80,9 @@ extern "C" {
 
 #define SHA256_OUTPUT_SIZE 32
 
+#define MAX_ATTEST_FULL_LOAD_STATUS_LEN 35
+#define MAX_ATTEST_FULL_LOAD_STATUS_TIMES 4
+
 // 认证接口返回值，与json结构一一对应
 typedef struct {
     int32_t errorCode;

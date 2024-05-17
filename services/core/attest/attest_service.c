@@ -15,6 +15,7 @@
 
 #include <string.h>
 #include <securec.h>
+#include <math.h>
 #include "pthread.h"
 #include "time.h"
 #include "attest_type.h"
@@ -32,6 +33,8 @@
 #include "attest_service_challenge.h"
 #include "attest_network.h"
 #include "attest_service.h"
+#include "cJSON.h"
+#include "attest_utils_json.h"
 
 pthread_mutex_t g_mtxAttest = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t g_authStatusMutex;
@@ -53,6 +56,66 @@ static void UpdateAuthResultCode(uint8_t authResultCode)
     AttestWriteAuthResultCode((char*)&authResultCode, 1);
     g_authResultCode = authResultCode;
     pthread_mutex_unlock(&g_authStatusMutex);
+}
+
+static int32_t RecordFullLoadStatus(bool isCreate, double curHour, double number)
+{
+    double curNumber = number;
+    if (isCreate) {
+        curNumber = 1;
+    }
+
+    cJSON *root = cJSON_CreateObject();
+    if (cJSON_AddNumberToObject(root, "Hour", curHour) == NULL ||\
+        cJSON_AddNumberToObject(root, "Number", curNumber) == NULL) {
+        ATTEST_LOG_ERROR("[RecordFullLoadStatus] Failed to add");
+        cJSON_Delete(root);
+        return ATTEST_ERR;
+    }
+
+    char *data = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+    int32_t ret = AttestWriteFullLoadStatus(data, strlen(data));
+    ATTEST_MEM_FREE(data);
+    return ret;
+}
+
+static int32_t IsFullLoad(void)
+{
+    time_t timet;
+    (void)time(&timet);
+    struct tm* timePacket = gmtime(&timet);
+    if (timePacket == NULL) {
+        ATTEST_LOG_ERROR("[IsFullLoad] Failed to get time");
+        return ATTEST_ERR;
+    }
+    int32_t curHour = timePacket->tm_mday * 24 + timePacket->tm_hour;
+
+    char data[MAX_ATTEST_FULL_LOAD_STATUS_LEN + 1] = {0};
+    int32_t ret = AttestReadFullLoadStatus(data, MAX_ATTEST_FULL_LOAD_STATUS_LEN);
+    if (ret != ATTEST_OK) {
+        return RecordFullLoadStatus(true, curHour, ATTEST_OK);
+    }
+
+    double recordHour = GetObjectItemValueNumber(data, "Hour");
+    if (isnan(recordHour)) {
+        ATTEST_LOG_ERROR("[IsFullLoad] recordHour is nan.");
+        return ATTEST_ERR;
+    }
+    double recordNumber = GetObjectItemValueNumber(data, "Number");
+    if (isnan(recordNumber)) {
+        ATTEST_LOG_ERROR("[IsFullLoad] recordNumber is nan.");
+        return ATTEST_ERR;
+    }
+    if ((recordHour == (double)curHour) && (recordNumber >= MAX_ATTEST_FULL_LOAD_STATUS_TIMES)) {
+        ATTEST_LOG_ERROR("[IsFullLoad] Full load limit");
+        return ATTEST_ERR;
+    } else if (recordHour == (double)curHour) {
+        ret = RecordFullLoadStatus(false, curHour, recordNumber + 1);
+    } else {
+        ret = RecordFullLoadStatus(false, curHour, 1);
+    }
+    return ret;
 }
 
 static int32_t ResetDevice(void)
@@ -271,7 +334,7 @@ static int32_t ProcAttestImpl(void)
         DestroySysData();
         return ATTEST_ERR;
     }
-    // 检查本地数据是否修改或过期，进行重新认证
+    // 检查本地数据是否修改或过期，进行重新验证
     if (!IsAuthStatusChg()) {
         ATTEST_LOG_WARN("[ProcAttestImpl] There is no change on auth status.");
         UpdateAuthResultCode(AUTH_SUCCESS);
@@ -284,6 +347,7 @@ static int32_t ProcAttestImpl(void)
         DestroySysData();
         return ATTEST_ERR;
     }
+    // 走授权验证流程
     ret = AttestStartup(authResult);
     DestroySysData();
     DestroyAuthResult(&authResult);
@@ -301,6 +365,12 @@ int32_t ProcAttest(void)
         ATTEST_LOG_INFO("[ProcAttest] Init mem node list, retValue = %d.", retValue);
     }
     do {
+        ret = IsFullLoad();
+        if (ret != ATTEST_OK) {
+            ATTEST_LOG_ERROR("[ProcAttest] Process stopped, ret = %d.", ret);
+            break;
+        }
+
         // init network server info
         ret = InitNetworkServerInfo();
         if (ret != ATTEST_OK) {
@@ -317,7 +387,7 @@ int32_t ProcAttest(void)
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ProcAttest] Proc Attest failed, ret = %d.", ret);
         }
-    }while (0);
+    } while (0);
     if (ATTEST_DEBUG_MEMORY_LEAK) {
         PrintMemNodeList();
         retValue = DestroyMemNodeList();
@@ -440,6 +510,7 @@ static int32_t QueryAttestStatusSwitch(int32_t** resultArray, int32_t arraySize,
         ATTEST_LOG_ERROR("[QueryAttestStatusSwitch] parameter wrong");
         return ATTEST_ERR;
     }
+
     int32_t ret = ATTEST_ERR;
     int32_t authResultCode = GetAuthResultCode();
     switch (authResultCode) {

@@ -36,12 +36,12 @@ int32_t GenResetMsg(ChallengeResult* challengeResult, DevicePacket** devPacket)
 
     uint8_t tokenId[TOKEN_ID_LEN + 1] = {0};
     uint8_t tokenValueHmac[TOKEN_VALUE_HMAC_LEN + 1] = {0};
-    if (GetTokenValueHmac(challengeResult->challenge, tokenValueHmac, TOKEN_VALUE_HMAC_LEN) != ATTEST_OK ||
-        GetTokenId(tokenId, TOKEN_ID_LEN) != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[GenResetMsg] Get device token failed.");
+    int32_t ret = GetTokenValueAndId(challengeResult->challenge, tokenValueHmac, TOKEN_VALUE_HMAC_LEN,\
+        tokenId, TOKEN_ID_LEN);
+    if (ret != ATTEST_OK) {
         return ATTEST_ERR;
     }
- 
+
     DevicePacket* devicePacket = CreateDevicePacket();
     if (devicePacket == NULL) {
         ATTEST_LOG_ERROR("[GenResetMsg] Create DevicePacket failed.");

@@ -21,7 +21,7 @@ using namespace OHOS::DevAttest;
 int main(int argc, char *arg[])
 {
     AttestResultInfo attestResultInfo;
-    int res = DelayedSingleton<DevAttestClient>::GetInstance()->GetAttestStatus(attestResultInfo);
+    int res = DevAttestClient::GetInstance().GetAttestStatus(attestResultInfo);
     if (res != DEVATTEST_SUCCESS) {
         printf("[DEVATTEST]AttestTest client main fail!\n");
         return DEVATTEST_FAIL;

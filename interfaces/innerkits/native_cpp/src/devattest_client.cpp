@@ -25,12 +25,11 @@ namespace DevAttest {
 using namespace std;
 using namespace OHOS;
 constexpr int32_t ATTEST_LOADSA_TIMEOUT_MS = 10000;
-DevAttestClient::DevAttestClient()
-{
-}
 
-DevAttestClient::~DevAttestClient()
+DevAttestClient &DevAttestClient::GetInstance()
 {
+    static DevAttestClient instance;
+    return instance;
 }
 
 sptr<DevAttestInterface> DevAttestClient::GetDeviceProfileService()
@@ -86,30 +85,25 @@ bool DevAttestClient::LoadDevAttestProfile()
         return false;
     }
     // 阻塞
-    bool waitStatus = proxyConVar_.wait_for(lock, std::chrono::milliseconds(ATTEST_LOADSA_TIMEOUT_MS),
-        [this]() { return attestClientInterface_ != nullptr; });
-    if (!waitStatus) {
-        HILOGE("[LoadDevAttestProfile] load sa timeout");
-        return false;
-    }
+    proxyConVar_.wait_for(lock, std::chrono::milliseconds(ATTEST_LOADSA_TIMEOUT_MS));
     return true;
 }
 
 void DevAttestClient::LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject)
 {
-    std::lock_guard<std::mutex> lock(clientLock_);
-    if (remoteObject == nullptr) {
-        return;
-    }
+    std::unique_lock<std::mutex> lock(clientLock_);
     attestClientInterface_ = iface_cast<DevAttestInterface>(remoteObject);
+    lock.unlock();
     proxyConVar_.notify_one();
     return;
 }
 
 void DevAttestClient::LoadSystemAbilityFail()
 {
-    std::lock_guard<std::mutex> lock(clientLock_);
+    std::unique_lock<std::mutex> lock(clientLock_);
     attestClientInterface_ = nullptr;
+    lock.unlock();
+    proxyConVar_.notify_one();
     return;
 }
 

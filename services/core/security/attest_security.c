@@ -129,7 +129,7 @@ int32_t Base64Encode(const uint8_t* srcData, size_t srcDataLen, uint8_t* base64E
     int32_t ret = mbedtls_base64_encode(NULL, 0, &outLen, srcData, srcDataLen);
 
     if ((outLen == 0) || (outLen > base64EncodeMaxLen)) {
-        ATTEST_LOG_ERROR("[Base64Encode] Base64 encode get outLen failed, outLen = %u, ret = -0x00%x", outLen, -ret);
+        ATTEST_LOG_ERROR("[Base64Encode] Base64 encode get outLen failed, outLen = %zu, ret = -0x00%x", outLen, -ret);
         return ERR_ATTEST_SECURITY_BASE64_ENCODE;
     }
     uint8_t base64Data[outLen];

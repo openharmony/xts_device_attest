@@ -103,7 +103,7 @@ int32_t ReadTicketFromDevice(char* ticket, uint8_t ticketLen)
                       aesKey, decryptedTicket, MAX_TICKET_LEN);
         (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
         if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ReadTicketFromDevice] Decrypt token value failed, ret = %d");
+            ATTEST_LOG_ERROR("[ReadTicketFromDevice] Decrypt token value failed, ret = %d", ret);
             return ERR_ATTEST_SECURITY_DECRYPT;
         }
     }

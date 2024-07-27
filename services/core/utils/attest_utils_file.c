@@ -174,7 +174,7 @@ int32_t ReadFile(const char* path, const char* fileName, char* buffer, uint32_t 
     return ATTEST_OK;
 }
 
-int32_t CreateFileImpl(char* formatPath, const char* fileName)
+static int32_t CreateFileImpl(char* formatPath, const char* fileName)
 {
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;
     if (realPathLen > PATH_MAX) {

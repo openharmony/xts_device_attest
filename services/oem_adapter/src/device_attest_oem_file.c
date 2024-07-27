@@ -162,7 +162,7 @@ int32_t OEMReadFile(const char* path, const char* fileName, char* buffer, uint32
     return DEVICE_ATTEST_OEM_OK;
 }
 
-int32_t OEMCreateFileImpl(char* formatPath, const char* fileName)
+static int32_t OEMCreateFileImpl(char* formatPath, const char* fileName)
 {
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;
     if (realPathLen > PATH_MAX) {

@@ -174,21 +174,8 @@ int32_t ReadFile(const char* path, const char* fileName, char* buffer, uint32_t 
     return ATTEST_OK;
 }
 
-int32_t CreateFile(const char* path, const char* fileName)
+int32_t CreateFileImpl(char* formatPath, const char* fileName)
 {
-    if (path == NULL || fileName == NULL) {
-        return ATTEST_ERR;
-    }
-    char* formatPath = realpath(path, NULL);
-    if (formatPath == NULL) {
-        ATTEST_LOG_ERROR("[CreateFile] Invalid path of %s or file %s not exist", path, fileName);
-        return ATTEST_ERR;
-    }
-    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) || (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
-        (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
-        free(formatPath);
-        return ATTEST_ERR;
-    }
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;
     if (realPathLen > PATH_MAX) {
         free(formatPath);
@@ -205,6 +192,7 @@ int32_t CreateFile(const char* path, const char* fileName)
         return ATTEST_ERR;
     }
     free(formatPath);
+
     FILE* fp = fopen(realPath, "w");
     if (fp == NULL) {
         ATTEST_MEM_FREE(realPath);
@@ -225,6 +213,26 @@ int32_t CreateFile(const char* path, const char* fileName)
     } while (0);
     (void)fclose(fp);
     return ret;
+}
+
+
+int32_t CreateFile(const char* path, const char* fileName)
+{
+    if (path == NULL || fileName == NULL) {
+        return ATTEST_ERR;
+    }
+    char* formatPath = realpath(path, NULL);
+    if (formatPath == NULL) {
+        ATTEST_LOG_ERROR("[CreateFile] Invalid path of %s or file %s not exist", path, fileName);
+        return ATTEST_ERR;
+    }
+    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        free(formatPath);
+        return ATTEST_ERR;
+    }
+    return CreateFileImpl(formatPath, fileName);
 }
 
 bool IsFileExist(const char* path, const char* fileName)

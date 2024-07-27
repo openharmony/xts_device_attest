@@ -167,13 +167,11 @@ int32_t OEMCreateFile(const char* path, const char* fileName)
     if (path == NULL || fileName == NULL) {
         return DEVICE_ATTEST_OEM_ERR;
     }
-
     char* formatPath = realpath(path, NULL);
     if (formatPath == NULL) {
         return DEVICE_ATTEST_OEM_ERR;
     }
-    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
-        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) || (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
         (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         free(formatPath);
         return DEVICE_ATTEST_OEM_ERR;

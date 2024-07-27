@@ -59,21 +59,25 @@ int32_t OEMGetFileSize(const char* path, const char* fileName, uint32_t* result)
 
     char* formatPath = realpath(filePath, NULL);
     if (formatPath == NULL) {
+        free(filePath);
         return DEVICE_ATTEST_OEM_ERR;
     }
 
     FILE* fp = fopen(formatPath, "r");
     if (fp == NULL) {
         free(formatPath);
+        free(filePath);
         return DEVICE_ATTEST_OEM_ERR;
     }
     if (fseek(fp, 0, SEEK_END) < 0) {
         free(formatPath);
+        free(filePath);
         (void)fclose(fp);
         return DEVICE_ATTEST_OEM_ERR;
     }
     *result = ftell(fp);
     free(formatPath);
+    free(filePath);
     (void)fclose(fp);
     return DEVICE_ATTEST_OEM_OK;
 }
@@ -158,23 +162,11 @@ int32_t OEMReadFile(const char* path, const char* fileName, char* buffer, uint32
     return DEVICE_ATTEST_OEM_OK;
 }
 
-int32_t OEMCreateFile(const char* path, const char* fileName)
+static int32_t OEMCreateFileImpl(char* formatPath, const char* fileName)
 {
-    if (path == NULL || fileName == NULL) {
-        return DEVICE_ATTEST_OEM_ERR;
-    }
-
-    char* formatPath = realpath(path, NULL);
-    if (formatPath == NULL) {
-        return DEVICE_ATTEST_OEM_ERR;
-    }
-    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
-        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
-        (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
-        return DEVICE_ATTEST_OEM_ERR;
-    }
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;
     if (realPathLen > PATH_MAX) {
+        free(formatPath);
         return DEVICE_ATTEST_OEM_ERR;
     }
     char* realPath = (char *)malloc(realPathLen);
@@ -210,4 +202,22 @@ int32_t OEMCreateFile(const char* path, const char* fileName)
     } while (0);
     (void)fclose(fp);
     return ret;
+}
+
+int32_t OEMCreateFile(const char* path, const char* fileName)
+{
+    if (path == NULL || fileName == NULL) {
+        return DEVICE_ATTEST_OEM_ERR;
+    }
+    char* formatPath = realpath(path, NULL);
+    if (formatPath == NULL) {
+        return DEVICE_ATTEST_OEM_ERR;
+    }
+    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+        (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        free(formatPath);
+        return DEVICE_ATTEST_OEM_ERR;
+    }
+    return OEMCreateFileImpl(formatPath, fileName);
 }

@@ -4,7 +4,7 @@
 
 device_attest，设备证明部件，是一个系统服务（SystemAbility）, 是OpenHarmony compatibility agreement约定需要设备厂商在产品中集成的部件，用于支撑生态伙伴完成产品的兼容性测试。其基本功能是看护OpenHarmony生态设备认证结果，通过端云校验机制，支撑OpenHarmony南北向生态统一，保障用户体验。该部件用于标准系统（standard system）。
 生态伙伴（即设备厂商）兼容性测试工作流程：  
-1、设备厂商在[OpenHarmony兼容性平台](https://openatom.cn/atomavatar/#/login?redirect=%2Fauthorize%3Fresponse_type%3Dcode%26client_id%3D6bdacef0a8bd11ec938bd9550d2decfd%26redirect_uri%3Dhttps%3A%2F%2Fcompatibility.openharmony.cn%2Fconsole%26appName%3DOpenHarmony%E8%AE%A4%E8%AF%81%E5%B9%B3%E5%8F%B0%26scope%3D0,1,2,3%26state%3D%2Fpersonal)注册企业账号，完成设备信息登记，将登记的设备信息写入设备，并完成依赖接口适配；  
+1、设备厂商在[OpenHarmony兼容性平台](https://compatibility.openharmony.cn/console/)注册企业账号，完成设备信息登记，将登记的设备信息写入设备，并完成依赖接口适配；  
 2、设备厂商启动认证测试，上传xts测试报告；  
 3、OpenHarmony认证云认证通过设备厂商产品信息，发放token到OpenHarmony兼容性平台；  
 4、设备厂商从OpenHarmony兼容性平台获取token；  

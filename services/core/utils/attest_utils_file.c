@@ -184,8 +184,7 @@ int32_t CreateFile(const char* path, const char* fileName)
         ATTEST_LOG_ERROR("[CreateFile] Invalid path of %s or file %s not exist", path, fileName);
         return ATTEST_ERR;
     }
-    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
-        (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
+    if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) || (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
         (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
         free(formatPath);
         return ATTEST_ERR;
@@ -206,7 +205,6 @@ int32_t CreateFile(const char* path, const char* fileName)
         return ATTEST_ERR;
     }
     free(formatPath);
-
     FILE* fp = fopen(realPath, "w");
     if (fp == NULL) {
         ATTEST_MEM_FREE(realPath);

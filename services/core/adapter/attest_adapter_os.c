@@ -37,7 +37,7 @@ char* OsGetDisplayVersion(void)
 char* OsGetManufacture(void)
 {
     // GetXXX()会返回一段malloc内存,需手动释放
-    char* manufacture = GetManufacture();
+    const char* manufacture = GetManufacture();
     if (manufacture == NULL) {
         return NULL;
     }
@@ -49,7 +49,7 @@ char* OsGetManufacture(void)
 char* OsGetProductModel(void)
 {
     // GetXXX()会返回一段malloc内存,需手动释放
-    char* productModel = GetProductModel();
+    const char* productModel = GetProductModel();
     if (productModel == NULL) {
         return NULL;
     }

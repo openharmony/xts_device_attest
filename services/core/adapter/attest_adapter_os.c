@@ -36,12 +36,26 @@ char* OsGetDisplayVersion(void)
 
 char* OsGetManufacture(void)
 {
-    return AttestStrdup(GetManufacture());
+    // GetXXX()会返回一段malloc内存,需手动释放
+    char* manufacture = GetManufacture();
+    if (manufacture == NULL) {
+        return NULL;
+    }
+    char* res = AttestStrdup(manufacture);
+    ATTEST_MEM_FREE(manufacture);
+    return res;
 }
 
 char* OsGetProductModel(void)
 {
-    return AttestStrdup(GetProductModel());
+    // GetXXX()会返回一段malloc内存,需手动释放
+    char* productModel = GetProductModel();
+    if (productModel == NULL) {
+        return NULL;
+    }
+    char* res = AttestStrdup(productModel);
+    ATTEST_MEM_FREE(productModel);
+    return res;
 }
 
 char* OsGetBrand(void)

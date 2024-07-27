@@ -59,21 +59,25 @@ int32_t OEMGetFileSize(const char* path, const char* fileName, uint32_t* result)
 
     char* formatPath = realpath(filePath, NULL);
     if (formatPath == NULL) {
+        free(filePath);
         return DEVICE_ATTEST_OEM_ERR;
     }
 
     FILE* fp = fopen(formatPath, "r");
     if (fp == NULL) {
         free(formatPath);
+        free(filePath);
         return DEVICE_ATTEST_OEM_ERR;
     }
     if (fseek(fp, 0, SEEK_END) < 0) {
         free(formatPath);
+        free(filePath);
         (void)fclose(fp);
         return DEVICE_ATTEST_OEM_ERR;
     }
     *result = ftell(fp);
     free(formatPath);
+    free(filePath);
     (void)fclose(fp);
     return DEVICE_ATTEST_OEM_OK;
 }
@@ -171,10 +175,12 @@ int32_t OEMCreateFile(const char* path, const char* fileName)
     if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
         (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
         (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        free(formatPath);
         return DEVICE_ATTEST_OEM_ERR;
     }
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;
     if (realPathLen > PATH_MAX) {
+        free(formatPath);
         return DEVICE_ATTEST_OEM_ERR;
     }
     char* realPath = (char *)malloc(realPathLen);

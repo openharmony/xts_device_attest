@@ -187,10 +187,12 @@ int32_t CreateFile(const char* path, const char* fileName)
     if ((strlen(formatPath) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
         (strlen(fileName) >= MAX_ATTEST_MALLOC_BUFF_SIZE) ||\
         (strlen(formatPath) + strlen(fileName)) >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
+        free(formatPath);
         return ATTEST_ERR;
     }
     uint32_t realPathLen = strlen(formatPath) + 1 + strlen(fileName) + 1;
     if (realPathLen > PATH_MAX) {
+        free(formatPath);
         return ATTEST_ERR;
     }
     char* realPath = (char *)ATTEST_MEM_MALLOC(realPathLen);

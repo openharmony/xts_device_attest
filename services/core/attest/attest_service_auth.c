@@ -621,10 +621,14 @@ void InitSoftwareResultDetail(SoftwareResultDetail* softwareResultDetail)
 void DestroyAuthStatus(AuthStatus** authStat)
 {
     if (authStat == NULL) {
-        ATTEST_LOG_ERROR("[DestroyAuthStatus] Invalid parameter");
+        ATTEST_LOG_ERROR("[DestroyAuthStatus] Invalid parameter , authStat is null");
         return;
     }
     AuthStatus* authStatus = *authStat;
+    if (authStatus == NULL) {
+        ATTEST_LOG_ERROR("[DestroyAuthStatus] Invalid parameter , authStatus is null");
+        return;
+    }
     ATTEST_MEM_FREE(authStatus->versionId);
     ATTEST_MEM_FREE(authStatus->authType);
     ATTEST_MEM_FREE(authStatus->softwareResultDetail);

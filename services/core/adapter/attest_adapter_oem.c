@@ -98,24 +98,30 @@ int32_t OEMWriteTicket(const TicketInfo* ticketInfo)
 // 是否存在网络配置信息
 bool OEMIsNetworkConfigExist(void)
 {
-    return false
+    return false;
 }
 
 // 写入网络配置信息
 int32_t OEMWriteNetworkConfig(const char* buffer, uint32_t bufferLen)
 {
+    (void)buffer;
+    (void)bufferLen;
     return 0;
 }
 
 // 读取网络配置信息
 int32_t OEMReadNetworkConfig(char* buffer, uint32_t bufferLen)
 {
+    (void)buffer;
+    (void)bufferLen;
     return 0;
 }
 
 // 读取默认网络配置信息
 int32_t OEMReadDefaultNetworkConfig(char* buffer, uint32_t bufferLen)
 {
+    (void)buffer;
+    (void)bufferLen;
     return 0;
 }
 

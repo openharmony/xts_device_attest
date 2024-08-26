@@ -98,28 +98,25 @@ int32_t OEMWriteTicket(const TicketInfo* ticketInfo)
 // 是否存在网络配置信息
 bool OEMIsNetworkConfigExist(void)
 {
-    return IsFileExist(AUTH_RESULT_PATH, NETWORK_CONFIG_FILE_NAME);
+    return false
 }
 
 // 写入网络配置信息
 int32_t OEMWriteNetworkConfig(const char* buffer, uint32_t bufferLen)
 {
-    if (CreateFile(AUTH_RESULT_PATH, NETWORK_CONFIG_FILE_NAME) != 0) {
-        return ATTEST_ERR;
-    }
-    return WriteFile(AUTH_RESULT_PATH, NETWORK_CONFIG_FILE_NAME, buffer, bufferLen);
+    return 0;
 }
 
 // 读取网络配置信息
 int32_t OEMReadNetworkConfig(char* buffer, uint32_t bufferLen)
 {
-    return ReadFile(AUTH_RESULT_PATH, NETWORK_CONFIG_FILE_NAME, buffer, bufferLen);
+    return 0;
 }
 
 // 读取默认网络配置信息
 int32_t OEMReadDefaultNetworkConfig(char* buffer, uint32_t bufferLen)
 {
-    return ReadFile(ETC_DEVICE_ATTEST_PATH, NETWORK_CONFIG_FILE_NAME, buffer, bufferLen);
+    return 0;
 }
 
 // 写入认证结果

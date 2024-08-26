@@ -60,13 +60,6 @@ config("devattest_core_config") {
   defines += [ "OPENSSL_SUPPRESS_DEPRECATED" ]
 }
 
-ohos_prebuilt_etc("network_config.json") {
-  source = "network_config.json"
-  relative_install_dir = "device_attest"
-  subsystem_name = "xts"
-  part_name = "device_attest"
-}
-
 ohos_shared_library("devattest_core") {
   version_script = "libdevattest_core.map"
 
@@ -83,8 +76,6 @@ ohos_shared_library("devattest_core") {
   configs = [ ":devattest_core_config" ]
 
   deps = core_deps
-
-  deps += [ ":network_config.json" ]
 
   external_deps = core_external_deps
 

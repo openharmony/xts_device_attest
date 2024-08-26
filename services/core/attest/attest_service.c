@@ -365,7 +365,7 @@ int32_t ProcAttest(void)
         ATTEST_LOG_INFO("[ProcAttest] Init mem node list, retValue = %d.", retValue);
     }
     do {
-        if (ret == 0){
+        if (ret == 0) {
             break;
         }
         ret = IsFullLoad();

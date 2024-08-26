@@ -365,7 +365,9 @@ int32_t ProcAttest(void)
         ATTEST_LOG_INFO("[ProcAttest] Init mem node list, retValue = %d.", retValue);
     }
     do {
-        break;
+        if (ret == 0){
+            break;
+        }
         ret = IsFullLoad();
         if (ret != ATTEST_OK) {
             ATTEST_LOG_ERROR("[ProcAttest] Process stopped, ret = %d.", ret);

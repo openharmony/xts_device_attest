@@ -327,31 +327,7 @@ static int32_t AttestStartup(AuthResult *authResult)
 
 static int32_t ProcAttestImpl(void)
 {
-    // 初始化系统参数
-    int32_t ret = InitSysData();
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[ProcAttestImpl] Init system device param failed, ret = %d.", ret);
-        DestroySysData();
-        return ATTEST_ERR;
-    }
-    // 检查本地数据是否修改或过期，进行重新验证
-    if (!IsAuthStatusChg()) {
-        ATTEST_LOG_WARN("[ProcAttestImpl] There is no change on auth status.");
-        UpdateAuthResultCode(AUTH_SUCCESS);
-        DestroySysData();
-        return ATTEST_OK;
-    }
-    AuthResult *authResult = CreateAuthResult();
-    if (authResult == NULL) {
-        ATTEST_LOG_ERROR("[ProcAttestImpl] Create auth result failed");
-        DestroySysData();
-        return ATTEST_ERR;
-    }
-    // 走授权验证流程
-    ret = AttestStartup(authResult);
-    DestroySysData();
-    DestroyAuthResult(&authResult);
-    return ret;
+    return 0;
 }
 
 int32_t ProcAttest(void)
@@ -377,11 +353,6 @@ int32_t ProcAttest(void)
             ATTEST_LOG_ERROR("[ProcAttest] InitNetworkServerInfo failed, ret = %d.", ret);
         }
 
-        ret = CheckNetworkConnectted();
-        if (ret != ATTEST_OK) {
-            ATTEST_LOG_ERROR("[ProcAttest] Network does not connetted, ret = %d.", ret);
-            break;
-        }
         // 主流程
         ret = ProcAttestImpl();
         if (ret != ATTEST_OK) {

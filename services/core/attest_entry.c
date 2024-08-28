@@ -45,19 +45,7 @@ int32_t AttestWaitTaskOver(void)
 
 int32_t AttestCreateTimerTask(void)
 {
-    if (g_ProcAttestTimerId != NULL) {
-        return ATTEST_OK;
-    }
-
-    int32_t ret = AttestStartTimerTask(ATTEST_TIMER_TYPE_PERIOD,
-        EXPIRED_INTERVAL,
-        &ProcAttest,
-        NULL,
-        &g_ProcAttestTimerId);
-    if (ret != ATTEST_OK) {
-        ATTEST_LOG_ERROR("[AttestCreateTimerTask] Create Periodic TimerTask failed, ret = %d.", ret);
-    }
-    return ret;
+    return 0;
 }
 
 int32_t AttestDestroyTimerTask(void)

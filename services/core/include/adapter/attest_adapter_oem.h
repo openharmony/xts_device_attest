@@ -35,7 +35,6 @@ typedef enum {
 #define AUTH_RESULT_CODE_FILE_NAME "auth_result_code"
 #define TICKET_FILE_NAME "ticket"
 #define RESET_FLAG_FILE_NAME "reset_flag"
-#define NETWORK_CONFIG_FILE_NAME "network_config.json"
 #define FULL_LOAD_STATUS_FILE_NAME "full_load_status"
 
 int32_t OEMWriteTicket(const TicketInfo* ticketInfo);

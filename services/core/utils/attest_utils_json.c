@@ -35,11 +35,11 @@ int32_t GetObjectItemValueObject(const char* rootStr, const char* key, char** va
         return ATTEST_ERR;
     }
 
-    cJSON *item = cJSON_GetObjectItem(root, key);  
-    if (item == NULL) {  
-        cJSON_Delete(root);  
-        return ATTEST_ERR; 
-    } 
+    cJSON *item = cJSON_GetObjectItem(root, key);
+    if (item == NULL) {
+        cJSON_Delete(root);
+        return ATTEST_ERR;
+    }
 
     char *valueString = cJSON_PrintUnformatted(item);
     cJSON_Delete(root);

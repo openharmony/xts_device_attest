@@ -70,7 +70,7 @@ int DevAttestServiceStub::GetAttestStatusInner(MessageParcel& data, MessageParce
         return DEVATTEST_FAIL;
     }
     if (ret == DEVATTEST_SUCCESS) {
-        sptr<AttestResultInfo> attestResultInfoPtr = (std::make_unique<AttestResultInfo>(attestResultInfo)).release();
+        std::unique_ptr<AttestResultInfo> attestResultInfoPtr = std::make_unique<AttestResultInfo>(attestResultInfo);
         if (!attestResultInfoPtr->Marshalling(reply)) {
             HILOGE("[GetAttestStatusInner] stub Marshalling failed");
             return DEVATTEST_FAIL;

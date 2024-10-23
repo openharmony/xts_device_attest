@@ -980,7 +980,7 @@ static const char* SkipBlank(const char* appearAddr, size_t offsetLen)
         ATTEST_LOG_ERROR("[SkipBlank] Invalid parameter.");
         return NULL;
     }
-    int32_t blankLen = 0;
+    uint32_t blankLen = 0;
     while ((appearAddr + offsetLen + blankLen) != NULL) {
         if (appearAddr[offsetLen + blankLen] != ' ') {
             break;

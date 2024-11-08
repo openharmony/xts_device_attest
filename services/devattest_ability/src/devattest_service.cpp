@@ -66,7 +66,8 @@ void DevAttestService::OnStart(const SystemAbilityOnDemandReason& startReason)
             HILOGE("[OnStart] Failed to CreateThread");
         }
     } else {
-        std::unique_ptr<DevAttestSystemAbilityListener> pListener = std::make_unique<DevAttestSystemAbilityListener>();
+        sptr<DevAttestSystemAbilityListener> pListener =
+            (std::make_unique<DevAttestSystemAbilityListener>()).release();
         if (!pListener->AddDevAttestSystemAbilityListener(COMM_NET_CONN_MANAGER_SA_ID)) {
             HILOGE("[OnStart] AddDevAttestSystemAbilityListener failed.");
         }

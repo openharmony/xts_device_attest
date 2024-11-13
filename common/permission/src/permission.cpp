@@ -47,11 +47,14 @@ bool Permission::IsSystem()
             result = TokenIdKit::IsSystemAppByFullTokenID(IPCSkeleton::GetCallingFullTokenID());
             break;
         case ATokenTypeEnum::TOKEN_NATIVE:
+            HILOGD("[IsSystem] type switch in ATokenTypeEnum.TOKEN_NATIVE")
         case ATokenTypeEnum::TOKEN_SHELL:
             result = true;
             break;
         case ATokenTypeEnum::TOKEN_INVALID:
+            HILOGD("[IsSystem] type switch in ATokenTypeEnum.TOKEN_INVALID")
         case ATokenTypeEnum::TOKEN_TYPE_BUTT:
+            HILOGD("[IsSystem] type switch in ATokenTypeEnum.TOKEN_TYPE_BUTT")
             break;
     }
     if (!result) {
@@ -76,11 +79,14 @@ bool Permission::IsPermissionGranted(const std::string& perm)
             result = AccessTokenKit::VerifyAccessToken(tokenId, perm);
             break;
         case ATokenTypeEnum::TOKEN_NATIVE:
+            HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_NATIVE")
         case ATokenTypeEnum::TOKEN_SHELL:
             result = PermissionState::PERMISSION_GRANTED;
             break;
         case ATokenTypeEnum::TOKEN_INVALID:
+            HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_INVALID")
         case ATokenTypeEnum::TOKEN_TYPE_BUTT:
+            HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_TYPE_BUTT")
             break;
     }
     if (result == PermissionState::PERMISSION_DENIED) {

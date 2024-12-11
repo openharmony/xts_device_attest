@@ -48,11 +48,15 @@ bool Permission::IsSystem()
             break;
         case ATokenTypeEnum::TOKEN_NATIVE:
             HILOGD("[IsSystem] type switch in ATokenTypeEnum.TOKEN_NATIVE");
+            result = true;
+            break;
         case ATokenTypeEnum::TOKEN_SHELL:
+            HILOGD("[IsSystem] type switch in ATokenTypeEnum.TOKEN_SHELL");
             result = true;
             break;
         case ATokenTypeEnum::TOKEN_INVALID:
             HILOGD("[IsSystem] type switch in ATokenTypeEnum.TOKEN_INVALID");
+            break;
         case ATokenTypeEnum::TOKEN_TYPE_BUTT:
             HILOGD("[IsSystem] type switch in ATokenTypeEnum.TOKEN_TYPE_BUTT");
             break;
@@ -76,15 +80,20 @@ bool Permission::IsPermissionGranted(const std::string& perm)
     int32_t result = PermissionState::PERMISSION_DENIED;
     switch (type) {
         case ATokenTypeEnum::TOKEN_HAP:
+            HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_HAP");
             result = AccessTokenKit::VerifyAccessToken(tokenId, perm);
             break;
         case ATokenTypeEnum::TOKEN_NATIVE:
             HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_NATIVE");
+            result = PermissionState::PERMISSION_GRANTED;
+            break;
         case ATokenTypeEnum::TOKEN_SHELL:
+            HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_SHELL");
             result = PermissionState::PERMISSION_GRANTED;
             break;
         case ATokenTypeEnum::TOKEN_INVALID:
             HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_INVALID");
+            break;
         case ATokenTypeEnum::TOKEN_TYPE_BUTT:
             HILOGD("[IsPermissionGranted] type switch in ATokenTypeEnum.TOKEN_TYPE_BUTT");
             break;

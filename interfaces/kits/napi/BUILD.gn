@@ -44,6 +44,7 @@ ohos_shared_library("deviceattest") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "ipc:ipc_single"
   ]
 
   relative_install_dir = "module"

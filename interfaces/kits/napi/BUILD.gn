@@ -43,6 +43,7 @@ ohos_shared_library("deviceattest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "napi:ace_napi",
   ]
 

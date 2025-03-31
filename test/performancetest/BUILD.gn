@@ -17,7 +17,7 @@ import("//test/xts/device_attest/build/devattestconfig.gni")
 
 ##############################test_devattestclient_performance####################################
 ohos_unittest("test_devattestclient_performance") {
-  module_out_path = "devattest/devattest_performance"
+  module_out_path = "device_attest/device_attest"
 
   include_dirs = [
     "include",
@@ -48,7 +48,7 @@ ohos_unittest("test_devattestclient_performance") {
 
 ##############################test_devattestservice_performance####################################
 ohos_unittest("test_devattestservice_performance") {
-  module_out_path = "devattest/devattest_performance"
+  module_out_path = "device_attest/device_attest"
 
   include_dirs = [
     "include",

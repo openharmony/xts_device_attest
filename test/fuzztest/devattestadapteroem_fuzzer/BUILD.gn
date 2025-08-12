@@ -46,15 +46,14 @@ ohos_fuzztest("DevattestAdapterOemFuzzTest") {
 
   defines = [ "ATTEST_HILOG_LEVEL = 1" ]
 
-  deps = [
-    "//third_party/mbedtls:mbedtls_shared",
-    "//third_party/openssl:libcrypto_shared",
-    "//third_party/openssl:libssl_shared",
-  ]
+  deps = []
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "mbedtls:mbedtls_shared",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
   ]
 }

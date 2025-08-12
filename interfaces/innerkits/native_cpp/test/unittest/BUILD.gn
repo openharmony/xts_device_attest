@@ -22,7 +22,6 @@ ohos_unittest("test_devattestclient") {
     "${devattest_path}/common",
     "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
-    "//third_party/googletest/include",
   ]
 
   sources = [
@@ -32,7 +31,6 @@ ohos_unittest("test_devattestclient") {
 
   deps = [
     "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -40,6 +38,7 @@ ohos_unittest("test_devattestclient") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gtest_main",
   ]
 
   subsystem_name = "xts"
@@ -54,7 +53,6 @@ ohos_unittest("test_devattestclient_proxy") {
     "${devattest_path}/common",
     "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
-    "//third_party/googletest/include",
   ]
 
   sources = [
@@ -64,7 +62,6 @@ ohos_unittest("test_devattestclient_proxy") {
 
   deps = [
     "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -72,6 +69,7 @@ ohos_unittest("test_devattestclient_proxy") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gtest_main",
   ]
 
   subsystem_name = "xts"

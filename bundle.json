@@ -32,13 +32,12 @@
         "syscap_codec",
         "init",
         "eventhandler",
-        "huks"
-      ],
-      "third_party": [
+        "huks",
         "cJSON",
         "openssl",
         "mbedtls"
-      ]
+      ],
+      "third_party": []
     },
     "build": {
       "sub_component": [

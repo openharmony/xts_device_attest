@@ -23,20 +23,19 @@ ohos_unittest("test_devattestservice") {
     "${devattest_path}/common/log",
     "${devattest_innerkit_path}/native_cpp/include",
     "${devattest_path}/services/devattest_ability/include",
-    "//third_party/googletest/include",
   ]
 
   sources = [ "src/devattest_service_test.cpp" ]
 
   deps = [
     "${devattest_path}/services/devattest_ability:devattest_service",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
+    "googletest:gtest_main",
   ]
 
   subsystem_name = "xts"

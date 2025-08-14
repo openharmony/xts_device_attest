@@ -57,7 +57,6 @@ ohos_unittest("test_devattestservice_performance") {
     "${devattest_path}/common/permission/include",
     "${devattest_innerkit_path}/native_cpp/include",
     "${devattest_path}/services/devattest_ability/include",
-    "//third_party/googletest/include",
   ]
 
   sources = [
@@ -74,7 +73,6 @@ ohos_unittest("test_devattestservice_performance") {
 
   deps = [
     "${devattest_path}/services/core:devattest_core",
-    "//third_party/googletest:gtest_main",
   ]
 
   # service
@@ -85,6 +83,7 @@ ohos_unittest("test_devattestservice_performance") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gtest_main",
   ]
 
   # for permission

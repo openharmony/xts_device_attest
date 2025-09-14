@@ -136,10 +136,10 @@ int32_t DevAttestServiceProxyTest::GetAttestStatus(AttestResultInfo &attestResul
 
 namespace {
 /**
- * @tc.name: CheckSystemAbilityTest001
- * @tc.desc: Calculating the time spent calling the samgr external interface.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name CheckSystemAbilityTest001
+ * @tc.desc Calculating the time spent calling the samgr external interface.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestClientPerformanceTest, CheckSystemAbilityTest001, TestSize.Level0)
 {
@@ -165,10 +165,10 @@ HWTEST_F (DevAttestClientPerformanceTest, CheckSystemAbilityTest001, TestSize.Le
 }
 
 /**
- * @tc.name: GetAttestStatusTest001
- * @tc.desc: Calculating the time spent calling the client external interface when SA does not exist.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name GetAttestStatusTest001
+ * @tc.desc Calculating the time spent calling the client external interface when SA does not exist.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest001, TestSize.Level0)
 {
@@ -190,10 +190,10 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest001, TestSize.Level
 }
 
 /**
- * @tc.name: GetAttestStatusTest002
- * @tc.desc: Calculating the time spent calling the client external interface when SA exists.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name GetAttestStatusTest002
+ * @tc.desc Calculating the time spent calling the client external interface when SA exists.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest002, TestSize.Level0)
 {
@@ -213,10 +213,10 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest002, TestSize.Level
 }
 
 /**
- * @tc.name: GetAttestStatusTest003
- * @tc.desc: Calculating the time spent calling the client_proxy external interface when SA exists.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name GetAttestStatusTest003
+ * @tc.desc Calculating the time spent calling the client_proxy external interface when SA exists.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest003, TestSize.Level0)
 {
@@ -242,10 +242,10 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest003, TestSize.Level
 }
 
 /**
- * @tc.name: GetAttestStatusTest004
- * @tc.desc: Calculating the time spent calling the IPC remote interface when SA exists.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name GetAttestStatusTest004
+ * @tc.desc Calculating the time spent calling the IPC remote interface when SA exists.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest004, TestSize.Level0)
 {
@@ -272,10 +272,10 @@ HWTEST_F (DevAttestClientPerformanceTest, GetAttestStatusTest004, TestSize.Level
 }
 
 /**
- * @tc.name: ParcelTest001
- * @tc.desc: Calculating the time spent calling the Parcel interface.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name ParcelTest001
+ * @tc.desc Calculating the time spent calling the Parcel interface.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestClientPerformanceTest, ParcelTest001, TestSize.Level0)
 {

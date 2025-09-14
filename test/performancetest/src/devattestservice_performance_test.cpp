@@ -80,10 +80,10 @@ void DevAttestservicePerformanceTest::TearDown(void)
 
 namespace {
 /**
- * @tc.name: GetAttestStatusTest001
- * @tc.desc: Calculating the time spent calling the service_stub external interface.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name GetAttestStatusTest001
+ * @tc.desc Calculating the time spent calling the service_stub external interface.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest001, TestSize.Level0)
 {
@@ -119,10 +119,10 @@ HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest001, TestSize.Leve
 }
 
 /**
- * @tc.name: GetAttestStatusTest002
- * @tc.desc: Calculating the time spent calling the service external interface.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name GetAttestStatusTest002
+ * @tc.desc Calculating the time spent calling the service external interface.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest002, TestSize.Level0)
 {
@@ -142,10 +142,10 @@ HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest002, TestSize.Leve
 }
 
 /**
- * @tc.name: GetAttestStatusTest003
- * @tc.desc: Calculating the time spent calling the core external interface.
- * @tc.type: FUNC
- * @tc.require: Issue I7JVMY
+ * @tc.name GetAttestStatusTest003
+ * @tc.desc Calculating the time spent calling the core external interface.
+ * @tc.type FUNC
+ * @tc.require Issue I7JVMY
  */
 HWTEST_F (DevAttestservicePerformanceTest, GetAttestStatusTest003, TestSize.Level0)
 {

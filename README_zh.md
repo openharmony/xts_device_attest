@@ -74,4 +74,4 @@ device_attest，设备证明部件，是一个系统服务（SystemAbility）, �
 
 **xts\_device\_attest**
 
-[xts\_device\_attest\_lite](https://gitee.com/openharmony-sig/xts_device_attest_lite/)
+[xts\_device\_attest\_lite](https://gitcode.com/openharmony-sig/xts_device_attest_lite/)

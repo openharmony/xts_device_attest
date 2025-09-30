@@ -195,4 +195,4 @@ Take rk3568 as an example
 
 **xts\_device\_attest**
 
-[xts\_device\_attest\_lite](https://gitee.com/openharmony-sig/xts_device_attest_lite/)
+[xts\_device\_attest\_lite](https://gitcode.com/openharmony-sig/xts_device_attest_lite/)

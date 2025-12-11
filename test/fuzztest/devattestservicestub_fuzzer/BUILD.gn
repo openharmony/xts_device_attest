@@ -39,6 +39,7 @@ ohos_fuzztest("DevattestServiceStubFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "bounds_checking_function:libsec_shared",
     "ipc:ipc_core",
   ]
 }

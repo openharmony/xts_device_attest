@@ -42,6 +42,7 @@ ohos_shared_library("deviceattest") {
   deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
   external_deps = [
     "c_utils:utils",
+    "bounds_checking_function:libsec_shared",
     "hilog:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",

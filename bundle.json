@@ -26,6 +26,7 @@
         "ipc",
         "hilog",
         "c_utils",
+        "bounds_checking_function",
         "napi",
         "netmanager_base",
         "access_token",

@@ -33,6 +33,7 @@ ohos_unittest("test_devattestservice") {
 
   external_deps = [
     "c_utils:utils",
+    "bounds_checking_function:libsec_shared",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "googletest:gtest_main",

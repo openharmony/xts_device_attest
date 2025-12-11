@@ -35,6 +35,7 @@ ohos_unittest("test_devattestclient") {
 
   external_deps = [
     "c_utils:utils",
+    "bounds_checking_function:libsec_shared",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -66,6 +67,7 @@ ohos_unittest("test_devattestclient_proxy") {
 
   external_deps = [
     "c_utils:utils",
+    "bounds_checking_function:libsec_shared",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

@@ -30,7 +30,10 @@ ohos_executable("attesttestclient") {
 
   deps = [ "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk" ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "bounds_checking_function:libsec_shared",
+  ]
 
   subsystem_name = "xts"
   part_name = "device_attest"

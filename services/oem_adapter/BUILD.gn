@@ -29,6 +29,7 @@ ohos_shared_library("device_attest_oem_adapter") {
     debug = false
   }
 
+  stack_protector_ret = true
   branch_protector_ret = "pac_ret"
 
   sources = [

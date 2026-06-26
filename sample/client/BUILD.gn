@@ -21,6 +21,9 @@ ohos_executable("attesttestclient") {
     debug = false
   }
 
+  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
+
   sources = [ "devattest_main_client.cpp" ]
 
   include_dirs = [

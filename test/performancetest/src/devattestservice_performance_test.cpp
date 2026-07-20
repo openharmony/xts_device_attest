@@ -17,8 +17,8 @@
 
 #include <string>
 #include <unistd.h>
-#include <securec.h>
 #include <sys/timeb.h>
+#include "securec.h"
 #include "singleton.h"
 #include "devattest_errno.h"
 #include "devattest_service.h"

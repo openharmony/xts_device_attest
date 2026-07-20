@@ -15,7 +15,7 @@
 
 #include "devattest_service.h"
 
-#include <securec.h>
+#include "securec.h"
 #include "iservice_registry.h"
 #include "devattest_errno.h"
 #include "devattest_log.h"

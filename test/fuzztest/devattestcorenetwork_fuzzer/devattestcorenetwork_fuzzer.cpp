@@ -16,7 +16,7 @@
 #include "devattestcorenetwork_fuzzer.h"
 
 #include <string>
-#include <securec.h>
+#include "securec.h"
 #include "attest_service_active.h"
 #include "attest_service_auth.h"
 #include "attest_service_reset.h"

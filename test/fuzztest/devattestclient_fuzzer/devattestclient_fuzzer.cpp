@@ -16,7 +16,7 @@
 #include "devattestclient_fuzzer.h"
 
 #include <string>
-#include <securec.h>
+#include "securec.h"
 #include "devattest_client.h"
 
 using namespace std;

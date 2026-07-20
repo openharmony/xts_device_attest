@@ -15,7 +15,7 @@
 
 #include "devattest_network_callback.h"
 
-#include <securec.h>
+#include "securec.h"
 #include "singleton.h"
 #include "devattest_log.h"
 #include "devattest_errno.h"

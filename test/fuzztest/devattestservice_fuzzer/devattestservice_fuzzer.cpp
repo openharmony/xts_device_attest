@@ -16,7 +16,7 @@
 #include "devattestservice_fuzzer.h"
 
 #include <string>
-#include <securec.h>
+#include "securec.h"
 #include "devattest_service.h"
 
 using namespace std;

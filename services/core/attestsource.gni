@@ -58,6 +58,7 @@ core_deps = [
 
 core_external_deps = [
   "c_utils:utils",
+  "bounds_checking_function:libsec_shared",
   "hilog:libhilog",
   "huks:libhukssdk",
   "init:libbegetutil",

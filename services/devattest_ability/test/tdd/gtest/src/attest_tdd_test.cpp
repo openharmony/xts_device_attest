@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <securec.h>
 #include <gtest/gtest.h>
 
+#include "securec.h"
 #include "devattest_log.h"
 #include "attest_entry.h"
 #include "attest_result_info.h"

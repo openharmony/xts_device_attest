@@ -18,8 +18,8 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <securec.h>
 #include <limits.h>
+#include "securec.h"
 #include "attest_utils_log.h"
 #include "attest_utils.h"
 #include "attest_utils_file.h"

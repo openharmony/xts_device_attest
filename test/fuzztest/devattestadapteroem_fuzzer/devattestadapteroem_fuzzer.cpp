@@ -16,7 +16,7 @@
 #include "devattestadapteroem_fuzzer.h"
 
 #include <string>
-#include <securec.h>
+#include "securec.h"
 #include "attest_adapter_oem.h"
 
 using namespace std;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <securec.h>
+#include "securec.h"
 #include "attest_utils_file.h"
 #include "attest_adapter_oem.h"
 

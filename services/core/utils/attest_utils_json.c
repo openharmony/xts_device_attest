@@ -17,9 +17,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <securec.h>
 #include <math.h>
 #include "cJSON.h"
+#include "securec.h"
 #include "attest_type.h"
 #include "attest_utils.h"
 #include "attest_utils_json.h"

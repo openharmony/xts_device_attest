@@ -15,7 +15,7 @@
 
 #include <unistd.h>
 #include <limits.h>
-#include <securec.h>
+#include "securec.h"
 #include "device_attest_oem_file.h"
 
 #define MAX_ATTEST_MALLOC_BUFF_SIZE 1024

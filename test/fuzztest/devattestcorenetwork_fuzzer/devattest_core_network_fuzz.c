@@ -17,7 +17,7 @@
 
 #include <ctype.h>
 #include <string.h>
-#include <securec.h>
+#include "securec.h"
 
 typedef enum ATTEST_HTTPHEAD_TYPE {
     ATTEST_HTTPS_RESCODE = 0,

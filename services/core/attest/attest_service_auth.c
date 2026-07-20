@@ -14,7 +14,7 @@
  */
 
 #include <string.h>
-#include <securec.h>
+#include "securec.h"
 #include "cJSON.h"
 #include "mbedtls/base64.h"
 #include "attest_utils_log.h"

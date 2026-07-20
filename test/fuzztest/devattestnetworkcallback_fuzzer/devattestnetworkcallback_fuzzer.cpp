@@ -16,7 +16,7 @@
 #include "devattestnetworkcallback_fuzzer.h"
 
 #include <string>
-#include <securec.h>
+#include "securec.h"
 #include "devattest_network_callback.h"
 
 using namespace std;

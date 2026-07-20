@@ -15,9 +15,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <securec.h>
 #include <signal.h>
 #include <pthread.h>
+#include "securec.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_utils_timer.h"

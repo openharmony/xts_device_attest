@@ -14,8 +14,8 @@
  */
 
 #include <string.h>
-#include <securec.h>
 #include <math.h>
+#include "securec.h"
 #include "pthread.h"
 #include "time.h"
 #include "attest_type.h"

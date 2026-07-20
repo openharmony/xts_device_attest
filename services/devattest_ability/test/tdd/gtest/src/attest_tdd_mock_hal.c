@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <securec.h>
 #include <stdbool.h>
+#include "securec.h"
 #include "attest_type.h"
 #include "attest_tdd_test.h"
 #include "attest_tdd_mock_hal.h"

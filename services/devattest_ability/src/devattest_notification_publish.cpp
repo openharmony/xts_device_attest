@@ -15,7 +15,7 @@
 
 #include "devattest_notification_publish.h"
 
-#include <securec.h>
+#include "securec.h"
 #include "notification_helper.h"
 #include "notification_content.h"
 #include "notification_request.h"

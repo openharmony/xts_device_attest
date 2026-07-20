@@ -14,7 +14,7 @@
  */
 
 #include <ctype.h>
-#include <securec.h>
+#include "securec.h"
 #include "attest_utils.h"
 #include "attest_utils_log.h"
 #include "attest_tdd_data_transfer.h"

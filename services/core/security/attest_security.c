@@ -14,7 +14,7 @@
  */
 
 #include <stdbool.h>
-#include <securec.h>
+#include "securec.h"
 #include "mbedtls/base64.h"
 #include "mbedtls/cipher.h"
 #include "mbedtls/aes.h"

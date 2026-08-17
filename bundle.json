@@ -28,6 +28,7 @@
         "c_utils",
         "bounds_checking_function",
         "napi",
+        "node",
         "netmanager_base",
         "access_token",
         "syscap_codec",

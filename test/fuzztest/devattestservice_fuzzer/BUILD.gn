@@ -35,7 +35,10 @@ ohos_fuzztest("DevattestServiceFuzzTest") {
 
   sources = [ "devattestservice_fuzzer.cpp" ]
 
-  deps = [ "${devattest_path}/services/devattest_ability:devattest_service" ]
+  deps = [
+    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
+    "${devattest_path}/services/devattest_ability:devattest_service",
+  ]
 
   external_deps = [
     "c_utils:utils",

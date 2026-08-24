@@ -13,7 +13,6 @@
 
 1.0 {
   global:
-    *AttestResultInfo*;
     *DevAttestService*;
   local:
     *;

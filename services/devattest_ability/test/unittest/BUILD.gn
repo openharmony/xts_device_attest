@@ -28,6 +28,7 @@ ohos_unittest("test_devattestservice") {
   sources = [ "src/devattest_service_test.cpp" ]
 
   deps = [
+    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
     "${devattest_path}/services/devattest_ability:devattest_service",
   ]
 

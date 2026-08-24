@@ -42,7 +42,6 @@ ohos_shared_library("devattest_service") {
 
   sources = [
     "${devattest_path}/common/permission/src/permission.cpp",
-    "src/attest_result_info.cpp",
     "src/devattest_network_callback.cpp",
     "src/devattest_network_manager.cpp",
     "src/devattest_service.cpp",
@@ -53,7 +52,10 @@ ohos_shared_library("devattest_service") {
 
   configs = [ ":devattest_service_config" ]
 
-  deps = [ "${devattest_path}/services/core:devattest_core" ]
+  deps = [
+    "${devattest_path}/interfaces/innerkits/native_cpp:devattest_sdk",
+    "${devattest_path}/services/core:devattest_core",
+  ]
 
   # service
   external_deps = [

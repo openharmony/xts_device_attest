@@ -24,6 +24,8 @@ config("devattest_kit_config") {
 }
 
 ohos_shared_library("deviceattest") {
+  version_script = "libdeviceattest.map"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true

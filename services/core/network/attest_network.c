@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <ctype.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -41,6 +40,7 @@
 #include "attest_type.h"
 #include "attest_adapter.h"
 #include "attest_network.h"
+#include "parse_https_resp_int32.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -950,30 +950,6 @@ static int32_t SendHttpsMsg(const char *postData, char **respData)
     return ret;
 }
 
-static int32_t StringToInt32(const char *value, int32_t len, int32_t *intPara)
-{
-    if (value == NULL || intPara == NULL) {
-        return ATTEST_ERR;
-    }
-    if (len <= 0 || len >= MAX_ATTEST_MALLOC_BUFF_SIZE) {
-        return ATTEST_ERR;
-    }
-    char *httpValue = (char *)ATTEST_MEM_MALLOC(len + 1);
-    if (httpValue == NULL) {
-        return ATTEST_ERR;
-    }
-    memset_s(httpValue, len + 1, 0, len + 1);
-    int32_t ret = memcpy_s(httpValue, len + 1, value, len);
-    if (ret != ATTEST_OK) {
-        ATTEST_MEM_FREE(httpValue);
-        return ATTEST_ERR;
-    }
-
-    *intPara = atoi(httpValue);
-    ATTEST_MEM_FREE(httpValue);
-    return ATTEST_OK;
-}
-
 static const char* SkipBlank(const char* appearAddr, size_t offsetLen)
 {
     if (appearAddr == NULL || offsetLen == 0 || offsetLen > MAX_ATTEST_MALLOC_BUFF_SIZE) {
@@ -1020,23 +996,11 @@ static int32_t ParseHttpsRespIntPara(char *respMsg, int32_t httpType, int32_t *i
         ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] SkipBlank failed");
         return ATTEST_ERR;
     }
-    int32_t len = 0;
-    while ((httpValueAddr + len) != NULL) {
-        if (isdigit(httpValueAddr[len])) {
-            len++;
-            if (len > ATTEST_MAX_INT32_BIT) {
-                len = -1;
-                break;
-            }
-        } else {
-            break;
-        }
-    }
-    if (len <= 0) {
-        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] get digit failed");
+    if (!ParseHttpsRespInt32(httpValueAddr, intPara)) {
+        ATTEST_LOG_ERROR("[ParseHttpsRespIntPara] leftover HTTPS integer parse failed");
         return ATTEST_ERR;
     }
-    return StringToInt32(httpValueAddr, len, intPara);
+    return ATTEST_OK;
 }
 
 static int32_t ParseHttpsResp(char *respMsg, char **outBody)

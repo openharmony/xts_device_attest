@@ -26,6 +26,7 @@ sources_notmock = [
   "${attest_core_path}/attest/attest_service_reset.c",
   "${attest_core_path}/attest/attest_service_device.c",
   "${attest_core_path}/network/attest_network.c",
+  "${attest_core_path}/network/parse_https_resp_int32.cpp",
   "${attest_core_path}/security/attest_security.c",
   "${attest_core_path}/security/attest_security_token.c",
   "${attest_core_path}/security/attest_security_ticket.c",
